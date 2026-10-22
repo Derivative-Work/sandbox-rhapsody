@@ -146,3 +146,7 @@ Every human action: timestamp, what, why, and which production rule allows it. R
   - closer cuts and more drums at the end.
 
   All addressed in v3 (production log).
+
+## 2026-10-22T14:19:31-04:00 — Correction
+
+- The entry above says "Thirteen notes"; it was twelve, as listed.
