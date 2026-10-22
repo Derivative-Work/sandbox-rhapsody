@@ -191,6 +191,7 @@ These rules apply in every set:
 
 - **Glass:** raytraced refraction and dithered transparency were both tried and rejected (production log, step 3).
 - **Texture:** none painted. Text (signs, sticky notes, decals, displays) is the only "texture", rendered from fonts.
+- **Legibility:** every sign must read in the widest shot that shows it: opaque backing, letters at least ~2.5% of frame height there, no thin weights, and dark enough ink that bloom and AgX don't wash it out (C1: the SIMULATION decal).
 
 ### Lighting (`lights`, `cards`)
 
