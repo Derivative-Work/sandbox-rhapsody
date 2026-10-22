@@ -64,3 +64,11 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 - **What:** The human approved C1 ("much better, keep going"): `style/style_spec.md`, `config/look.json`, and the set A test frames `renders/c1/c1_v2_A_close.png` and `renders/c1/c1_v3_A_wide.png` (sheet `renders/c1/c1_v3_sheet.jpg`).
 - **Decided with it:** 60 fps; the coloured violet surround as the reading of "dark void"; the set A dressing as built.
 - **Rule:** R1.
+
+## 2026-10-22T06:16:02-04:00 — C2 approved — R1
+
+- **What:** The human approved C2 ("keep going"):
+  - the retroactive Suno and post-filter log entries;
+  - the master offset check (0 samples);
+  - `timing/midi_inventory.md`, with per-track shifts and the brass, FX and percussion stem substitutions.
+- **Rule:** R1.
