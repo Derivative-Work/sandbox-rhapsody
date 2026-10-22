@@ -1,0 +1,61 @@
+{
+ "mix": "audio/track/It Was Just a Benchmark.wav",
+ "master": "audio/master/sandbox_rhapsody_master_nofallback.wav",
+ "sr": 48000,
+ "mix_frames": 15504000,
+ "master_frames": 15504000,
+ "global_lag_samples": 0,
+ "global_norm_peak": 0.9999,
+ "windows_30s": [
+  {
+   "start_s": 0.0,
+   "lag_samples": 0,
+   "norm_peak": 1.0
+  },
+  {
+   "start_s": 30.0,
+   "lag_samples": 0,
+   "norm_peak": 1.0
+  },
+  {
+   "start_s": 60.0,
+   "lag_samples": 0,
+   "norm_peak": 1.0
+  },
+  {
+   "start_s": 90.0,
+   "lag_samples": 0,
+   "norm_peak": 1.0
+  },
+  {
+   "start_s": 120.0,
+   "lag_samples": 0,
+   "norm_peak": 1.0
+  },
+  {
+   "start_s": 150.0,
+   "lag_samples": 0,
+   "norm_peak": 0.9999
+  },
+  {
+   "start_s": 180.0,
+   "lag_samples": 0,
+   "norm_peak": 0.9999
+  },
+  {
+   "start_s": 210.0,
+   "lag_samples": 0,
+   "norm_peak": 0.9999
+  },
+  {
+   "start_s": 240.0,
+   "lag_samples": 0,
+   "norm_peak": 0.9999
+  },
+  {
+   "start_s": 270.0,
+   "lag_samples": 0,
+   "norm_peak": 1.0
+  }
+ ]
+}
