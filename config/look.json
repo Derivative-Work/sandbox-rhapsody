@@ -1,0 +1,37 @@
+{
+  "_doc": "The video's look as numbers, read by scenes/blender/lib/sr_kit.py. PROVISIONAL until style/style_spec.md is written from the reference measurements; every value there is copied here.",
+  "fps": 60,
+  "agx_look": "AgX - Punchy",
+  "exposure": 0.0,
+  "palette": {
+    "void": "#0a0814",
+    "floor": "#08070d",
+    "chrome": "#c9ccd2",
+    "probe": "#d4d7dd",
+    "lens": "#0b0d12",
+    "shadow": "#0a0c12",
+    "amber": "#ffa21f",
+    "lab": "#e6edf5",
+    "lab_dark": "#2a3442",
+    "lab_glow": "#9cc8ff",
+    "glass": "#f4f8ff",
+    "brass": "#c8963c",
+    "note": "#f2d64b",
+    "key": "#ffcf8f",
+    "fill": "#7a63d6",
+    "rim": "#a9d2ff",
+    "horizon": "#2a2046"
+  },
+  "materials": {
+    "plastic_roughness": 0.12,
+    "plastic_coat": 0.6,
+    "chrome_roughness": 0.05,
+    "floor_roughness": 0.06
+  },
+  "lights": {
+    "key": 5000,
+    "fill": 1500,
+    "rim": 6000
+  },
+  "stars": 1.2
+}

@@ -1,0 +1,1173 @@
+{
+  "acoustic-curves": {
+    "width": 1440,
+    "height": 1080,
+    "fps": 59.94,
+    "duration_s": 336.048,
+    "stills_every5s": 67,
+    "scene_changes": 11,
+    "avg_shot_length_s": 28.0,
+    "mean_brightness": 0.358,
+    "dark_fraction": 0.129,
+    "mean_saturation": 0.566,
+    "accent_fraction": 0.249,
+    "palette": [
+      {
+        "hex": "#40221a",
+        "share": 0.246
+      },
+      {
+        "hex": "#220f09",
+        "share": 0.2
+      },
+      {
+        "hex": "#663522",
+        "share": 0.172
+      },
+      {
+        "hex": "#4c3e4a",
+        "share": 0.127
+      },
+      {
+        "hex": "#8a5536",
+        "share": 0.104
+      },
+      {
+        "hex": "#7b6578",
+        "share": 0.057
+      },
+      {
+        "hex": "#b78556",
+        "share": 0.051
+      },
+      {
+        "hex": "#d4b6aa",
+        "share": 0.042
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#64301d",
+        "share": 0.352
+      },
+      {
+        "hex": "#784227",
+        "share": 0.284
+      },
+      {
+        "hex": "#945a30",
+        "share": 0.183
+      },
+      {
+        "hex": "#b37544",
+        "share": 0.117
+      },
+      {
+        "hex": "#d6ad51",
+        "share": 0.035
+      },
+      {
+        "hex": "#423785",
+        "share": 0.029
+      }
+    ]
+  },
+  "aqua-harp": {
+    "width": 1440,
+    "height": 1080,
+    "fps": 59.94,
+    "duration_s": 228.028,
+    "stills_every5s": 46,
+    "scene_changes": 1,
+    "avg_shot_length_s": 114.01,
+    "mean_brightness": 0.271,
+    "dark_fraction": 0.16,
+    "mean_saturation": 0.558,
+    "accent_fraction": 0.136,
+    "palette": [
+      {
+        "hex": "#1b1733",
+        "share": 0.331
+      },
+      {
+        "hex": "#382e43",
+        "share": 0.181
+      },
+      {
+        "hex": "#3b2015",
+        "share": 0.148
+      },
+      {
+        "hex": "#0c0917",
+        "share": 0.147
+      },
+      {
+        "hex": "#773d21",
+        "share": 0.075
+      },
+      {
+        "hex": "#b06032",
+        "share": 0.05
+      },
+      {
+        "hex": "#65526c",
+        "share": 0.048
+      },
+      {
+        "hex": "#a693b1",
+        "share": 0.02
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#8c4722",
+        "share": 0.29
+      },
+      {
+        "hex": "#6a341e",
+        "share": 0.288
+      },
+      {
+        "hex": "#ae592b",
+        "share": 0.22
+      },
+      {
+        "hex": "#402d6f",
+        "share": 0.104
+      },
+      {
+        "hex": "#cf7d47",
+        "share": 0.075
+      },
+      {
+        "hex": "#6850b8",
+        "share": 0.023
+      }
+    ]
+  },
+  "cathedral-pictures": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 59.94,
+    "duration_s": 367.048,
+    "stills_every5s": 73,
+    "scene_changes": 49,
+    "avg_shot_length_s": 7.34,
+    "mean_brightness": 0.388,
+    "dark_fraction": 0.177,
+    "mean_saturation": 0.389,
+    "accent_fraction": 0.11,
+    "palette": [
+      {
+        "hex": "#37262d",
+        "share": 0.215
+      },
+      {
+        "hex": "#180e12",
+        "share": 0.211
+      },
+      {
+        "hex": "#574756",
+        "share": 0.159
+      },
+      {
+        "hex": "#7f697c",
+        "share": 0.127
+      },
+      {
+        "hex": "#b194a1",
+        "share": 0.1
+      },
+      {
+        "hex": "#6b3623",
+        "share": 0.083
+      },
+      {
+        "hex": "#e2c5d0",
+        "share": 0.06
+      },
+      {
+        "hex": "#ad623e",
+        "share": 0.044
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#6a3220",
+        "share": 0.381
+      },
+      {
+        "hex": "#8d482d",
+        "share": 0.293
+      },
+      {
+        "hex": "#b6613c",
+        "share": 0.178
+      },
+      {
+        "hex": "#d99556",
+        "share": 0.073
+      },
+      {
+        "hex": "#503071",
+        "share": 0.042
+      },
+      {
+        "hex": "#624fa3",
+        "share": 0.032
+      }
+    ]
+  },
+  "drum-machine": {
+    "width": 1440,
+    "height": 1080,
+    "fps": 59.94,
+    "duration_s": 201.048,
+    "stills_every5s": 40,
+    "scene_changes": 0,
+    "avg_shot_length_s": 201.05,
+    "mean_brightness": 0.323,
+    "dark_fraction": 0.157,
+    "mean_saturation": 0.5,
+    "accent_fraction": 0.164,
+    "palette": [
+      {
+        "hex": "#231322",
+        "share": 0.343
+      },
+      {
+        "hex": "#341e39",
+        "share": 0.269
+      },
+      {
+        "hex": "#5c3331",
+        "share": 0.11
+      },
+      {
+        "hex": "#9a523b",
+        "share": 0.084
+      },
+      {
+        "hex": "#5e3f5e",
+        "share": 0.084
+      },
+      {
+        "hex": "#886e79",
+        "share": 0.051
+      },
+      {
+        "hex": "#d6816b",
+        "share": 0.035
+      },
+      {
+        "hex": "#d397cc",
+        "share": 0.024
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#9c5237",
+        "share": 0.357
+      },
+      {
+        "hex": "#6e332d",
+        "share": 0.305
+      },
+      {
+        "hex": "#d86c50",
+        "share": 0.131
+      },
+      {
+        "hex": "#4f2967",
+        "share": 0.114
+      },
+      {
+        "hex": "#7c3c85",
+        "share": 0.076
+      },
+      {
+        "hex": "#ca6ce1",
+        "share": 0.017
+      }
+    ]
+  },
+  "fiber-bundles": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 59.94,
+    "duration_s": 316.048,
+    "stills_every5s": 63,
+    "scene_changes": 8,
+    "avg_shot_length_s": 35.12,
+    "mean_brightness": 0.272,
+    "dark_fraction": 0.403,
+    "mean_saturation": 0.656,
+    "accent_fraction": 0.158,
+    "palette": [
+      {
+        "hex": "#050f0a",
+        "share": 0.347
+      },
+      {
+        "hex": "#112d24",
+        "share": 0.249
+      },
+      {
+        "hex": "#225e41",
+        "share": 0.116
+      },
+      {
+        "hex": "#4c3c2d",
+        "share": 0.085
+      },
+      {
+        "hex": "#808c5b",
+        "share": 0.066
+      },
+      {
+        "hex": "#544b8f",
+        "share": 0.056
+      },
+      {
+        "hex": "#c4c2b9",
+        "share": 0.045
+      },
+      {
+        "hex": "#339281",
+        "share": 0.036
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#377529",
+        "share": 0.304
+      },
+      {
+        "hex": "#245066",
+        "share": 0.259
+      },
+      {
+        "hex": "#2b9886",
+        "share": 0.157
+      },
+      {
+        "hex": "#9eb43c",
+        "share": 0.106
+      },
+      {
+        "hex": "#782a1e",
+        "share": 0.097
+      },
+      {
+        "hex": "#644ac3",
+        "share": 0.077
+      }
+    ]
+  },
+  "future-retro": {
+    "width": 1440,
+    "height": 1080,
+    "fps": 59.94,
+    "duration_s": 256.548,
+    "stills_every5s": 51,
+    "scene_changes": 17,
+    "avg_shot_length_s": 14.25,
+    "mean_brightness": 0.271,
+    "dark_fraction": 0.343,
+    "mean_saturation": 0.332,
+    "accent_fraction": 0.082,
+    "palette": [
+      {
+        "hex": "#1b1716",
+        "share": 0.313
+      },
+      {
+        "hex": "#2b2526",
+        "share": 0.307
+      },
+      {
+        "hex": "#3d3543",
+        "share": 0.161
+      },
+      {
+        "hex": "#594d61",
+        "share": 0.08
+      },
+      {
+        "hex": "#9a653b",
+        "share": 0.044
+      },
+      {
+        "hex": "#987c8c",
+        "share": 0.037
+      },
+      {
+        "hex": "#dfaf94",
+        "share": 0.036
+      },
+      {
+        "hex": "#4d42aa",
+        "share": 0.021
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#3b2c78",
+        "share": 0.248
+      },
+      {
+        "hex": "#92572d",
+        "share": 0.223
+      },
+      {
+        "hex": "#b57947",
+        "share": 0.17
+      },
+      {
+        "hex": "#614c25",
+        "share": 0.161
+      },
+      {
+        "hex": "#5147c1",
+        "share": 0.13
+      },
+      {
+        "hex": "#e5bc47",
+        "share": 0.069
+      }
+    ]
+  },
+  "gyro-drums": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 59.94,
+    "duration_s": 250.048,
+    "stills_every5s": 50,
+    "scene_changes": 6,
+    "avg_shot_length_s": 35.72,
+    "mean_brightness": 0.155,
+    "dark_fraction": 0.709,
+    "mean_saturation": 0.548,
+    "accent_fraction": 0.066,
+    "palette": [
+      {
+        "hex": "#060406",
+        "share": 0.386
+      },
+      {
+        "hex": "#151214",
+        "share": 0.327
+      },
+      {
+        "hex": "#2e2729",
+        "share": 0.119
+      },
+      {
+        "hex": "#61412e",
+        "share": 0.051
+      },
+      {
+        "hex": "#474b56",
+        "share": 0.045
+      },
+      {
+        "hex": "#956e46",
+        "share": 0.041
+      },
+      {
+        "hex": "#c7ad6c",
+        "share": 0.018
+      },
+      {
+        "hex": "#787794",
+        "share": 0.015
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#6f4128",
+        "share": 0.333
+      },
+      {
+        "hex": "#9e6b38",
+        "share": 0.279
+      },
+      {
+        "hex": "#cea14b",
+        "share": 0.142
+      },
+      {
+        "hex": "#4f2a6f",
+        "share": 0.106
+      },
+      {
+        "hex": "#3e9168",
+        "share": 0.096
+      },
+      {
+        "hex": "#9345b7",
+        "share": 0.044
+      }
+    ]
+  },
+  "harmonic-voltage": {
+    "width": 1440,
+    "height": 1080,
+    "fps": 59.94,
+    "duration_s": 355.008,
+    "stills_every5s": 71,
+    "scene_changes": 9,
+    "avg_shot_length_s": 35.5,
+    "mean_brightness": 0.269,
+    "dark_fraction": 0.408,
+    "mean_saturation": 0.585,
+    "accent_fraction": 0.216,
+    "palette": [
+      {
+        "hex": "#040406",
+        "share": 0.338
+      },
+      {
+        "hex": "#1e142b",
+        "share": 0.195
+      },
+      {
+        "hex": "#38214f",
+        "share": 0.181
+      },
+      {
+        "hex": "#55336e",
+        "share": 0.134
+      },
+      {
+        "hex": "#7f4e8b",
+        "share": 0.068
+      },
+      {
+        "hex": "#996cda",
+        "share": 0.035
+      },
+      {
+        "hex": "#4435b2",
+        "share": 0.033
+      },
+      {
+        "hex": "#e4b6e5",
+        "share": 0.016
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#422066",
+        "share": 0.352
+      },
+      {
+        "hex": "#5b3182",
+        "share": 0.284
+      },
+      {
+        "hex": "#7840a9",
+        "share": 0.139
+      },
+      {
+        "hex": "#9061df",
+        "share": 0.088
+      },
+      {
+        "hex": "#3431bc",
+        "share": 0.081
+      },
+      {
+        "hex": "#a1385d",
+        "share": 0.057
+      }
+    ]
+  },
+  "heavy-light": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 59.94,
+    "duration_s": 387.288,
+    "stills_every5s": 77,
+    "scene_changes": 13,
+    "avg_shot_length_s": 27.66,
+    "mean_brightness": 0.265,
+    "dark_fraction": 0.353,
+    "mean_saturation": 0.669,
+    "accent_fraction": 0.188,
+    "palette": [
+      {
+        "hex": "#08040a",
+        "share": 0.268
+      },
+      {
+        "hex": "#040a30",
+        "share": 0.197
+      },
+      {
+        "hex": "#2d1e20",
+        "share": 0.177
+      },
+      {
+        "hex": "#563e2c",
+        "share": 0.116
+      },
+      {
+        "hex": "#92683e",
+        "share": 0.081
+      },
+      {
+        "hex": "#c38d53",
+        "share": 0.077
+      },
+      {
+        "hex": "#41345d",
+        "share": 0.07
+      },
+      {
+        "hex": "#8668c2",
+        "share": 0.014
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#af7c46",
+        "share": 0.286
+      },
+      {
+        "hex": "#8f6536",
+        "share": 0.215
+      },
+      {
+        "hex": "#cf9553",
+        "share": 0.186
+      },
+      {
+        "hex": "#6a4827",
+        "share": 0.182
+      },
+      {
+        "hex": "#362d6e",
+        "share": 0.096
+      },
+      {
+        "hex": "#7154d6",
+        "share": 0.036
+      }
+    ]
+  },
+  "pipe-dream": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 59.94,
+    "duration_s": 203.048,
+    "stills_every5s": 41,
+    "scene_changes": 17,
+    "avg_shot_length_s": 11.28,
+    "mean_brightness": 0.347,
+    "dark_fraction": 0.074,
+    "mean_saturation": 0.443,
+    "accent_fraction": 0.108,
+    "palette": [
+      {
+        "hex": "#2d1f34",
+        "share": 0.281
+      },
+      {
+        "hex": "#412e4e",
+        "share": 0.209
+      },
+      {
+        "hex": "#654b5d",
+        "share": 0.117
+      },
+      {
+        "hex": "#57402d",
+        "share": 0.114
+      },
+      {
+        "hex": "#86684b",
+        "share": 0.089
+      },
+      {
+        "hex": "#170e12",
+        "share": 0.089
+      },
+      {
+        "hex": "#a89465",
+        "share": 0.063
+      },
+      {
+        "hex": "#d9bf80",
+        "share": 0.037
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#674924",
+        "share": 0.236
+      },
+      {
+        "hex": "#815e2f",
+        "share": 0.216
+      },
+      {
+        "hex": "#513367",
+        "share": 0.209
+      },
+      {
+        "hex": "#9f7a3b",
+        "share": 0.142
+      },
+      {
+        "hex": "#c79b4b",
+        "share": 0.119
+      },
+      {
+        "hex": "#ddcb5d",
+        "share": 0.079
+      }
+    ]
+  },
+  "pipe-dream-2": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 59.94,
+    "duration_s": 232.048,
+    "stills_every5s": 46,
+    "scene_changes": 6,
+    "avg_shot_length_s": 33.15,
+    "mean_brightness": 0.3,
+    "dark_fraction": 0.156,
+    "mean_saturation": 0.443,
+    "accent_fraction": 0.081,
+    "palette": [
+      {
+        "hex": "#32202f",
+        "share": 0.338
+      },
+      {
+        "hex": "#201213",
+        "share": 0.214
+      },
+      {
+        "hex": "#503e48",
+        "share": 0.155
+      },
+      {
+        "hex": "#56321b",
+        "share": 0.102
+      },
+      {
+        "hex": "#7b6445",
+        "share": 0.091
+      },
+      {
+        "hex": "#ae9c63",
+        "share": 0.047
+      },
+      {
+        "hex": "#807498",
+        "share": 0.028
+      },
+      {
+        "hex": "#d1cca7",
+        "share": 0.024
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#673617",
+        "share": 0.317
+      },
+      {
+        "hex": "#745125",
+        "share": 0.235
+      },
+      {
+        "hex": "#9a5f29",
+        "share": 0.174
+      },
+      {
+        "hex": "#b48343",
+        "share": 0.136
+      },
+      {
+        "hex": "#e2ad5b",
+        "share": 0.073
+      },
+      {
+        "hex": "#453066",
+        "share": 0.066
+      }
+    ]
+  },
+  "pogo-sticks": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 59.94,
+    "duration_s": 200.048,
+    "stills_every5s": 40,
+    "scene_changes": 6,
+    "avg_shot_length_s": 28.58,
+    "mean_brightness": 0.328,
+    "dark_fraction": 0.354,
+    "mean_saturation": 0.644,
+    "accent_fraction": 0.261,
+    "palette": [
+      {
+        "hex": "#10050b",
+        "share": 0.32
+      },
+      {
+        "hex": "#30151c",
+        "share": 0.171
+      },
+      {
+        "hex": "#422152",
+        "share": 0.119
+      },
+      {
+        "hex": "#633231",
+        "share": 0.099
+      },
+      {
+        "hex": "#bf6e61",
+        "share": 0.097
+      },
+      {
+        "hex": "#935146",
+        "share": 0.095
+      },
+      {
+        "hex": "#6f3c73",
+        "share": 0.052
+      },
+      {
+        "hex": "#e09684",
+        "share": 0.046
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#8e4c3c",
+        "share": 0.215
+      },
+      {
+        "hex": "#6a3231",
+        "share": 0.213
+      },
+      {
+        "hex": "#b56153",
+        "share": 0.188
+      },
+      {
+        "hex": "#d98061",
+        "share": 0.138
+      },
+      {
+        "hex": "#3c1d68",
+        "share": 0.138
+      },
+      {
+        "hex": "#6c347b",
+        "share": 0.108
+      }
+    ]
+  },
+  "resonant-chamber": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 59.94,
+    "duration_s": 270.048,
+    "stills_every5s": 54,
+    "scene_changes": 9,
+    "avg_shot_length_s": 27.0,
+    "mean_brightness": 0.295,
+    "dark_fraction": 0.301,
+    "mean_saturation": 0.701,
+    "accent_fraction": 0.235,
+    "palette": [
+      {
+        "hex": "#2c0e10",
+        "share": 0.262
+      },
+      {
+        "hex": "#120406",
+        "share": 0.233
+      },
+      {
+        "hex": "#4a1b17",
+        "share": 0.19
+      },
+      {
+        "hex": "#642d27",
+        "share": 0.119
+      },
+      {
+        "hex": "#834337",
+        "share": 0.084
+      },
+      {
+        "hex": "#a95d47",
+        "share": 0.055
+      },
+      {
+        "hex": "#d78861",
+        "share": 0.035
+      },
+      {
+        "hex": "#eab68b",
+        "share": 0.022
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#6b302b",
+        "share": 0.236
+      },
+      {
+        "hex": "#652015",
+        "share": 0.221
+      },
+      {
+        "hex": "#893d2e",
+        "share": 0.208
+      },
+      {
+        "hex": "#a6503b",
+        "share": 0.158
+      },
+      {
+        "hex": "#c86c4b",
+        "share": 0.09
+      },
+      {
+        "hex": "#e99765",
+        "share": 0.088
+      }
+    ]
+  },
+  "starship-groove": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 59.94,
+    "duration_s": 245.048,
+    "stills_every5s": 49,
+    "scene_changes": 23,
+    "avg_shot_length_s": 10.21,
+    "mean_brightness": 0.219,
+    "dark_fraction": 0.518,
+    "mean_saturation": 0.628,
+    "accent_fraction": 0.085,
+    "palette": [
+      {
+        "hex": "#050209",
+        "share": 0.44
+      },
+      {
+        "hex": "#24161b",
+        "share": 0.156
+      },
+      {
+        "hex": "#3e2b32",
+        "share": 0.146
+      },
+      {
+        "hex": "#53455f",
+        "share": 0.101
+      },
+      {
+        "hex": "#7b4637",
+        "share": 0.065
+      },
+      {
+        "hex": "#b2795f",
+        "share": 0.04
+      },
+      {
+        "hex": "#777595",
+        "share": 0.031
+      },
+      {
+        "hex": "#dfabbf",
+        "share": 0.021
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#6f3227",
+        "share": 0.368
+      },
+      {
+        "hex": "#96553a",
+        "share": 0.264
+      },
+      {
+        "hex": "#ca894d",
+        "share": 0.119
+      },
+      {
+        "hex": "#333c68",
+        "share": 0.115
+      },
+      {
+        "hex": "#6b48a4",
+        "share": 0.078
+      },
+      {
+        "hex": "#36c180",
+        "share": 0.056
+      }
+    ]
+  },
+  "stick-figures": {
+    "width": 1440,
+    "height": 1080,
+    "fps": 59.94,
+    "duration_s": 320.228,
+    "stills_every5s": 64,
+    "scene_changes": 9,
+    "avg_shot_length_s": 32.02,
+    "mean_brightness": 0.295,
+    "dark_fraction": 0.329,
+    "mean_saturation": 0.496,
+    "accent_fraction": 0.208,
+    "palette": [
+      {
+        "hex": "#231a1b",
+        "share": 0.398
+      },
+      {
+        "hex": "#412a23",
+        "share": 0.183
+      },
+      {
+        "hex": "#0a0704",
+        "share": 0.108
+      },
+      {
+        "hex": "#764a2c",
+        "share": 0.102
+      },
+      {
+        "hex": "#ad7543",
+        "share": 0.073
+      },
+      {
+        "hex": "#3c3a68",
+        "share": 0.063
+      },
+      {
+        "hex": "#deb76e",
+        "share": 0.054
+      },
+      {
+        "hex": "#7b8ec5",
+        "share": 0.019
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#6e3f24",
+        "share": 0.302
+      },
+      {
+        "hex": "#965c33",
+        "share": 0.256
+      },
+      {
+        "hex": "#c08142",
+        "share": 0.169
+      },
+      {
+        "hex": "#e4b459",
+        "share": 0.121
+      },
+      {
+        "hex": "#383677",
+        "share": 0.116
+      },
+      {
+        "hex": "#5a66c2",
+        "share": 0.036
+      }
+    ]
+  },
+  "_pooled": {
+    "note": "All fifteen videos, equal weight per video.",
+    "mean_brightness": 0.29,
+    "dark_fraction": 0.305,
+    "mean_saturation": 0.544,
+    "accent_fraction": 0.157,
+    "avg_shot_length_s": 42.73,
+    "palette": [
+      {
+        "hex": "#271c25",
+        "share": 0.283
+      },
+      {
+        "hex": "#0c080c",
+        "share": 0.252
+      },
+      {
+        "hex": "#433651",
+        "share": 0.136
+      },
+      {
+        "hex": "#532e21",
+        "share": 0.111
+      },
+      {
+        "hex": "#86553c",
+        "share": 0.085
+      },
+      {
+        "hex": "#716089",
+        "share": 0.053
+      },
+      {
+        "hex": "#be895d",
+        "share": 0.05
+      },
+      {
+        "hex": "#d0b2b6",
+        "share": 0.03
+      }
+    ],
+    "accents": [
+      {
+        "hex": "#6a3322",
+        "share": 0.268
+      },
+      {
+        "hex": "#8d5031",
+        "share": 0.228
+      },
+      {
+        "hex": "#b36f44",
+        "share": 0.164
+      },
+      {
+        "hex": "#40266a",
+        "share": 0.113
+      },
+      {
+        "hex": "#daa057",
+        "share": 0.082
+      },
+      {
+        "hex": "#5d3892",
+        "share": 0.072
+      },
+      {
+        "hex": "#2c7f51",
+        "share": 0.047
+      },
+      {
+        "hex": "#805dd6",
+        "share": 0.026
+      }
+    ]
+  }
+}
