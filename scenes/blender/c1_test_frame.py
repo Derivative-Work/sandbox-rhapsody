@@ -25,7 +25,7 @@ framing = args[4] if len(args) >= 5 else "close"
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = K.setup_render(bpy.context.scene, w, h, samples)
-S = set_a.build(decal_peel=0.3)
+S = set_a.build(decal_peel=0.6)
 
 # The choir mid-phrase: vents in a wave around the ring; the blade under the lead probe fully open.
 for k, b in enumerate(S["blades"]):

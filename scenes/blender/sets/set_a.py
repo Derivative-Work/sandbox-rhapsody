@@ -23,7 +23,7 @@ def build(decal_peel=0.25):
     out = {"cube": K.glass_cube("sandbox", 2.0)}
 
     # Decal on the front glass, just outside the pane, upper left.
-    out["decal"] = K.decal("decal_sim", "SIMULATION", (-0.42, -1.003, 1.62), (math.pi / 2, 0, 0), (0.86, 0.17),
+    out["decal"] = K.decal("decal_sim", "SIMULATION", (-0.28, -1.003, 1.58), (math.pi / 2, 0, 0), (1.3, 0.27),
                            peel=decal_peel)
 
     # Blade ring: 10 blades x 2 tiers, fronts outward.

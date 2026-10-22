@@ -26,7 +26,9 @@
     "platform": "#14b8a6",
     "alarm": "#ff3b30",
     "paper": "#efe8da",
-    "copper": "#b36f44"
+    "copper": "#b36f44",
+    "decal_film": "#b8b2a8",
+    "decal_ink": "#c41e14"
   },
   "materials": {
     "plastic_roughness": 0.12,

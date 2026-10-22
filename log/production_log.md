@@ -191,3 +191,14 @@ Append-only. One entry per action: timestamp, step (shot ID where relevant), wha
 - **Fixes on the way:** Blender 5 has no `scene.node_tree`; the compositor is now a node group, and the Glare node's type and size are sockets.
 - **Known and deferred:** the build time. The wall of 198 and the swarm (700 probes) move to geometry-nodes instancing when step 7 builds the animated sets; the brief already asks for this.
 - **Why:** Human interventions, C1 rejection (R1).
+
+## 2026-10-22T05:57:37-04:00 — C1: SIMULATION decal made legible
+
+- **What:** The human said the decal was "near-impossible to read". Changes:
+  - **Size:** 1.30 × 0.27 m (was 0.86 × 0.17).
+  - **Film:** opaque off-white (`decal_film` `#b8b2a8`, roughness 0.55) replaces translucent paper, which blew out under the key and bloom.
+  - **Letters:** darker red ink (`decal_ink` `#c41e14`), letter height 0.7 × the film, lightly emboldened (outline offset 0.008 × height). A heavier offset filled the A's crossbar ("SIMULΛTION").
+  - **Peel:** rebuilt as a real curl around a diagonal fold line; the old per-vertex shift made a staircase. Shown at peel 0.6.
+- **Commands:** `blender -b --factory-startup --python scenes/blender/c1_test_frame.py -- renders/c1/c1_v3_A_wide.png 3840 2160 64 wide`; `.venv/bin/python -I scripts/c1_sheet.py renders/c1/c1_v2_A_close.png renders/c1/c1_v3_A_wide.png renders/c1/c1_v3_sheet.jpg`
+- **Outputs:** `renders/c1/c1_v3_A_wide.png`, `renders/c1/c1_v3_sheet.jpg`. Superseded: `archive/renders/c1/c1_v2_A_wide_superseded_decal-illegible.png` and `c1_v2_sheet_superseded_decal-illegible.jpg`. The close frame (v2) has no decal and is unchanged.
+- **Why:** Human feedback on C1 (R1); a rule for every set: signs must read in the widest shot that shows them.

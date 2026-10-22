@@ -752,19 +752,36 @@ def decal(name, body, loc, rot, size, peel=0.0, parent=None):
     film.scale = (w, h, 1)
     bpy.ops.object.transform_apply(scale=True)
     film.parent = root
-    film.data.materials.append(mat_acrylic(f"{name}.film", "paper", alpha=0.55))
-    t = text(f"{name}.text", body, h * 0.62, mat_plastic(f"{name}.ink", "alarm", 0.3), loc=(0, 0, 0.0008), rot=(0, 0, 0),
+    # Opaque film and heavy letters: it has to read in a wide shot (a translucent film with regular-weight red
+    # letters didn't; human, C1 v2).
+    film.data.materials.append(mat_plastic(f"{name}.film", "decal_film", 0.55))  # off-white, so it doesn't bloom
+    t = text(f"{name}.text", body, h * 0.7, mat_plastic(f"{name}.ink", "decal_ink", 0.4), loc=(0, 0, 0.0008), rot=(0, 0, 0),
              font="Inter[opsz,wght].ttf", parent=root)
-    t.data.space_character = 1.12
-    # Curl the film's corner: vertices beyond a diagonal line lift off the glass (+Z, toward the viewer).
+    t.data.space_character = 1.05
+    t.data.offset = h * 0.008  # embolden a little (Inter loads at its default weight); more fills the A's crossbar
+    # Curl the top-right corner: a fold line cuts the corner diagonally; film beyond it rolls up off the glass
+    # (+Z, toward the viewer) around a cylinder of radius R, then continues straight along the tangent. The letters
+    # stay flat: the peel is confined to the corner, past the last letter.
+    n = Vector((w, h * 1.6, 0)).normalized()          # in-plane direction across the fold, toward the corner
+    corner = Vector((w / 2, h / 2, 0))
+    d0 = corner.dot(n) - (0.12 + 0.25 * peel) * h * 1.9  # fold line sits this far in from the corner
+    R = 0.06 * h
+    theta = peel * 2.4                                  # radians of roll at full peel
     for v in film.data.vertices:
-        u = (v.co.x / w + 0.5) + (v.co.y / h + 0.5) * 0.4 - (1.4 - 0.5 * peel)
-        if u > 0:
-            r = 0.05 * h + 0.0001
-            ang = min(u * w / r, math.pi * 0.9) * peel
-            v.co.z = r * (1 - math.cos(ang))
-            v.co.x -= r * (ang - math.sin(ang)) * 0.7
-            v.co.y -= r * (ang - math.sin(ang)) * 0.3
+        p = Vector((v.co.x, v.co.y, 0))
+        d = p.dot(n) - d0
+        if d <= 0 or peel <= 0:
+            continue
+        base = p - n * d
+        arc = R * theta
+        if d <= arc:
+            phi = d / R
+            along, up = R * math.sin(phi), R * (1 - math.cos(phi))
+        else:
+            along = R * math.sin(theta) + (d - arc) * math.cos(theta)
+            up = R * (1 - math.cos(theta)) + (d - arc) * math.sin(theta)
+        q = base + n * along
+        v.co = (q.x, q.y, up)
     return root
 
 
