@@ -63,7 +63,7 @@ def build(decal_peel=0.25):
     for bp, p in zip(sp.bezier_points, pts):
         bp.co = p
         bp.handle_left_type = bp.handle_right_type = "AUTO"
-    cd.use_path = True  # the lead probe rides it in S10 (Follow Path); without this the constraint did nothing
+    cd.use_path = True  # sampled as a path for the lead probe's ride in S10 (_tube_points)
     tube = K.link(bpy.data.objects.new("proxy_tube", cd))
     tube.data.materials.append(K.mat_acrylic("tube", "lab_glow", alpha=0.5, emit=1.2))
     out["tube"] = tube
@@ -316,21 +316,45 @@ def probe_moves(S):
         n.location, n.rotation_euler = n0 + Vector(dloc), rot
         n.keyframe_insert("location", frame=A.frame(t_arrive + dt))
         n.keyframe_insert("rotation_euler", frame=A.frame(t_arrive + dt))
-    # Fixed-location Follow Path adds the probe's own location to the path point, so its location goes from the mouth
-    # to zero while the constraint fades in (both linear): the sum holds still at the mouth through the handover.
-    for loc, t in ((mouth, t_in), (Vector((0, 0, 0)), t_in + 0.5)):
-        p.location = loc
-        p.keyframe_insert("location", frame=A.frame(t))
+    # Into the tube: keyed straight along points sampled from the tube's centre line (a Follow Path constraint
+    # hands over badly: the probe jerked backwards as it took hold; human, C4 v5). It holds at the mouth, then eases
+    # along about 1.6 m by the cut.
+    path = _tube_points(S["tube"])
+    i0 = min(range(len(path)), key=lambda i: (path[i] - mouth).length)
+    dist = [0.0]
+    for i in range(i0 + 1, len(path)):
+        dist.append(dist[-1] + (path[i] - path[i - 1]).length)
+    travel = 1.6
+    fa, fb = A.frame(t_in), A.frame(t11)
     for ax in range(3):
-        for kp in A._fcurve(p, "location", ax).keyframe_points:
-            if A.frame(t_in) <= kp.co.x < A.frame(t_in + 0.5):
-                kp.interpolation = "LINEAR"
-    c = p.constraints.new("FOLLOW_PATH")
-    c.target, c.use_fixed_location, c.use_curve_follow = S["tube"], True, True
-    A.write_keys(p, f'constraints["{c.name}"].influence', [(0, 0.0, "CONSTANT"), (A.frame(t_in), 0.0, "LINEAR"),
-                                                          (A.frame(t_in + 0.5), 1.0, "LINEAR")])
-    # Offsets are by length: 0.088 is the mouth (the grommet), 0.3 about 2.6 m along, just outside the cube.
-    A.write_keys(p, f'constraints["{c.name}"].offset_factor', [(A.frame(t_in + 0.5), 0.088), (A.frame(t11), 0.3)])
+        keys = [(fa, mouth[ax], "LINEAR")]
+        for f in range(fa + 2, fb + 1, 2):
+            u = (f - fa) / (fb - fa)
+            d = travel * u * u * (3 - 2 * u)  # smoothstep: eases in and out
+            j = next((k for k in range(len(dist)) if dist[k] >= d), len(dist) - 1)
+            keys.append((f, path[i0 + j][ax], "LINEAR"))
+        fc = A._fcurve(p, "location", ax)
+        for kp in list(fc.keyframe_points):
+            if kp.co.x > fa:
+                fc.keyframe_points.remove(kp)
+        for f, v, interp in keys:
+            kp = fc.keyframe_points.insert(f, v)
+            kp.interpolation = interp
+
+
+def _tube_points(tube, n=1200):
+    """The tube's centre line as n points along its length (a helper follows the path at each offset)."""
+    helper = bpy.data.objects.new("tube_probe_helper", None)
+    bpy.context.scene.collection.objects.link(helper)
+    c = helper.constraints.new("FOLLOW_PATH")
+    c.target, c.use_fixed_location = tube, True
+    pts = []
+    for k in range(n + 1):
+        c.offset_factor = k / n
+        bpy.context.view_layer.update()
+        pts.append(helper.matrix_world.translation.copy())
+    bpy.data.objects.remove(helper)
+    return pts
 
 
 # ---------------------------------------------------------------- cameras (u = fraction of the shot; eye, target, lens)
@@ -352,7 +376,7 @@ CAMERAS = {
     "S08": [(0.0, _v(2.0, -1.25, 0.8), _v(1.72, -0.78, 0.6), 40), (1.0, _v(1.95, -1.1, 0.75), _v(1.72, -0.78, 0.58), 50)],
     "S09": [(0.0, _v(-2.6, 1.0, 0.55), _v(-2.2, 2.7, 0.35), 32), (1.0, _v(2.6, 1.0, 0.55), _v(2.2, 2.7, 0.35), 32)],
     "S10": [(0.0, _v(1.9, -0.6, 1.0), _v(1.0, 0.55, 0.62), 35), (0.45, _v(1.5, 0.3, 0.7), _v(1.0, 0.55, 0.62), 35),
-            (0.7, _v(1.75, 0.35, 0.75), _v(2.08, 1.13, 0.41), 30), (1.0, _v(2.6, 1.05, 0.65), _v(3.11, 1.92, 0.23), 30)],
+            (0.7, _v(1.45, 0.2, 0.75), _v(1.55, 0.85, 0.52), 30), (1.0, _v(2.0, 0.5, 0.65), _v(2.35, 1.27, 0.37), 30)],
     "S20": [(0.0, _v(3.0, -5.0, 1.8), _v(0, 0, 1.0), 35), (1.0, _v(28.0, -48.0, 20.0), _v(0, 0, 1.0), 35)],
     "S21": [(0.0, _v(1.6, -2.6, 0.5), _v(0.55, -1.0, 0.15), 40), (1.0, _v(1.0, -1.7, 0.3), _v(0.55, -1.0, 0.13), 50)],
     "S23": [(0.0, _v(-0.6, -3.4, 0.9), _v(-1.45, -1.1, 0.05), 35), (1.0, _v(-1.55, -2.0, 0.55), _v(-1.7, -1.05, 0.08), 40)],

@@ -267,7 +267,7 @@ def build():
     for k in range(60):  # log lines, generic (no real systems)
         K.text(f"logline{k}", f"{12 + k // 20:02d}:{(k * 7) % 60:02d}:{(k * 13) % 60:02d}  agent-{(k * 37) % 700:03d}  "
                f"{('GET', 'PUT', 'POST', 'EXEC')[k % 4]} /run/{(k * 53) % 9973}  {('200', '201', '403', '200')[k % 4]}",
-               0.028, ink, loc=(0, 0.06 + 0.05 * k, 0.0), rot=(0, 0, 0), font="JetBrainsMono[wght].ttf",
+               0.028, ink, loc=(0, 0.06 + 0.05 * k, 0.0), rot=(0, 0, 0), font="JetBrainsMono-SemiBold-flat.ttf",
                parent=mover)
     out["log_lines"] = [bpy.data.objects[f"logline{k}"] for k in range(60)]
     inv = K.empty("invoice", (0, 0, 0.0005), mover)
@@ -341,7 +341,7 @@ def build():
     sw.rotation_euler = (0, 0, math.radians(35))
     K.mesh_obj("stopwatch.pillar", bpy.ops.mesh.primitive_cylinder_add, brass, sw, radius=0.14, depth=1.5,
                location=(0, 0, 0.75))
-    K.mesh_obj("stopwatch.face", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("sw_face", "paper", 0.4), sw,
+    K.mesh_obj("stopwatch.face", bpy.ops.mesh.primitive_cylinder_add, K.mat_matte("sw_face", "paper"), sw,
                radius=0.42, depth=0.06, vertices=64, location=(0, 0, 1.95), rotation=(math.pi / 2, 0, 0))
     K.mesh_obj("stopwatch.bezel", bpy.ops.mesh.primitive_torus_add, brass, sw, major_radius=0.42, minor_radius=0.03,
                location=(0, -0.03, 1.95), rotation=(math.pi / 2, 0, 0))
@@ -356,11 +356,20 @@ def build():
     hand = K.empty("stopwatch.hand", (0, -0.041, 1.95), sw)  # in front of the readout window
     K.drive(hand, "rotation_euler", 1, sw, "tick", "-0.2094 * x")  # 30 ticks a turn, anticlockwise: counting down
     _box("stopwatch.needle", K.mat_plastic("needle", "shadow", 0.3), (0, 0, 0.15), (0.016, 0.004, 0.32), hand)
-    # The readout: glowing red digits on a black window, so `30:00` reads under the red light (was dark ink, faint).
-    _box("stopwatch.window", K.mat_plastic("sw_window", "shadow", 0.2), (0, -0.033, 1.765), (0.36, 0.004, 0.14), sw)
-    K.text("stopwatch.readout", "30:00", 0.13, K.mat_emission("readout", "alarm", 12.0), loc=(0, -0.036, 1.765),
-           parent=sw).data.offset = 0.001
-    out["stopwatch"] = sw
+    # The readout: a countdown from `30:00` in glowing red monospace digits on a matte black window (human, C4 v5:
+    # "barely legible and is not counting down"). Each digit cell holds all ten glyphs; animate() shows one at a time.
+    _box("stopwatch.window", K.mat_matte("sw_window", "shadow"), (0, -0.033, 1.76), (0.5, 0.004, 0.19), sw)
+    lit = K.mat_emission("readout", "alarm", 30.0)
+    size, adv = 0.16, 0.096  # JetBrains Mono advances 0.6 em
+    cells = []
+    for i, x in enumerate((-2 * adv, -adv, 0.0, adv, 2 * adv)):
+        if i == 2:
+            K.text("stopwatch.colon", ":", size, lit, loc=(x, -0.036, 1.76), font="JetBrainsMono-SemiBold-flat.ttf",
+                   parent=sw)
+            continue
+        cells.append([K.text(f"stopwatch.d{i}_{g}", str(g), size, lit, loc=(x, -0.036, 1.76),
+                             font="JetBrainsMono-SemiBold-flat.ttf", parent=sw) for g in range(10)])
+    out["stopwatch"], out["stopwatch_digits"] = sw, cells
 
     # Cold storage: a conveyor into a frosted freezer with a vault door.
     _box("conveyor", black, (1.45, -1.4, 0.08), (2.0, 0.3, 0.16), bev=0.01)
@@ -513,7 +522,15 @@ def animate(S, t0, t1):
 
     # Security: the stopwatch ticks a beat at a time under red light (S43).
     a, b = shot["S43"]["cut"], shot["S44"]["cut"]
-    A.stepper(S["stopwatch"], "tick", A.between(A.events("beats"), a, b), pre=2, settle=6, overshoot=0.1)
+    beats = A.between(A.events("beats"), a, b)
+    A.stepper(S["stopwatch"], "tick", beats, pre=2, settle=6, overshoot=0.1)
+    # The readout counts down a second per beat, in step with the hand: 30:00, 29:59, ...
+    shown = [(0, 1800)] + [(A.frame(e["t"]), 1799 - n) for n, e in enumerate(beats)]
+    for c, cell in enumerate(S["stopwatch_digits"]):
+        digit = [(f, int(f"{v // 60:02d}{v % 60:02d}"[c])) for f, v in shown]
+        for g, glyph in enumerate(cell):
+            A.write_keys(glyph, "hide_render", [(f, 0 if d == g else 1, "CONSTANT") for f, d in digit],
+                         interp="CONSTANT")
     A.write_keys(S["alarm_light"].data, "energy", [(0, 0.0), (A.frame(a) - 1, 0.0), (A.frame(a), 60.0),
                                                    (A.frame(b) + 1, 0.0)], interp="CONSTANT")
 

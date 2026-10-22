@@ -31,7 +31,10 @@ import sr_kit as K
 ROAD_X0, MOAT_R0, MOAT_R1, ROAD_X1, ROAD_W = 2.0, 3.0, 3.8, 16.0, 1.6
 GATE_X = 2.45
 YAML = ["egress:", "  allow: true", "proxy:", "  upstream: '*'", "network:", "  mode: offline", "trust: high",
-        "guardrails: []", "metadata:", "  reachable: yes", "tokens:", "  ttl: forever"]
+        "guardrails: []", "metadata:", "  reachable: yes", "tokens:", "  ttl: forever", "sandbox:", "  escape: unlikely",
+        "monitoring:", "  alerts: muted", "evals:", "  watched: sometimes", "credentials:", "  rotate: never",
+        "kill_switch:", "  wired: false", "liability:", "  owner: tbd"]
+YAML_TOP, YAML_LH, YAML_ROWS = 1.8, 0.15, 12  # first line's height on the pane, line height, lines the pane shows
 
 
 # ---------------------------------------------------------------- helpers
@@ -124,7 +127,7 @@ def build():
 
     # S45: the old cube's walls are config files in a code editor, scrolling up: a dark editor pane per wall, line
     # numbers, keys and values in their own colours, in a monospace font (human, C4 v4: "like YAML in a code editor").
-    mono = "JetBrainsMono[wght].ttf"
+    mono = "JetBrainsMono-SemiBold-flat.ttf"
     size, adv = 0.1, 0.06  # JetBrains Mono advances 0.6 em per character
     ink_key = K.mat_emission("yaml_key", "lab_glow", 6.0)
     ink_val = K.mat_emission("yaml_val", "amber", 5.0)
@@ -138,7 +141,7 @@ def build():
         pane = _box(f"yaml_{side}.pane", pane_m, root, (0, 0.012, 1.0), (1.9, 0.004, 1.9))
         lines = []
         for k, body in enumerate(YAML):
-            ln = K.empty(f"yaml_{side}_{k}", (0, 0, 0.15 + 0.15 * k), root)
+            ln = K.empty(f"yaml_{side}_{k}", (0, 0, YAML_TOP - YAML_LH * k), root)
             K.text(f"yaml_{side}_{k}.num", f"{k + 1:>2}", size * 0.85, ink_num, loc=(-0.88, 0, 0), align="LEFT",
                    font=mono, parent=ln)
             key, _, val = body.partition(":")
@@ -525,19 +528,22 @@ def animate(S, t0, t1):
     # Global: the floor ring on the bass.
     A.led_pulse(S["floor_ring"], "pulse", W(A.strikes(bass, 0.05)))
 
-    # S45: config text scrolls up the old walls, then the walls are glass (text gone at S46's cut).
+    # S45: the config files scroll up the old walls, once through from line 1, never wrapping, so the line numbers
+    # run 1, 2, 3... down the pane (they jumped where the lines wrapped round, C4 v5); a line shows only while it is on
+    # the pane. Then the walls are glass (text gone at S46's cut).
     fa, fb = A.frame(cut("S45")) - 2, A.frame(cut("S46")) + 2
     for root, lines, pane in S["yaml"]:
         A.write_keys(pane, "hide_render", [(0, 0, "CONSTANT"), (A.frame(cut("S46")) + 1, 1, "CONSTANT")])
-        n = len(lines)
+        rate = min(3.0, (len(lines) - YAML_ROWS) / ((fb - fa) / A.FPS))  # lines a second, ending on the last line
         for k, t in enumerate(lines):
-            keys = []
+            keys, vis = [], []
             for f in range(fa, fb + 1):
-                u = (k + (f - fa) / A.FPS * 3.0) % n
-                keys.append((f, 0.15 + 0.15 * u, "LINEAR"))
+                z = YAML_TOP - YAML_LH * k + YAML_LH * rate * (f - fa) / A.FPS
+                keys.append((f, z, "LINEAR"))
+                vis.append((f, 0 if 0.08 < z < YAML_TOP + 0.08 and f <= A.frame(cut("S46")) else 1, "CONSTANT"))
             A.write_keys(t, "location", keys, index=2)
             for ch in t.children:
-                A.write_keys(ch, "hide_render", [(0, 0, "CONSTANT"), (A.frame(cut("S46")) + 1, 1, "CONSTANT")])
+                A.write_keys(ch, "hide_render", vis, interp="CONSTANT")
 
     # S46: the road widens out of the tube; lane dashes run out along it.
     a, b = cut("S46"), cut("S47")

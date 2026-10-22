@@ -654,7 +654,7 @@ def glass_cube(name="sandbox", size=2.0, loc=(0, 0, 0)):
 FONTS = ROOT / "assets" / "fonts"
 
 
-def text(name, body, size, mat, loc=(0, 0, 0), rot=(math.pi / 2, 0, 0), font="Inter[opsz,wght].ttf", extrude=0.0,
+def text(name, body, size, mat, loc=(0, 0, 0), rot=(math.pi / 2, 0, 0), font="Inter-Medium-flat.ttf", extrude=0.0,
          align="CENTER", parent=None):
     """A text object (signs, notes, decals, displays): crisp at any resolution, never a painted texture."""
     cu = bpy.data.curves.new(name, "FONT")
@@ -845,7 +845,7 @@ def decal(name, body, loc, rot, size, peel=0.0, parent=None):
     # letters didn't; human, C1 v2).
     film.data.materials.append(mat_matte(f"{name}.film", "decal_film"))  # off-white and matte, so it doesn't bloom or glare
     t = text(f"{name}.text", body, h * 0.7, mat_ink(f"{name}.ink", "decal_ink"), loc=(0, 0, 0.0008), rot=(0, 0, 0),
-             font="Inter[opsz,wght].ttf", parent=root)
+             font="Inter-Medium-flat.ttf", parent=root)
     t.data.space_character = 1.05
     t.data.offset = h * 0.008  # embolden a little (Inter loads at its default weight); more fills the A's crossbar
     # Curl the top-right corner: a fold line cuts the corner diagonally; film beyond it rolls up off the glass

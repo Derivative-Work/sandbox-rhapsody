@@ -192,3 +192,16 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** The human asked whether the dial had been put back; it hadn't rendered (the finger wheel was placed flat under the body). Fixed before v5 (production log).
+
+## 2026-10-22T18:45:52-04:00 — C4 review of animatic v5 (R1)
+
+- **Rule:** R1.
+- **What:** Six notes:
+  - S10: the protagonist backs up far too fast after releasing the sticky note;
+  - S22: the dial should turn, ideally to the "0" position; the hanging handset sits off to the side instead of straight down;
+  - S43: `30:00` is barely legible and doesn't count down;
+  - S45: the line numbers don't increase monotonically;
+  - S60: the flag is barely visible ("probably needs (just a bit more) lighting");
+  - the letter "A" is missing its crossbar throughout.
+
+  Addressed in v6 (production log).

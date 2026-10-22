@@ -79,8 +79,8 @@ def _coil_cord(name, mat, hooks, turns=70, coil_r=0.007, wire_r=0.0018):
     cd.use_path, cd.use_stretch, cd.use_deform_bounds = True, True, True
     sp = cd.splines.new("NURBS")
     sp.points.add(len(hooks) - 1)
-    for pt in sp.points:
-        pt.co = (0, 0, 0, 1)
+    for i, pt in enumerate(sp.points):  # inner points weighted, so the cord hugs them (the drape over the bracket)
+        pt.co = (0, 0, 0, 3.0 if 0 < i < len(hooks) - 1 else 1.0)
     sp.order_u, sp.use_endpoint_u, sp.resolution_u = 3, True, 32
     path = K.link(bpy.data.objects.new(f"{name}.path", cd))  # no bevel: the path itself never renders
     for i, h in enumerate(hooks):  # with the path at the origin, a point at 0 sits on its hook's world position
@@ -335,10 +335,16 @@ def animate(S, t0, t1):
     A.led_pulse(S["work_lights"], "glow", W(A.strikes(A.pieces(A.events("kit"), "kick"))), floor=0.55)
     # Floor ring: bass.
     A.led_pulse(S["floor_ring"], "pulse", W(A.strikes(A.events("bass"), 0.05)))
-    # The phone dials itself on each "Operator": three pulls over a long one, one over a short one.
+    # The phone dials itself on each "Operator": three pulls over a long one, one over a short one. In S22 it dials
+    # 0, the operator (the full pull, 1.0), just after the cut, so it reads before the handset goes (human, C4 v5).
     keys = [(0, 0.0, "CONSTANT")]
+    s22 = _dial_zero(shot)
     for w in A.words_starting("Operator"):
         if not (t0 - 2 <= w["t"] <= t1 + 1):
+            continue
+        if abs(w["t"] - shot["S22"]["cut"]) < 1.0:
+            keys += [(A.frame(s22), 0.0, "BEZIER"), (A.frame(s22 + 0.65), 1.0, "BEZIER"),
+                     (A.frame(s22 + 1.6), 0.0, "BEZIER")]
             continue
         n = 3 if w["end"] - w["t"] > 2.0 else 1
         for k in range(n):
@@ -350,7 +356,7 @@ def animate(S, t0, t1):
     A.write_keys(S["sec_cam"], A.prop_path("swivel"), [(A.frame(line["L24"]["start"]), 0.0),
                                                        (A.frame(line["L24"]["end"]), 1.0)])
     _lead(S, shot, line)
-    _handset(S, line)
+    _handset(S, shot)
     _pinners(S, shot)
 
 
@@ -369,32 +375,44 @@ def _lead(S, shot, line):
     A.envelope_rig(p, "led", A.envelope("vocal_env") ** 2.0, A.frame(t11), A.frame(shot["S23"]["cut"]), gain=0.8,
                    offset=0.2)
     # S22: the handset goes; the probe hops up and settles on the cradle's posts, where the handset lay.
-    t = line["L30"]["start"]
+    t = _off_hook(shot)
     for dt, loc in ((-0.1, perch), (0.25, perch + Vector((0.0, 0.0, 0.12))), (0.6, perch + Vector((0.0, -0.03, -0.02)))):
         p.location = loc
         p.keyframe_insert("location", frame=A.frame(t + dt))
 
 
-def _handset(S, line):
-    """Off the hook on the S22 "Operator": lifted, swung out past the base's right side, dropped, dangling from its
-    cord over the bracket's edge and swinging down to rest. The cord's slack point moves with it."""
+def _dial_zero(shot):
+    """S22: when the dial starts its pull to 0."""
+    return shot["S22"]["cut"] + 0.05
+
+
+def _off_hook(shot):
+    """S22: the handset goes once the dial has run back from 0."""
+    return _dial_zero(shot) + 1.8
+
+
+def _handset(S, shot):
+    """Off the hook in S22, after the dial's 0: lifted, swung out past the base's right side, dropped, and hanging
+    straight down from its cord where the cord goes over the bracket's edge, swinging there like a pendulum and
+    settling. The cord's slack point moves with it."""
     hs = S["handset"]
     mid = bpy.data.objects["phone.cord_mid"]
-    t = line["L30"]["start"]
+    t = _off_hook(shot)
     rest_loc, rest_rot = hs.location.copy(), hs.rotation_euler.copy()
-    # Hanging cord-end up (local +X up), its top below the bracket and its cups clear of the bracket's edge (x 0.17).
-    hang = rest_loc + Vector((0.31, -0.12, -0.45))
+    drape = Vector((0.2, -0.04, -0.01))  # phone-local: just past the bracket's edge (x 0.17), above its top
+    length = 0.42  # drape point to the handset's centre (cord drop plus half the handset)
     seq = [(t - 0.1, rest_loc, rest_rot), (t + 0.25, rest_loc + Vector((0, -0.05, 0.12)), (0.2, 0, 0)),
-           (t + 0.42, rest_loc + Vector((0.32, -0.12, 0.1)), (0.1, -0.6, 0.2)), (t + 0.62, hang, (0, -1.4, 0.3))]
-    for k in range(6):  # a damped swing on the cord
-        a = 0.5 * math.exp(-0.6 * k) * (1 if k % 2 == 0 else -1)
-        seq.append((t + 0.9 + 0.45 * k, hang + Vector((0.1 * a, 0, 0)), (0, -1.5, 0.3 + a)))
+           (t + 0.42, rest_loc + Vector((0.32, -0.12, 0.1)), (0.1, -0.6, 0.2))]
+    for k in range(7):  # a damped pendulum about the drape point: it tilts as it swings, cord end toward the drape
+        phi = 0.0 if k == 0 else 0.22 * math.exp(-0.55 * (k - 1)) * (1 if k % 2 else -1)
+        centre = drape + Vector((length * math.sin(phi), 0.0, -length * math.cos(phi)))
+        seq.append((t + 0.62 + 0.42 * k, centre, (0, -math.pi / 2 - phi, 0.3 * phi)))
     for tt, loc, rot in seq:
         hs.location, hs.rotation_euler = loc, rot
         hs.keyframe_insert("location", frame=A.frame(tt))
         hs.keyframe_insert("rotation_euler", frame=A.frame(tt))
-    # The slack point: by the base while the handset is up, then over the bracket's front-right corner.
-    for tt, loc in ((t - 0.1, CORD_MID_REST), (t + 0.42, (0.21, -0.04, 0.05)), (t + 0.62, (0.25, -0.04, -0.06))):
+    # The slack point: by the base while the handset is up, then on the drape point over the bracket's edge.
+    for tt, loc in ((t - 0.1, CORD_MID_REST), (t + 0.42, (0.21, -0.04, 0.05)), (t + 0.62, tuple(drape))):
         mid.location = loc
         mid.keyframe_insert("location", frame=A.frame(tt))
 

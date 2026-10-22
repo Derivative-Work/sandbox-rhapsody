@@ -282,6 +282,10 @@ def lights(S):
     """One work light over the music box, a cold faint fill: a freezer."""
     K.area_light("work", (0, 0, 2.25), (0, 0, 0), 180, 0.35, "key", shape="DISK")
     K.studio_lights(center=(0, 0.6, 0.8), radius=5.0, scale=0.12)
+    # A soft key on the singer and its flag from the front, low, so the flag reads in S60's POV (human, C4 v5: "just
+    # a bit more lighting").
+    K.area_light("flag_key", LEAD + Vector((0.35, -0.7, 0.55)), LEAD + Vector((0.05, 0.0, 0.08)), 14, 0.5, "key",
+                 specular=0.3)
 
 
 # ---------------------------------------------------------------- animation (config/instrument_map.json, set I)

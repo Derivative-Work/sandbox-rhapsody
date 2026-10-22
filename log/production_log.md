@@ -654,3 +654,28 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Re-rendered:** every set. Invalid drivers after rebind: 0 in all sets.
 - **Outputs:** `renders/animatic/animatic_v5.mp4`. Superseded: `archive/renders/animatic_v4_superseded_c4-review-4.mp4`.
 - **Why:** Human feedback, R1; the phone model, R4 (human interventions).
+
+## 2026-10-22T19:49:33-04:00 — C4 animatic v6: the v5 review's six notes
+
+- **Human review of v5 (R1)** (human interventions), item by item, with what changed:
+  - **S10, the probe backs up far too fast after releasing the note:** the Follow Path constraint's hand-over jerked the probe backwards as it took hold. It is now keyed directly along 1,200 points sampled from the tube's centre line (`set_a._tube_points`): it holds at the mouth on "wherever", then eases (smoothstep) about 1.6 m along by the cut. Sampled positions show steady forward motion.
+  - **S22, the dial; the hanging handset:**
+    - The dial pulls all the way to 0, the operator (the full pull, −5.0 rad), right after the cut, and runs back.
+    - Then the handset goes (`_dial_zero`, `_off_hook`).
+    - It hangs straight down under the cord's drape point over the bracket's edge, a damped pendulum that tilts as it swings, ending vertical.
+    - The cord's inner NURBS point is weighted 3, so it hugs the drape.
+    - Checked every 2 frames: no cord or handset vertex inside the bracket.
+  - **S43, `30:00` barely legible and not counting down:**
+    - The readout counts down a second per beat, in step with the hand (30:00, 29:59, …).
+    - Each cell holds all ten glyphs, and the hidden ones are keyed off.
+    - It's in red emissive JetBrains Mono, 0.16 m, on a larger matte black window, and the clock face is matte.
+  - **S45, line numbers not monotonic:** the lines wrapped round as they scrolled. The file is now 24 lines (12 new, same voice) and scrolls once from line 1 without wrapping; a line shows only while it is on the pane.
+  - **S60, the flag barely visible:** a soft, low key light on the singer and flag (`flag_key`, 14 W, 0.5 m, specular 0.3).
+  - **"A"s missing the crossbar:**
+    - **The cause:** the variable fonts (Inter, JetBrains Mono) build glyphs from overlapping contours, and Blender's even-odd fill cancels the overlaps.
+    - **The fix:** `scripts/flat_fonts.py` writes static, overlap-merged instances (fontTools instancer, skia-pathops): `assets/fonts/Inter-Medium-flat.ttf` (wght 500, opsz 32) and `JetBrainsMono-SemiBold-flat.ttf` (wght 600). They are renamed "… Flat" and are byte-for-byte reproducible (hashes in `assets/fonts/SHA256SUMS`).
+    - **Checked:** a test render showed the variable font's A without its bar and the flat one with it.
+    - **Scope:** every Blender text uses them. The PIL scripts (burn-ins, earlier previews) keep the variable fonts, which PIL draws correctly.
+- **Re-rendered:** every set. Invalid drivers after rebind: 0 in all nine.
+- **Outputs:** `renders/animatic/animatic_v6.mp4`. Superseded: `archive/renders/animatic_v5_superseded_c4-review-5.mp4`.
+- **Why:** Human feedback, R1 (human interventions).
