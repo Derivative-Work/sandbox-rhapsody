@@ -88,6 +88,19 @@ def chords(notes, src, gap=0.06):
     return out
 
 
+def active_filter(stem, events):
+    """Keep an event only where its stem is playing: the stem's RMS in the 0.3 s after the event reaches the
+    activity threshold of timing/activity.json (active playing sits within 26 dB of the stem's loud level, bleed 32 dB
+    or more below). Judged per event, not per section, so short real passages survive (the band stab at 5.4-8.0 s
+    in the piano intro) while bleed in silent sections doesn't (409 brass notes in the voice-and-piano intro)."""
+    thr = json.loads(Path("timing/activity.json").read_text())["active_db"]
+    y, sr = librosa.load(f"audio/stems/It Was Just a Benchmark ({stem}).wav", sr=11025)
+    r = 20 * np.log10(librosa.feature.rms(y=y, frame_length=2048, hop_length=256)[0] + 1e-9)
+    loud = float(np.percentile(r, 99))
+    k = lambda t: int(t * 11025 / 256)  # noqa: E731
+    return [e for e in events if r[k(e["t"]):k(e["t"] + 0.3) + 1].max(initial=-200) >= loud + thr]
+
+
 def main():
     sources = {
         "_doc": "Which event file drives each instrument's machines (steps 4-5, C3 revisions). Written by "
@@ -118,6 +131,9 @@ def main():
         ev = [{**n, "t": round(n["t"] + shift / 1000, 4), "end": round(n["end"] + shift / 1000, 4)} for n in keep]
         if stem in SUPPORTED:
             ev = chords(ev, src)
+        n_all = len(ev)
+        ev = active_filter(stem, ev)
+        print(f"{stem:8s} {n_all - len(ev)} events dropped in sections where the stem doesn't play")
         slug = f"{stem.lower()}__basic_pitch"
         Path(f"timing/events/{slug}.json").write_text(json.dumps(
             {"stem": stem, "track": "basic-pitch transcription", "shift_ms": round(shift, 1),
@@ -139,7 +155,7 @@ def main():
            and np.min(np.abs(m_t - (n["t"] + model["shift_ms"] / 1000))) >= 0.05]
     fill = chords([{**n, "t": round(n["t"] + model["shift_ms"] / 1000, 4), "end": round(n["end"] + model["shift_ms"] / 1000, 4),
                     "source": "basic_pitch"} for n in add], "audio/stems/It Was Just a Benchmark (Keyboard).wav")
-    ev = sorted(model["events"] + fill, key=lambda e: (e["t"], e["pitch"]))
+    ev = active_filter("Keyboard", sorted(model["events"] + fill, key=lambda e: (e["t"], e["pitch"])))
     Path("timing/events/keyboard__piano.json").write_text(json.dumps(
         {"stem": "Keyboard", "track": "piano model + basic-pitch fill-ins", "shift_ms": model["shift_ms"],
          "events": ev}) + "\n")

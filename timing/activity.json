@@ -1,0 +1,468 @@
+{
+ "_doc": "A stem is active in a section when the section's 75th-percentile RMS is within ACTIVE_DB of the stem's loud level (99th percentile). Transcriptions are filtered by it (scripts/events_from_transcriptions.py): Basic Pitch transcribes bleed in sections where a stem doesn't play (brass at 2.7 notes/s in the voice-and-piano intro, where the brass stem sits 37 dB under its loud level). The values separate cleanly: active sections sit within 26 dB, inactive ones 32 dB or more below.",
+ "active_db": -28.0,
+ "stems": {
+  "Vocals": {
+   "piano intro": {
+    "db": -86.9,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -7.8,
+    "active": true
+   },
+   "intro: band": {
+    "db": -7.7,
+    "active": true
+   },
+   "ballad": {
+    "db": -4.0,
+    "active": true
+   },
+   "guitar solo": {
+    "db": -51.7,
+    "active": false
+   },
+   "opera": {
+    "db": -2.5,
+    "active": true
+   },
+   "hard rock": {
+    "db": -2.8,
+    "active": true
+   },
+   "outro": {
+    "db": -6.5,
+    "active": true
+   },
+   "coda": {
+    "db": -1.1,
+    "active": true
+   },
+   "piano tail": {
+    "db": -75.2,
+    "active": false
+   }
+  },
+  "Backing Vocals": {
+   "piano intro": {
+    "db": -163.2,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -32.3,
+    "active": false
+   },
+   "intro: band": {
+    "db": -6.4,
+    "active": true
+   },
+   "ballad": {
+    "db": -3.3,
+    "active": true
+   },
+   "guitar solo": {
+    "db": -163.2,
+    "active": false
+   },
+   "opera": {
+    "db": -3.2,
+    "active": true
+   },
+   "hard rock": {
+    "db": -7.9,
+    "active": true
+   },
+   "outro": {
+    "db": -20.5,
+    "active": true
+   },
+   "coda": {
+    "db": -5.2,
+    "active": true
+   },
+   "piano tail": {
+    "db": -116.9,
+    "active": false
+   }
+  },
+  "Keyboard": {
+   "piano intro": {
+    "db": -5.4,
+    "active": true
+   },
+   "intro: voice and piano": {
+    "db": -15.9,
+    "active": true
+   },
+   "intro: band": {
+    "db": -14.7,
+    "active": true
+   },
+   "ballad": {
+    "db": -19.5,
+    "active": true
+   },
+   "guitar solo": {
+    "db": -10.3,
+    "active": true
+   },
+   "opera": {
+    "db": -16.1,
+    "active": true
+   },
+   "hard rock": {
+    "db": -12.9,
+    "active": true
+   },
+   "outro": {
+    "db": -10.6,
+    "active": true
+   },
+   "coda": {
+    "db": -10.6,
+    "active": true
+   },
+   "piano tail": {
+    "db": 3.5,
+    "active": true
+   }
+  },
+  "Guitar": {
+   "piano intro": {
+    "db": -39.0,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -42.6,
+    "active": false
+   },
+   "intro: band": {
+    "db": -10.9,
+    "active": true
+   },
+   "ballad": {
+    "db": -9.5,
+    "active": true
+   },
+   "guitar solo": {
+    "db": -0.6,
+    "active": true
+   },
+   "opera": {
+    "db": -9.2,
+    "active": true
+   },
+   "hard rock": {
+    "db": -15.2,
+    "active": true
+   },
+   "outro": {
+    "db": -158.9,
+    "active": false
+   },
+   "coda": {
+    "db": -10.2,
+    "active": true
+   },
+   "piano tail": {
+    "db": -26.2,
+    "active": true
+   }
+  },
+  "Bass": {
+   "piano intro": {
+    "db": -52.1,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -49.4,
+    "active": false
+   },
+   "intro: band": {
+    "db": -11.1,
+    "active": true
+   },
+   "ballad": {
+    "db": -7.1,
+    "active": true
+   },
+   "guitar solo": {
+    "db": -5.7,
+    "active": true
+   },
+   "opera": {
+    "db": -6.0,
+    "active": true
+   },
+   "hard rock": {
+    "db": -9.2,
+    "active": true
+   },
+   "outro": {
+    "db": -85.7,
+    "active": false
+   },
+   "coda": {
+    "db": -1.3,
+    "active": true
+   },
+   "piano tail": {
+    "db": -11.4,
+    "active": true
+   }
+  },
+  "Synth": {
+   "piano intro": {
+    "db": -60.2,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -39.4,
+    "active": false
+   },
+   "intro: band": {
+    "db": -14.9,
+    "active": true
+   },
+   "ballad": {
+    "db": -17.0,
+    "active": true
+   },
+   "guitar solo": {
+    "db": -12.7,
+    "active": true
+   },
+   "opera": {
+    "db": -5.5,
+    "active": true
+   },
+   "hard rock": {
+    "db": -4.1,
+    "active": true
+   },
+   "outro": {
+    "db": -53.9,
+    "active": false
+   },
+   "coda": {
+    "db": -6.2,
+    "active": true
+   },
+   "piano tail": {
+    "db": -36.3,
+    "active": false
+   }
+  },
+  "Strings": {
+   "piano intro": {
+    "db": -33.0,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -21.2,
+    "active": true
+   },
+   "intro: band": {
+    "db": -19.3,
+    "active": true
+   },
+   "ballad": {
+    "db": -10.2,
+    "active": true
+   },
+   "guitar solo": {
+    "db": -11.3,
+    "active": true
+   },
+   "opera": {
+    "db": -17.5,
+    "active": true
+   },
+   "hard rock": {
+    "db": -13.9,
+    "active": true
+   },
+   "outro": {
+    "db": -23.7,
+    "active": true
+   },
+   "coda": {
+    "db": -5.9,
+    "active": true
+   },
+   "piano tail": {
+    "db": -56.9,
+    "active": false
+   }
+  },
+  "Brass": {
+   "piano intro": {
+    "db": -147.9,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -36.7,
+    "active": false
+   },
+   "intro: band": {
+    "db": -26.2,
+    "active": true
+   },
+   "ballad": {
+    "db": -17.2,
+    "active": true
+   },
+   "guitar solo": {
+    "db": -32.4,
+    "active": false
+   },
+   "opera": {
+    "db": -15.9,
+    "active": true
+   },
+   "hard rock": {
+    "db": -7.1,
+    "active": true
+   },
+   "outro": {
+    "db": -147.8,
+    "active": false
+   },
+   "coda": {
+    "db": -32.2,
+    "active": false
+   },
+   "piano tail": {
+    "db": -62.6,
+    "active": false
+   }
+  },
+  "Drums": {
+   "piano intro": {
+    "db": -81.5,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -76.8,
+    "active": false
+   },
+   "intro: band": {
+    "db": -23.9,
+    "active": true
+   },
+   "ballad": {
+    "db": -7.1,
+    "active": true
+   },
+   "guitar solo": {
+    "db": -3.0,
+    "active": true
+   },
+   "opera": {
+    "db": -5.5,
+    "active": true
+   },
+   "hard rock": {
+    "db": -3.4,
+    "active": true
+   },
+   "outro": {
+    "db": -80.9,
+    "active": false
+   },
+   "coda": {
+    "db": -2.0,
+    "active": true
+   },
+   "piano tail": {
+    "db": -57.4,
+    "active": false
+   }
+  },
+  "Percussion": {
+   "piano intro": {
+    "db": -63.0,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -57.3,
+    "active": false
+   },
+   "intro: band": {
+    "db": -27.0,
+    "active": true
+   },
+   "ballad": {
+    "db": -34.5,
+    "active": false
+   },
+   "guitar solo": {
+    "db": -37.2,
+    "active": false
+   },
+   "opera": {
+    "db": -32.7,
+    "active": false
+   },
+   "hard rock": {
+    "db": -32.7,
+    "active": false
+   },
+   "outro": {
+    "db": -69.1,
+    "active": false
+   },
+   "coda": {
+    "db": -2.8,
+    "active": true
+   },
+   "piano tail": {
+    "db": -41.0,
+    "active": false
+   }
+  },
+  "FX": {
+   "piano intro": {
+    "db": -57.2,
+    "active": false
+   },
+   "intro: voice and piano": {
+    "db": -45.4,
+    "active": false
+   },
+   "intro: band": {
+    "db": -30.4,
+    "active": false
+   },
+   "ballad": {
+    "db": -46.5,
+    "active": false
+   },
+   "guitar solo": {
+    "db": -44.3,
+    "active": false
+   },
+   "opera": {
+    "db": -38.8,
+    "active": false
+   },
+   "hard rock": {
+    "db": -9.4,
+    "active": true
+   },
+   "outro": {
+    "db": -59.7,
+    "active": false
+   },
+   "coda": {
+    "db": -8.0,
+    "active": true
+   },
+   "piano tail": {
+    "db": -48.2,
+    "active": false
+   }
+  }
+ }
+}

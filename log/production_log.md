@@ -401,3 +401,27 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - Bar 59 kicks: 0, 0.53, 1, 1.53, 2, 3. Bar 60's fill into 61: snare at 2.45, 3.45, 3.79 and toms at 2.78, over kicks.
   - The drumless intro and outro: no strikes.
 - **Rebuilt:** score, both previews, `renders/c3/score.musicxml`. Superseded files: `archive/timing/drums__kit_larsnet_superseded_strict-additions.json` and `archive/renders/c3/*_superseded_missing-kicks-fill.mp4`.
+
+## 2026-10-22T08:26:21-04:00 — Step 6: instrument map (and stem activity)
+
+- **What:**
+  - Measured which stems play in which section. Transcribed events are now filtered per event: a note is kept only where its stem's level in the 0.3 s after it reaches −28 dB of the stem's loud level.
+  - Wrote the instrument map: which events drive which machine in each set, with the reason for each.
+  - Checked that every machine has events while its set is on screen.
+- **Commands:** `.venv/bin/python -I scripts/activity.py`; `.venv/bin/python -I scripts/events_from_transcriptions.py`; `.venv/bin/python -I scripts/instrument_map_report.py`
+- **Outputs:** `timing/activity.json`, `config/instrument_map.json` (machine-readable, for step 7), `timing/instrument_map.md`, `scripts/activity.py`, `scripts/instrument_map_report.py`, regenerated `timing/events/*__basic_pitch.json` and `keyboard__piano.json`
+- **Findings:**
+  - Activity separates cleanly: active sections sit within 26 dB of a stem's loud level, inactive ones 32 dB or more below.
+  - Basic Pitch had transcribed bleed where stems are silent. Brass had 452 notes in the voice-and-piano intro, where the brass stem is 37 dB down; 43 remain, short loud bursts that pass the level check.
+  - Filtering per section (tried first) also dropped the real band stab at 5.4–8.0 s; per event keeps it (guitar 30, bass 5, strings 16 events).
+- **Map highlights:**
+  - **Set A:** the lead vocal envelope drives the upper blade vents and the backing vocals the lower ones (until the backing enters at 44.5 s, a softened lead); the music box plays the piano's top line; the wall of 198 lights with the left hand; tube pellets ride the strings, then the synth.
+  - **Set B:** drawers are piano keys; the phone dials on each "Operator".
+  - **Set D:** the kit is the bells and sirens.
+  - **Set E:** the guitar is the modem's fiber strings.
+  - **Set G:** the brass plays the kill-switch tower; words drive the card stunts, stamp arms and pause pedal.
+  - **Set H:** one prevention machine per part.
+  - **Set I:** the music box and scoreboard; the proposed S64b coda wakes every machine on the kit.
+  - **Everywhere:** the floor ring is the bass (the piano's left hand before the bass enters).
+- **Check:** every machine has events while its set is on screen (`timing/instrument_map.md`). On-screen time per set: A 89 s, B 38, C 14, D 7, E 9, F 12, G 48, H 63, I 57.
+- **Why:** Brief, pre-production step 6.

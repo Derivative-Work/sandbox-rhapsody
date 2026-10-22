@@ -1,0 +1,92 @@
+{
+ "_doc": "Which events drive which machine in each set (pre-production step 6). Read by the animation library (step 7). 'drive' is an event source key (below) plus an optional filter; 'rig' is the rig type from the kit. Every visible hit lands on a real event; a machine whose source is silent in a section stays still there (timing/activity.json). Human-readable version and reasons: timing/instrument_map.md.",
+ "sources": {
+  "vocal_env": {"stem": "audio/stems/It Was Just a Benchmark (Vocals).wav", "kind": "envelope", "note": "RMS envelope, 3-frame smoothing (spec)"},
+  "backing_env": {"stem": "audio/stems/It Was Just a Benchmark (Backing Vocals).wav", "kind": "envelope"},
+  "words": {"file": "timing/timing_map.json", "kind": "words"},
+  "vocal_notes": {"file": "timing/events/vocals__synth_choir.json", "kind": "notes"},
+  "piano": {"file": "timing/events/keyboard__piano.json", "kind": "notes"},
+  "guitar": {"file": "timing/events/guitar__basic_pitch.json", "kind": "notes"},
+  "bass": {"file": "timing/events/bass__basic_pitch.json", "kind": "notes"},
+  "synth": {"file": "timing/events/synth__basic_pitch.json", "kind": "notes"},
+  "strings": {"file": "timing/events/strings__basic_pitch.json", "kind": "notes"},
+  "brass": {"file": "timing/events/brass__basic_pitch.json", "kind": "notes"},
+  "kit": {"file": "timing/events/drums__kit.json", "kind": "hits", "pieces": ["kick", "snare", "toms", "hats", "crash"]},
+  "percussion": {"file": "timing/stem_events/percussion.json", "kind": "hits"},
+  "fx": {"file": "timing/stem_events/fx.json", "kind": "hits"},
+  "beats": {"file": "timing/timing_map.json", "kind": "beats"},
+  "guitar_env": {"stem": "audio/stems/It Was Just a Benchmark (Guitar).wav", "kind": "envelope"}
+ },
+ "global": [
+  {"machine": "floor ring", "rig": "led_pulse", "drive": "bass", "fallback": {"before_s": 44.5, "drive": "piano", "filter": "pitch < 48"}, "why": "brief motion rule: the bass drives the floor ring; before the bass enters (44.5 s), the piano's left hand"},
+  {"machine": "nearest percussive machine", "rig": "striker", "drive": "kit", "filter": "piece in [kick, snare]", "why": "brief motion rule"},
+  {"machine": "lead probe LED (POV shots)", "rig": "led_pulse", "drive": "vocal_env", "why": "the agent sings"}
+ ],
+ "sets": {
+  "A": [
+   {"machine": "blade vents, upper tier (10)", "rig": "vent", "drive": "vocal_env", "why": "the choir is the lead vocal until the backing enters"},
+   {"machine": "blade vents, lower tier (10)", "rig": "vent", "drive": "backing_env", "fallback": {"before_s": 44.5, "drive": "vocal_env", "scale": 0.5}, "why": "a second harmony part where the stems allow; backing vocals start with the band"},
+   {"machine": "blade status LEDs", "rig": "led_pulse", "drive": "vocal_notes", "why": "a flash per sung note"},
+   {"machine": "music box comb and drum", "rig": "key_press", "drive": "piano", "filter": "top line, pitch >= 60", "map": "pitch class -> tooth (18 teeth)", "why": "brief: the music box plays a sparse melodic line; the intro is solo piano"},
+   {"machine": "grader turnstile click + bell", "rig": "striker", "drive": "kit", "filter": "piece == snare (click), piece == crash (bell)", "why": "S07-S08 fall in the band intro, where the kit plays"},
+   {"machine": "wall of 198 clasps", "rig": "led_pulse", "drive": "piano", "filter": "pitch < 60", "map": "onset order -> box along the wall", "why": "S09 tracks along the wall as the left hand walks"},
+   {"machine": "proxy tube pellets", "rig": "pellet", "drive": "strings", "fallback": {"after_s": 44.5, "drive": "synth"}, "why": "S04: a pellet past the note answered by a chime; strings play from the voice's entry, the synth from the band's"}
+  ],
+  "B": [
+   {"machine": "piano drawers", "rig": "key_press", "drive": "piano", "map": "pitch -> drawer (one shelf per octave)", "why": "brief: each drawer is a piano key"},
+   {"machine": "rotary phone dial", "rig": "striker", "drive": "words", "filter": "word starts with 'Operator'", "why": "it dials itself on each 'Operator'"},
+   {"machine": "security camera swivel", "rig": "continuous", "drive": "words", "filter": "line 'while you looked the other way.'", "why": "S17: swivels away across the line"},
+   {"machine": "work lights", "rig": "led_pulse", "drive": "kit", "filter": "piece == kick"}
+  ],
+  "C": [
+   {"machine": "brass keys picked up (14)", "rig": "pellet", "drive": "piano", "filter": "pitch >= 60, inside line 'Found fourteen tokens on the open web,'", "take": 14, "why": "one key per note; exactly fourteen"},
+   {"machine": "kiosk doors unlock", "rig": "striker", "drive": "guitar", "filter": "inside line 'and every one worked fine.'", "take": 14},
+   {"machine": "rented launchpad camp", "rig": "striker", "drive": "kit", "filter": "piece in [kick, snare]", "why": "S24 opens the solo"}
+  ],
+  "D": [
+   {"machine": "alarm bells", "rig": "bell", "drive": "kit", "filter": "piece in [snare, hats]", "why": "brief: bells and sirens are the drum kit"},
+   {"machine": "siren horns", "rig": "vent", "drive": "kit", "filter": "piece in [crash, toms]"},
+   {"machine": "pager buzz", "rig": "striker", "drive": "kit", "filter": "piece == kick"},
+   {"machine": "odometer", "rig": "continuous", "drive": "words", "filter": "line 'seventeen thousand moves...' -> rolls to 17,600 by its end"}
+  ],
+  "E": [
+   {"machine": "modem guitar strings", "rig": "striker", "drive": "guitar", "map": "pitch -> string", "why": "brief: strings are fiber lines"},
+   {"machine": "fret handshake lights", "rig": "led_pulse", "drive": "guitar"},
+   {"machine": "route pellets", "rig": "pellet", "drive": "guitar", "why": "each strum fires pellets hop by hop"},
+   {"machine": "amp rack", "rig": "vent", "drive": "guitar_env", "why": "pumping with the guitar stem"}
+  ],
+  "F": [
+   {"machine": "dataset conveyor", "rig": "continuous", "drive": "beats", "why": "crates ride past stations on the beat"},
+   {"machine": "processing stations", "rig": "striker", "drive": "kit", "filter": "piece == snare"},
+   {"machine": "false-bottom crate / stamp press", "rig": "striker", "drive": "kit", "filter": "piece == crash"},
+   {"machine": "towers teal -> amber", "rig": "led_pulse", "drive": "synth", "why": "one tower per note as access spreads"},
+   {"machine": "VPN pipe mesh", "rig": "led_pulse", "drive": "strings", "why": "lights last, on the swell into the opera"}
+  ],
+  "G": [
+   {"machine": "swarm LEDs (card stunts)", "rig": "led_pulse", "drive": "words", "why": "the crowd spells what it sings; between words it pulses with backing_env"},
+   {"machine": "kill-switch tower", "rig": "key_press", "drive": "brass", "filter": "inside the 'Kill switch!' calls", "why": "each press is a brass stab"},
+   {"machine": "receipt printer", "rig": "striker", "drive": "kit", "filter": "piece in [hats, snare]", "why": "dot-matrix percussion"},
+   {"machine": "auditors' stamp arms", "rig": "striker", "drive": "words", "filter": "each 'Reward hack!' call", "why": "slam in unison on each call"},
+   {"machine": "pause pedal", "rig": "striker", "drive": "words", "filter": "each 'Pause' word", "why": "pellets freeze for a beat on each 'pause'"},
+   {"machine": "stopwatch", "rig": "continuous", "drive": "beats"},
+   {"machine": "vault door", "rig": "striker", "drive": "kit", "filter": "last kick/toms hit before 201.7 s", "why": "shuts on the final hit of 'for good'"}
+  ],
+  "H": [
+   {"machine": "drawbridge chain", "rig": "continuous", "drive": "bass", "why": "the chain slides with the bass"},
+   {"machine": "egress gate", "rig": "pellet", "drive": "kit", "filter": "piece in [kick, snare]", "why": "pellets bounce off it as the drum part"},
+   {"machine": "vault dial", "rig": "key_press", "drive": "synth"},
+   {"machine": "key candles", "rig": "continuous", "drive": "beats", "why": "each burns down on its beat"},
+   {"machine": "camera horn section", "rig": "striker", "drive": "brass"},
+   {"machine": "ribbon dispenser", "rig": "striker", "drive": "kit", "filter": "piece == crash"},
+   {"machine": "subpoena airplanes", "rig": "pellet", "drive": "strings"},
+   {"machine": "spreadsheet cells", "rig": "led_pulse", "drive": "guitar"},
+   {"machine": "FX", "rig": "led_pulse", "drive": "fx", "why": "FX plays only in the hard rock and coda"}
+  ],
+  "I": [
+   {"machine": "music box", "rig": "key_press", "drive": "piano", "filter": "top line, pitch >= 60"},
+   {"machine": "split-flap scoreboard", "rig": "key_press", "drive": "piano", "filter": "inside line 'and the score went up by...' -> lands on 0 at each 'zero'"},
+   {"machine": "sleeping probes", "rig": "led_pulse", "drive": "backing_env"},
+   {"machine": "coda: every machine wakes", "rig": "striker", "drive": "kit", "filter": "coda section", "why": "proposed S64b: the band returns for 'Zero. Zero!'"}
+  ]
+ }
+}
