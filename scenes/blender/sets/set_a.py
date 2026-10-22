@@ -7,6 +7,7 @@ Contents, as the brief lists them:
 - the grader turnstile beside the cube, with flags waiting in a tray;
 - the wall of 198 locked music boxes (33 x 6) in an arc behind the cube;
 - the bass floor ring around the cube; idle probes.
+- from S20 on (the exterior reveal), the cube stands toy-sized on a vast desk: edges, legs, a mug, a pencil.
 Deterministic: placement is arithmetic, never random.
 """
 import math
@@ -174,7 +175,51 @@ def build(decal_peel=0.25):
     # Idle probes inside, LEDs breathing low.
     for k, (x, y, rz) in enumerate(((-0.62, -0.62, -40), (0.7, 0.4, 120), (-0.55, 0.66, 200))):
         K.probe(f"idle{k}", (x, y, K.PROBE_R), led=0.25).rotation_euler = (0, 0, math.radians(rz))
+    out["exterior"] = _desk()
     return out
+
+
+def _desk():
+    """S20's reveal (brief: "the cube is toy-sized on a vast desk in a dim lab"): at about 20x, a desk top with its
+    edge, thickness and legs, a lab floor far below, a mug and a pencil for scale, and a desk lamp's pool of light.
+    They exist from S20's cut on (animate() keys them; the endless floor goes then), so S01-S10 keep the void."""
+    objs = []
+    top = K.floor(size=1.0)  # the desk top keeps the mirror finish the cube has stood on all along
+    top.name = "desk.top"
+    top.location, top.scale = (3.0, -1.0, 0.0005), (42.0, 30.0, 1.0)
+    objs.append(top)
+    wood = K.mat_plastic("desk_body", "lab_dark", 0.5)
+    objs.append(_slab("desk.body", wood, (3.0, -1.0, -0.4), (42.0, 30.0, 0.8)))
+    for sx, sy in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
+        objs.append(_slab(f"desk.leg{sx}{sy}", wood, (3.0 + sx * 19.5, -1.0 + sy * 13.5, -8.4), (1.2, 1.2, 15.2)))
+    objs.append(_slab("lab_floor", K.mat_plastic("lab_floor", "horizon", 0.7), (3.0, -1.0, -16.05), (160, 160, 0.1)))
+    # A mug, back left, and a pencil lying at an angle, front right.
+    mug_m = K.mat_plastic("mug", "paper", 0.25)
+    objs.append(K.mesh_obj("mug", bpy.ops.mesh.primitive_cylinder_add, mug_m, None, radius=1.6, depth=4.0,
+                           vertices=48, location=(-9.0, 6.0, 2.0)))
+    objs.append(K.mesh_obj("mug.coffee", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("coffee", "shadow", 0.1),
+                           None, radius=1.45, depth=0.05, vertices=48, location=(-9.0, 6.0, 3.6)))
+    objs.append(K.mesh_obj("mug.handle", bpy.ops.mesh.primitive_torus_add, mug_m, None, major_radius=0.9,
+                           minor_radius=0.22, location=(-10.6, 6.0, 2.1), rotation=(math.pi / 2, 0, 0)))
+    pencil = K.mesh_obj("pencil", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("pencil", "note", 0.3), None,
+                        radius=0.16, depth=7.0, vertices=6, location=(7.0, -7.5, 0.16), rotation=(0, math.pi / 2, 0.5))
+    objs.append(pencil)
+    objs.append(K.mesh_obj("pencil.tip", bpy.ops.mesh.primitive_cone_add, K.mat_plastic("pencil_tip", "key", 0.5),
+                           pencil, radius1=0.16, depth=0.7, vertices=6, location=(0, 0, 3.85)))
+    # The desk lamp: a warm pool on the desk around the cube, falling off before the edges.
+    lamp = bpy.data.lights.new("desk_lamp", "SPOT")
+    lamp.energy, lamp.color, lamp.spot_size, lamp.spot_blend = 60000.0, K.col("key")[:3], math.radians(70), 0.6
+    lo = K.link(bpy.data.objects.new("desk_lamp", lamp))
+    lo.location = (-4.0, 3.0, 22.0)
+    lo.rotation_euler = (Vector((1.0, -1.0, 0.0)) - lo.location).to_track_quat("-Z", "Y").to_euler()
+    objs.append(lo)
+    return objs
+
+
+def _slab(name, mat, loc, size):
+    o = K.mesh_obj(name, bpy.ops.mesh.primitive_cube_add, mat, None, size=1, location=loc)
+    o.scale = size
+    return o
 
 
 # ---------------------------------------------------------------- animation (config/instrument_map.json, set A)
@@ -189,6 +234,17 @@ def animate(S, t0, t1):
     A.comb(S["musicbox"], A.between(A.events("piano"), t0 - 1, t1 + 1))
     W = lambda evs: A.between(evs, t0 - 1, t1 + 1)  # noqa: E731
     f0, f1 = A.frame(t0 - 1), A.frame(t1 + 1)
+    # S20 on: the desk instead of the endless floor.
+    f20 = A.frame(next(s["cut"] for s in A.timing_map()["shots"] if s["id"] == "S20"))
+    for o in S["exterior"]:
+        o.hide_render = True
+        o.keyframe_insert("hide_render", frame=f20 - 1)
+        o.hide_render = False
+        o.keyframe_insert("hide_render", frame=f20)
+    fl = bpy.data.objects["floor"]
+    fl.keyframe_insert("hide_render", frame=f20 - 1)
+    fl.hide_render = True
+    fl.keyframe_insert("hide_render", frame=f20)
     vocal = A.envelope("vocal_env") ** 2.0
     backing = np.where(np.arange(len(vocal)) < A.frame(BAND_IN), 0.5 * vocal, A.envelope("backing_env") ** 2.0)
     for b in S["blades"]:

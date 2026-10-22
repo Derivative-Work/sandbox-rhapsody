@@ -308,8 +308,11 @@ def build():
     # shrinking "not the right call"). "dead" (0-1) on each candle greys its own material.
     bench = K.empty("candles", (0, -2.55, 0))
     _box("candles.bench", K.mat_plastic("bench", "lab_dark", 0.3), bench, (0, 0, 0.1), (3.4, 0.3, 0.2))
-    smoke_m = K.mat_plastic("smoke", "decal_film", 0.9)
-    brass, grey = K.col("brass"), K.lin("#3e3c3a")
+    # Smoke is soft and see-through, with a faint glow so it reads against the dark; a dead key is pale ash, not
+    # dark grey, so it reads on the dark floor (C4 v3 rough spots).
+    smoke_m = K.mat_acrylic("smoke", "decal_film", alpha=0.16, emit=0.12)
+    smoke_m.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 0.9
+    brass, grey = K.col("brass"), K.lin("#86827b")
     candles = []
     for k in range(8):
         c = K.empty(f"candle{k}", (-1.4 + 0.4 * k, 0, 0.2), bench)
@@ -757,7 +760,7 @@ CAMERAS = {
     "S49": [(0.0, _v(2.1, -3.2, 1.0), _v(2.45, -0.4, 0.55), 32), (1.0, _v(2.2, -2.9, 0.95), _v(2.45, -0.4, 0.55), 34)],
     "S50": [(0.0, _v(-1.5, -1.9, 1.3), _v(-2.3, 1.7, 1.2), 30), (1.0, _v(-1.8, -1.0, 1.25), _v(-2.3, 1.7, 1.2), 30)],
     "S51": [(0.0, _v(0.6, -4.3, 0.8), _v(0.0, -2.55, 0.35), 32), (1.0, _v(0.3, -3.9, 0.6), _v(0.0, -2.55, 0.35), 32)],
-    "S52": [(0.0, _v(1.0, -1.6, 1.5), _v(-0.1, -4.6, 1.0), 24), (1.0, _v(0.7, -1.7, 1.45), _v(-0.1, -4.6, 1.0), 24)],
+    "S52": [(0.0, _v(0.3, -0.15, 1.8), _v(0.0, -4.6, 0.95), 24), (1.0, _v(0.1, -0.3, 1.75), _v(0.0, -4.6, 0.95), 24)],
     "S53": [(0.0, _v(2.08, -2.45, 0.2), _v(1.86, -1.75, 0.17), 30), (1.0, _v(2.03, -2.3, 0.19), _v(1.86, -1.75, 0.17), 32)],
     "S54": [(0.0, _v(1.68, -2.35, 0.22), _v(2.0, -1.6, 0.1), 30), (1.0, _v(1.74, -2.2, 0.2), _v(2.0, -1.6, 0.1), 32)],
     "S55": [(0.0, _v(1.5, -7.5, 2.0), _v(-1.5, 1.5, 1.6), 24), (1.0, _v(0.5, -7.0, 2.2), _v(-1.0, 1.5, 1.8), 24)],

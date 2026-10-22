@@ -10,8 +10,8 @@ Contents, as the brief lists them:
   the corporate VPN -- word by word, then melts;
 - the split-flap scoreboard: clacks through its digits on the piano notes and lands on 0 at each "zero";
 - the sleeping machines of the coda (S64b, as sung): two mallet pads, a grader turnstile, a rack of blades and the
-  floor ring, frosted over until the band returns; they shake the frost off and play the coda, then everything powers
-  down one by one, the lead probe last: its amber LED fades on the SIGTERM (S65; the CRT collapse is an edit effect).
+  floor ring, frosted over; they play under the frost from the band's return and burst it off on S64b's cut, play the
+  coda, then everything powers down one by one, the lead probe last: its amber LED fades on the SIGTERM (S65; the CRT collapse is an edit effect).
 Deterministic: placement is arithmetic, never random.
 """
 import math
@@ -352,13 +352,21 @@ def animate(S, t0, t1):
     # S60: the lead opens its arm on "before": it was holding the flag all along.
     t_open = next(w["start"] for li in tm["lines"] if li["id"] == "L67" for w in li["words"] if w["w"].startswith("bef"))
     A.write_keys(lead, '["arm_r"]', [(0, 0.0), (A.frame(t_open) - 4, 0.0), (A.frame(t_open) + 26, 1.0)])
-    # The coda machines: frost shells shake off as the band returns; they play the coda; they stop after the final hits.
+    # The coda machines play from the band's return (bar 173, in S64) under their frost; the shells rattle on the kit's
+    # hits there, and burst off on S64b's cut, its first setup being the wide (C4 v3: the shake-off fell in S64, so
+    # S64b opened awake).
+    t_burst = shots["S64b"]["cut"]
+    rattle = [A.frame(e["t"]) for e in A.between(A.strikes(A.events("kit"), 0.08), coda0, t_burst - 0.1)]
     for k, sh in enumerate(S["shells"]):
-        fw = A.frame(coda0) + 6 * k
-        A.write_keys(sh, "location", [(fw - 6, sh.location.x), (fw - 3, sh.location.x + 0.02), (fw, sh.location.x - 0.02),
-                                      (fw + 2, sh.location.x)], index=0)
+        x0 = sh.location.x
+        keys = [(0, x0)]
+        for n, f in enumerate(rattle):
+            keys += [(f, x0 + (0.012 if (n + k) % 2 else -0.012)), (f + 4, x0)]
+        A.write_keys(sh, "location", keys, index=0)
+        fw = A.frame(t_burst) + 2 * k
         for ax in range(3):
-            A.write_keys(sh, "scale", [(fw, sh.scale[ax]), (fw + 3, sh.scale[ax] * 1.08), (fw + 14, 0.0)], index=ax)
+            A.write_keys(sh, "scale", [(fw - 1, sh.scale[ax]), (fw + 3, sh.scale[ax] * 1.12), (fw + 13, 0.0)],
+                         index=ax)
     M = S["machines"]
     kitc = A.between(A.events("kit"), coda0, final + 0.5)
     kicks, snares = A.strikes(A.pieces(kitc, "kick")), A.strikes(A.pieces(kitc, "snare"))
@@ -472,31 +480,35 @@ CAMERAS = {
 
 def _coda_cuts():
     """S64b as cuts on the coda's downbeats: [(bar, eye, target, lens, eye_end, target_end, lens_end), ...]; each
-    setup runs to the next one's bar. Bar numbers are the timing map's."""
+    setup runs to the next one's bar. Bar numbers are the timing map's; a float is a cut time in seconds instead."""
     tm = A.timing_map()
     sh = {s["id"]: s for s in tm["shots"]}
     a, b = sh["S64b"]["cut"], sh["S65"]["cut"]
     bar = {x["n"]: x["start"] for x in tm["bars"]}
     L = LEAD
     plan = [  # bar, subject: (eye, target, lens) at the start -> at the end
-        (174, (L + _v(-0.22, -0.5, 0.12), L + _v(0, 0, 0.03), 50), (L + _v(-0.18, -0.42, 0.1), L + _v(0, 0, 0.03), 55)),
+        (174, (_v(0.0, -3.2, 1.8), _v(0.0, 0.8, 0.4), 24), (_v(0.6, -3.0, 1.7), _v(0.0, 0.8, 0.4), 24)),  # wide: the frost bursts
         (175, (_v(-0.55, 0.05, 0.42), _v(-1.0, 0.8, 0.2), 40), (_v(-0.62, 0.15, 0.38), _v(-1.0, 0.8, 0.2), 44)),  # kick
         (176, (_v(0.0, 0.25, 0.85), _v(0.0, 1.3, 0.18), 22), (_v(0.08, 0.35, 0.8), _v(0.0, 1.3, 0.18), 24)),  # toms
         (177, (_v(-1.0, -0.35, 0.95), _v(-1.65, 0.3, 0.8), 40), (_v(-1.1, -0.25, 0.9), _v(-1.65, 0.3, 0.8), 44)),  # crash
         (178, (_v(1.05, -0.3, 0.78), _v(1.6, 0.25, 0.6), 45), (_v(1.15, -0.25, 0.74), _v(1.6, 0.25, 0.6), 48)),  # hats
-        (179, (_v(0.0, -3.2, 1.8), _v(0.0, 0.8, 0.4), 24), (_v(0.6, -3.0, 1.7), _v(0.0, 0.8, 0.4), 24)),  # wide: all
+        (179, (L + _v(-0.22, -0.5, 0.12), L + _v(0, 0, 0.03), 50), (L + _v(-0.18, -0.42, 0.1), L + _v(0, 0, 0.03), 55)),  # singer
         (180, (_v(0.6, 0.1, 0.45), _v(1.0, 0.8, 0.2), 40), (_v(0.66, 0.2, 0.42), _v(1.0, 0.8, 0.2), 44)),  # snare
         (181, (_v(0.0, 2.5, 0.9), _v(0.0, 0.6, 0.15), 28), (_v(0.25, 2.45, 0.85), _v(0.0, 0.6, 0.15), 28)),  # reverse
         (182, (_v(0.16, -0.58, 0.88), _v(0.0, -0.05, 0.45), 40), (_v(0.12, -0.5, 0.84), _v(0.0, -0.05, 0.45), 44)),  # comb
         (183, (_v(-0.4, 0.1, 0.42), _v(-0.75, 0.95, 0.2), 24), (_v(-0.36, 0.14, 0.4), _v(-0.75, 0.95, 0.2), 26)),  # final hits
+        # The last two final hits bring the crash in (human, C4 v3: a hit not visible): cut between the first and
+        # second hit to the crash, kick and tom together.
+        (316.45, (_v(-0.35, -0.75, 0.62), _v(-1.05, 0.7, 0.42), 26), (_v(-0.38, -0.68, 0.6), _v(-1.05, 0.7, 0.42), 27)),
         (184, (_v(2.4, -1.6, 1.3), _v(-0.5, 1.0, 0.6), 28), (_v(1.4, -1.5, 1.1), _v(-0.2, 0.6, 0.5), 30)),  # power-down
         (186, (_v(0.5, -1.35, 1.15), _v(0.2, -0.15, 0.24), 44), (_v(0.48, -1.2, 1.05), _v(0.21, -0.16, 0.24), 48)),
     ]
     u = lambda t: (t - a) / (b - a)  # noqa: E731
+    at = lambda n: n if isinstance(n, float) else bar[n]  # noqa: E731
     segs = []
     for k, (n, (e0, t0, l0), (e1, t1, l1)) in enumerate(plan):
-        ua = 0.0 if k == 0 else u(bar[n])
-        ub = 1.0 if k + 1 == len(plan) else u(bar[plan[k + 1][0]]) - 1e-4
+        ua = 0.0 if k == 0 else u(at(n))
+        ub = 1.0 if k + 1 == len(plan) else u(at(plan[k + 1][0])) - 1e-4
         segs.append([(ua, e0, t0, l0), (ub, e1, t1, l1)])
     return segs
 

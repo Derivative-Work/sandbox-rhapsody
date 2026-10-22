@@ -582,3 +582,43 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Rough still:** smoke puffs are opaque; the grey fallen keys are low-contrast; one S52 camera is just out of frame; the S43 `30:00` readout is faint; the S64b frost shakes off in S64, so S64b opens awake; a snare and a tom on the last chord aren't played (not checked whether real or bleed).
 - **Outputs:** `renders/animatic/animatic_v3.mp4` (every set re-rendered). Superseded: `archive/renders/animatic_v2_superseded_c4-review-2.mp4`.
 - **Why:** Human feedback, R1 (human interventions).
+
+## 2026-10-22T17:06:29-04:00 — C4 animatic v4: the approval's three fixes and the known rough spots
+
+- **Human review of v3 (R1):** cut approved, with three fixes first (human interventions). Each fix, with what changed:
+  - **A drum hit not visible in the ending** (S64b): a visibility check of every coda hit against its cut's camera found the final hits' crash (316.57 s) off screen in the kick-and-tom setup. S64b gets a 13th setup, cut between the first and second final hits (316.45 s), on the crash, kick and tom together. All three final hits are now on screen. `_coda_cuts` takes a time in seconds as well as a bar.
+  - **The pause pedal clipping** (S42): its hinge driver had the wrong sign, so at rest the plate's toe tipped down through its base. Now the toe is up at rest and flat when stomped.
+  - **The phone's handset and cord clipping the box** (S12, S22):
+    - The cord is now a curve through three hooks: the base's right face, a slack point keyed with the handset, and the handset's end. It drapes over the bracket's edge, not through the base.
+    - The handset swings out past the base before it drops, and it hangs clear of the bracket.
+    - At rest it sits on the cradle prongs, not in them.
+    - A vertex check finds no handset or cord point inside the base, bracket or prongs, sampled every 3 frames from S12 to S23.
+- **Known rough spots from v3:**
+  - **Smoke** (S51): soft and see-through (alpha 0.16, rough, a faint glow), not opaque.
+  - **Dead keys** (S51): pale ash (#86827b), not dark grey, so they read on the dark floor.
+  - **S52:** the camera pulls back so all six security cameras stay in frame (checked across the shot).
+  - **S43:** `30:00` is red glowing digits in a black window; the needle sits in front of it.
+  - **S64b frost:**
+    - The machines play under their frost from the band's return (bar 173, in S64), and the shells rattle on each kit hit.
+    - On S64b's cut the shells burst off.
+    - S64b now opens on the wide, and the singer's setup moves to bar 179.
+  - **The snare and tom on the last chord:** the kit events at 322.98 s (snare vel 58, tom vel 30) sit at Suno's audio cut, after the start of the release crossfade (322.60 s), so the final audio doesn't have them. They are bleed at the cut, not hits; left unplayed.
+  - **S13:** all 14 key pickups are inside the shot, so the count runs 1/14 → 14/14. Only 12 piano notes fall inside it, so the two widest gaps take the guitar strike nearest their middle.
+  - **S20:** the desk. From S20's cut on, set A's endless floor gives way to a desk top about 20x scale, with:
+    - a visible edge and thickness;
+    - legs down to a lab floor 16 m below;
+    - a mug and a pencil;
+    - a warm desk-lamp spot.
+
+    Before S20 they don't render, so the interior shots keep the void.
+  - **Edit effects** (new `scripts/edit_fx.py`, used by the assembler, for the final assembly too):
+    - **S22 rewind:** on "back" (122.65 s), the picture runs back two beats in one, with colour split, tearing bands and scanlines. Then a tracking bar, and it snaps to real time; the music never rewinds.
+    - **S65 CRT collapse:** 12 frames after the SIGTERM (after the LED's flash), it squashes to a bright line, then shrinks to a dot that fades.
+- **Re-rendered:** sets A, B, C, G, H and I. D, E and F are unchanged since v3. All report 0 invalid drivers.
+- **Outputs:** `renders/animatic/animatic_v4.mp4`. Superseded: `archive/renders/animatic_v3_superseded_c4-approved-with-fixes.mp4`.
+- **Still open:**
+  - the dashboard and fact-card source check (C6);
+  - the S66 fact card (JS) and its length, which sets S67;
+  - transcription accuracy (the human: later);
+  - the vocal repaint.
+- **Why:** Human feedback, R1 (human interventions).

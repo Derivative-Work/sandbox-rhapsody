@@ -172,13 +172,22 @@ def build():
 # ---------------------------------------------------------------- animation (config/instrument_map.json, set C)
 
 def pickup_events():
-    """The 14 notes the keys are picked up on: the last 14 piano notes before S14's cut. Only 12 fall inside S13
-    (its cut sits on the downbeat after "Found" starts), so the first two pickups land 0.37 s and 0.16 s before the
-    cut: the shot opens with two keys on the ring (HUD 2/14) and ends on 14/14."""
+    """The 14 notes the keys are picked up on, all inside S13 so the HUD runs 1/14 -> 14/14 in the shot (C4 v3: it
+    opened on 2/14). Only 12 piano notes fall inside the shot, so the widest gaps between them take the guitar strike
+    nearest their middle until there are 14."""
     tm = A.timing_map()
     shot = {s["id"]: s for s in tm["shots"]}
-    evs = A.strikes(A.between(A.events("piano"), shot["S13"]["cut"] - 1.5, shot["S14"]["cut"]), 0.05)
-    return evs[-N_KEYS:]
+    a, b = shot["S13"]["cut"], shot["S14"]["cut"]
+    evs = A.strikes(A.between(A.events("piano"), a + 0.03, b), 0.05)
+    guitar = A.strikes(A.between(A.events("guitar"), a + 0.03, b), 0.05)
+    while len(evs) < N_KEYS:
+        gaps = [(evs[k + 1]["t"] - evs[k]["t"], k) for k in range(len(evs) - 1)]
+        _, k = max(gaps)
+        mid = (evs[k]["t"] + evs[k + 1]["t"]) / 2
+        g = min((e for e in guitar if evs[k]["t"] + 0.1 < e["t"] < evs[k + 1]["t"] - 0.1),
+                key=lambda e: abs(e["t"] - mid))
+        evs.insert(k + 1, g)
+    return evs[:N_KEYS]
 
 
 def door_events():

@@ -313,7 +313,7 @@ def build():
     _box("pedal.base", black, (0, 0, 0.04), (0.75, 1.0, 0.08), ped, bev=0.01)
     K.prop(ped, "press", 0.0)
     hinge = K.empty("pedal.hinge", (0, 0.42, 0.1), ped)
-    K.drive(hinge, "rotation_euler", 0, ped, "press", "0.16 - 0.16 * x")
+    K.drive(hinge, "rotation_euler", 0, ped, "press", "-0.16 + 0.16 * x")  # toe up at rest, flat when pressed
     _box("pedal.plate", K.mat_plastic("pedal_plate", "lab", 0.3), (0, -0.38, 0.03), (0.6, 0.8, 0.05), hinge, bev=0.01)
     _box("pedal.glow", K.mat_emission("pedal_glow", "alarm", 25.0, ped, "press"), (0, -0.38, 0.03), (0.64, 0.84, 0.03),
          hinge)
@@ -353,11 +353,13 @@ def build():
              (math.sin(a) * 0.36, -0.032, 1.95 + math.cos(a) * 0.36), (0.012, 0.004, 0.05 if k % 5 == 0 else 0.025),
              sw).rotation_euler = (0, a, 0)  # long axis along the radius (was -a: mirrored, C4 v2)
     K.prop(sw, "tick", 0.0, lo=0.0, hi=10000.0)
-    hand = K.empty("stopwatch.hand", (0, -0.036, 1.95), sw)
+    hand = K.empty("stopwatch.hand", (0, -0.041, 1.95), sw)  # in front of the readout window
     K.drive(hand, "rotation_euler", 1, sw, "tick", "0.2094 * x")  # 30 ticks a turn
     _box("stopwatch.needle", K.mat_plastic("needle", "shadow", 0.3), (0, 0, 0.15), (0.016, 0.004, 0.32), hand)
-    K.text("stopwatch.readout", "30:00", 0.13, K.mat_plastic("readout", "shadow", 0.5), loc=(0, -0.034, 1.76),
-           parent=sw).data.offset = 0.002
+    # The readout: glowing red digits on a black window, so `30:00` reads under the red light (was dark ink, faint).
+    _box("stopwatch.window", K.mat_plastic("sw_window", "shadow", 0.2), (0, -0.033, 1.765), (0.36, 0.004, 0.14), sw)
+    K.text("stopwatch.readout", "30:00", 0.13, K.mat_emission("readout", "alarm", 12.0), loc=(0, -0.036, 1.765),
+           parent=sw).data.offset = 0.001
     out["stopwatch"] = sw
 
     # Cold storage: a conveyor into a frosted freezer with a vault door.

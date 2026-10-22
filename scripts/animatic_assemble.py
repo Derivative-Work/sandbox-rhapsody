@@ -4,7 +4,8 @@ Each frame comes from its shot's plate (renders/animatic/plates/<shot>/f_<frame>
 a shot without a plate yet is a grey card naming the shot, its set and the brief's visual, so the cut is complete
 from the first version. Burnt in for review: shot id and set (top left), bar.beat and timecode (top right), the
 sung line with the current word highlighted (bottom), the brief's on-screen text for the shot (bottom right).
-Hard cuts; S01's fade up from black is applied here (an edit effect, as the pipeline table says).
+Hard cuts; S01's fade up from black is applied here, and the S22 rewind and the S65 CRT collapse come from
+scripts/edit_fx.py (edit effects, as the pipeline table says).
 
 Usage: .venv/bin/python -I scripts/animatic_assemble.py [out.mp4] [--from S] [--to S]  (default
 renders/animatic/animatic_v1.mp4, the whole song)
@@ -18,6 +19,9 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import edit_fx  # noqa: E402
 
 W, H = 640, 360
 FPS = 60
@@ -78,7 +82,7 @@ def main():
         k = bisect.bisect_right(cuts, f) - 1
         sid = ids[k]
         r = rows.get(sid, {})
-        plate = Path(f"renders/animatic/plates/{sid}/f_{f:04d}.png")
+        plate = Path(f"renders/animatic/plates/{sid}/f_{edit_fx.source_frame(sid, f):04d}.png")
         if plate.exists():
             img = Image.open(plate).convert("RGB").resize((W, H))
             used.add(sid)
@@ -94,6 +98,7 @@ def main():
         t = f / FPS
         if sid == "S01" and t < FADE_UP_S:
             img = Image.fromarray((np.asarray(img) * (t / FADE_UP_S)).astype(np.uint8))
+        img = edit_fx.apply(sid, f, img)
         d = ImageDraw.Draw(img, "RGBA")
         d.rectangle((0, 0, W, 20), fill=(0, 0, 0, 150))
         d.text((6, 3), f"{sid}  ·  set {r.get('set', '—')}  ·  {r.get('section', '')}", font=f_small,

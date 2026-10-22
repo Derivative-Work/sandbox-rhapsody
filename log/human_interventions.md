@@ -150,3 +150,13 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 ## 2026-10-22T14:19:31-04:00 — Correction
 
 - The entry above says "Thirteen notes"; it was twelve, as listed.
+
+## 2026-10-22T15:52:50-04:00 — C4 review of animatic v3: cut approved with three fixes (R1)
+
+- **Rule:** R1.
+- **What:** The human approved v3 ("this is great and ready for cleaning up the known-rough spots"), noting that "the music sync did actually work well enough for this application". Three fixes first:
+  - the ending needs one more cut, for a drum hit that isn't visible;
+  - the "pause" button clips through the table;
+  - the phone's handset and cord clip through the box.
+
+  Addressed with the known rough spots in v4 (production log).
