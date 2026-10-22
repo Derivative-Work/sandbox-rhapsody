@@ -80,3 +80,13 @@ Every human action: timestamp, what, why, and which production rule allows it. R
   - the preview is hard to read: they asked for held notes, note-offs and pitch ("a piano roll would work but an actual score would be even easier"), then for "a key signature in there so the accidentals aren't in the way";
   - "the lyrics don't appear aligned with the notes".
 - **Rule:** R2 (timing-map and A/V-sync correctness) and R1 (rejecting the preview as a review tool). The human named the problems in words; the agent made every change.
+
+## 2026-10-22T07:39:26-04:00 — C3 second look: bars 44, 58, 62 — R2
+
+- **What:** The human reported, in the score preview:
+  - bar 44: electric guitar missing; "it sounds like it should be eighth notes but it's notated inconsistently as dotted quarter + eighth and similar, differently each time";
+  - bar 58: "missing both eighth note chords in seemingly all the instruments plus snare hits";
+  - bar 62: similar.
+
+  They added that the rest will probably be fixed once the detectors work in those cases.
+- **Rule:** R2 (timing-data correctness). The human named problems; the agent made every change.

@@ -167,6 +167,28 @@ def main():
             added[p].append(ta)
             merged.append({"t": round(ta, 4), "end": round(ta + 0.1, 4), "pitch": GM[p], "vel": 80, "piece": p,
                            "source": "stem_nmf", "strength": round(float(r[p]), 2)})
+    # Suno's own hits: add any piece the hit's spectrum carries (>= SHARE) that Suno didn't label at that time,
+    # with the same transient and strength gates (human, C3: bar 58's snares were labelled kick + hat).
+    relabelled = {p: 0 for p in PIECES}
+    suno_times = np.unique(np.round(allhits, 3))
+    for t in suno_times:
+        f = int(t * SR / HOP)
+        after = V[:, f:f + int(0.035 * SR / HOP) + 1].mean(1)
+        before = V[:, max(0, f - int(0.03 * SR / HOP)):f].mean(1) if f > 0 else np.zeros(BANDS)
+        c, _ = nnls(Wk, np.maximum(0, after - before))
+        share = c / (c.sum() + 1e-12)
+        for j, p in enumerate(PIECES):
+            if share[j] < SHARE or (len(hits[p]) and np.min(np.abs(hits[p] - t)) < MATCH):
+                continue
+            if any(abs(e["t"] - t) < MATCH and e["piece"] == p for e in merged):
+                continue
+            ta, rise = transient(envs[p], t)
+            if rise < RISE or band_peak(p, ta) < floor[p]:
+                continue
+            merged.append({"t": round(ta, 4), "end": round(ta + 0.1, 4), "pitch": GM[p], "vel": 80, "piece": p,
+                           "source": "stem_nmf_relabel", "strength": round(float(share[j]), 2)})
+            relabelled[p] += 1
+    print("pieces added to Suno's own hits:", relabelled)
     for p in PIECES:
         by_pos = {q: [0, 0] for q in range(4)}
         for t in added[p]:

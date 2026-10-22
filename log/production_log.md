@@ -332,3 +332,36 @@ The human reported missing piano notes and drum hits (off-beat "and"s), an unrea
 - **Outputs:** `timing/piano_notes.json`, `timing/piano_transcription.mid`, `timing/events/*.json` (regenerated), `timing/stem_events/*.json`, `timing/midi_inventory.md`, `timing/drums_nmf.md`, `timing/timing_map.{json,md}`, `renders/c3/c3_score_preview.mp4`, `renders/c3/c3_preview.mp4`, `renders/c3/score.musicxml`
 - **Why:** Human feedback at C3 (log, human interventions); brief, steps 4–5.
 - **Status:** C3 re-review: `renders/c3/c3_score_preview.mp4` (score), with `renders/c3/c3_preview.mp4` (lanes) as a second view.
+
+## 2026-10-22T07:39:26-04:00 — C3 revision 2: re-transcribed pitched stems, LarsNet drum kit, chord timing
+
+The human found missing eighth-note chords and snares (bars 58, 62) and inconsistent guitar rhythm (bar 44). The same pattern holds across all pitched instruments: in bar 58 the bass stem has 10 onsets and Suno's bass MIDI has 4.
+
+1. **Pitched stems re-transcribed** with Spotify's Basic Pitch 0.4.0 (ICASSP 2022 model, ONNX backend on onnxruntime-gpu; TensorFlow overridden away in `pyproject.toml`, with uv resolving for Linux only) (`scripts/transcribe_stems.py`). It explains this share of each stem's detected onsets against Suno's MIDI:
+
+   | Stem | Basic Pitch | Suno |
+   | --- | --- | --- |
+   | guitar | 97% | 50% |
+   | bass | 93% | 82% |
+   | synth | 89% | 42% |
+   | strings | 86% | 12% |
+
+   Brass: 87%. The bass is limited to 30–220 Hz; up to 400 Hz it took second harmonics as notes (octave jumps).
+2. **Events from the transcriptions** (`scripts/events_from_transcriptions.py`):
+   - **Shift** from physical attacks.
+   - **Ghosts:** notes starting more than 30 dB under the stem's loud level, or with amplitude under 0.12, are dropped. A fixed −50 dBFS floor was unfair to quiet stems.
+   - **Support gate** for guitar, bass and synth: the note must show an onset in its stem (Basic Pitch re-triggers on decaying overtones).
+   - **Chords:** notes within 60 ms form one chord. It snaps to the stem's nearest locally normalised detected onset (±80 ms, minus 12 ms detector lag), else to its physical attack; a group with no onset of its own within 0.15 s of the previous chord folds into it.
+   - **Why the chord timing:** Basic Pitch spreads one strum over 50–100 ms and runs ~50 ms late in sustained distortion. Globally normalised onset detection found nothing in the quiet ballad, and a 0.25 s fold window swallowed real eighths at 140 BPM.
+   - **Result:** bar 44's guitar reads 0.03, 0.6, 1.04, 1.57, 2.04, 2.52, 3.04, 3.57 beats, i.e. eighths.
+3. **Piano:** the model's 3,451 notes plus 1,175 Basic Pitch fill-ins where the model has no onset within 50 ms (support-gated, chord-timed). On the keyboard stem Basic Pitch covers 99.4% of onsets, the model 89.8%; the model missed bar 58's beat-4 chord. Output: `timing/events/keyboard__piano.json`.
+4. **Drums from LarsNet-separated pieces** (`scripts/drums_larsnet.py`): Mezza et al. 2024, the authors' checkpoints (CC BY-NC 4.0, analysis only, not redistributed), run from a clone in `cache/larsnet` with Wiener α 1.0 on the GPU (3 s for the song). Stems are in `audio/derived/drums_larsnet/`.
+   - **Why:** Suno's labels were wrong where the human pointed (bar 58's hits on 2 and 4 are toms; bar 62's snares on 1–3 were missing), and the NMF templates learned from those labels inherited the errors (a "hats" template with strong lows; bar 58's spectra are kick/tom-like).
+   - **Per piece:** onsets in its own stem, kept if within 20 dB (hats 26, crash 14) of that stem's loud level and rising 8 dB (hats and crash 6/3) from the 30 ms before; merged within 40 ms; timed at the physical attack.
+   - **Hits:** kick 442, snare 270, toms 263, hats 684, crash 336. They find 97% of Suno's kicks, 79% of its toms and 55% of its snares (Suno's snare labels were the least reliable).
+   - Hits Suno lacked are amber in the score. The NMF kit is archived as `archive/timing/drums__kit_nmf_superseded.json`.
+5. **Which source drives each instrument** is recorded in `config/event_sources.json`; the score and both previews read from it.
+6. **Rebuilt:** the score (guitar staff shows each chord's lowest 3 notes), `renders/c3/c3_score_preview.mp4`, `renders/c3/c3_preview.mp4`, `renders/c3/score.musicxml`. The superseded previews are in `archive/renders/c3/`.
+7. **Reproducibility:** `uv sync` reproduces every transcription note count (re-run under the lock: guitar 2,631, bass 1,309, synth 3,438, strings 3,152, brass 2,773, keyboard 4,376).
+
+- **Why:** Human feedback at C3 (human interventions); brief, steps 4–5 ("where a track fails, derive events from the stem").

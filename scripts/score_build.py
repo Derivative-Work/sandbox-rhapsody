@@ -1,7 +1,8 @@
 """Build a readable score of the timing data (for the C3 check; human, C3: "an actual score would be even easier").
 
-Parts: Vocals (lead melody, with the aligned lyrics), Piano (the model transcription, right hand >= C4, left hand
-below), Bass, Guitar (distortion), Drums (kick, snare, toms, hats, crash; hits the NMF added are amber). Every event
+Parts: Vocals (lead melody, with the aligned lyrics), Piano (model + basic-pitch fill-ins, right hand >= C4, left
+hand below), Bass, Guitar (lowest 3 notes of each chord shown), Drums (from LarsNet-separated pieces; hits Suno's
+MIDI didn't have are amber). Sources: config/event_sources.json. Every event
 is placed on the measured beat grid (timing/timing_map.json) at sixteenth-note resolution, so the notation shows
 what the animation will hit, in the song's own bars (incl. its 2/4 and 5/4 bars). Held notes, rests and ties show
 durations and note-offs.
@@ -59,6 +60,14 @@ def mono(evs, top=True):
         end = min(qz(qpos(e["end"])), on[k + 1] if k + 1 < len(on) else 1e9)
         out.append((q, max(Q, end - q), [e]))
     return out
+
+
+def lowest(n):
+    """Keep each chord's lowest n notes: a display reduction for the distorted guitar, whose transcription stacks
+    harmonics on every power chord (the events keep every note)."""
+    def f(items):
+        return [(q, d, sorted(evs, key=lambda e: e["pitch"])[:n]) for q, d, evs in items]
+    return f
 
 
 def poly(evs):
@@ -135,7 +144,7 @@ def build_part(name, inst, cl, items, color_of=None, lyrics=None, drums=False):
                 n = note.Unpitched()
                 n.displayStep, n.displayOctave = DRUM[pc][0], DRUM[pc][1]
                 n.notehead = DRUM[pc][2]
-                if all(e.get("source") == "stem_nmf" for e in evs if e["piece"] == pc):
+                if not any(e.get("in_suno", e.get("source", "suno") == "suno") for e in evs if e["piece"] == pc):
                     n.style.color = AMBER
                 ns.append(n)
             el = ns[0] if len(ns) == 1 else percussion.PercussionChord(ns)
@@ -233,12 +242,12 @@ def main():
     voc, lyr = vocal_line()
     parts = [
         build_part("Vocals", instrument.Vocalist(), clef.TrebleClef(), voc, lyrics=lyr),
-        build_part("Piano RH", instrument.Piano(), clef.TrebleClef(), poly(events("timing/events/keyboard__piano_model.json", lo=60))),
-        build_part("Piano LH", instrument.Piano(), clef.BassClef(), poly(events("timing/events/keyboard__piano_model.json", hi=60))),
+        build_part("Piano RH", instrument.Piano(), clef.TrebleClef(), poly(events("timing/events/keyboard__piano.json", lo=60))),
+        build_part("Piano LH", instrument.Piano(), clef.BassClef(), poly(events("timing/events/keyboard__piano.json", hi=60))),
         build_part("Bass", instrument.ElectricBass(), clef.Bass8vbClef(),
-                   mono(events("timing/events/bass__electric_bass_finger.json"), top=False)),
+                   mono(events("timing/events/bass__basic_pitch.json"), top=False)),
         build_part("Guitar", instrument.ElectricGuitar(), clef.Treble8vbClef(),
-                   poly(events("timing/events/guitar__distortion_guitar.json"))),
+                   lowest(3)(poly(events("timing/events/guitar__basic_pitch.json")))),
         build_part("Drums", instrument.UnpitchedPercussion(), clef.PercussionClef(),
                    poly(events("timing/events/drums__kit.json")), drums=True),
     ]

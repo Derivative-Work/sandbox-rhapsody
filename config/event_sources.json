@@ -1,0 +1,43 @@
+{
+ "_doc": "Which event file drives each instrument's machines (steps 4-5, C3 revisions). Written by scripts/events_from_transcriptions.py.",
+ "vocals": {
+  "events": "timing/timing_map.json lines/words",
+  "why": "forced alignment of the as-sung lyrics"
+ },
+ "piano": {
+  "events": "timing/events/keyboard__piano.json",
+  "why": "piano model (3451 notes) + 1175 basic-pitch notes where the model had no onset within 50 ms"
+ },
+ "drums": {
+  "events": "timing/events/drums__kit.json",
+  "why": "LarsNet-separated kit pieces (scripts/drums_larsnet.py); Suno compared, not used"
+ },
+ "percussion": {
+  "events": "timing/stem_events/percussion.json",
+  "why": "stem onsets; Suno MIDI had 5 notes"
+ },
+ "fx": {
+  "events": "timing/stem_events/fx.json",
+  "why": "stem onsets; Suno MIDI explained 8%"
+ },
+ "guitar": {
+  "events": "timing/events/guitar__basic_pitch.json",
+  "why": "basic-pitch; shift -8.4 ms; 618 of 2631 notes dropped (ghosts < -53 dBFS, amplitude < 0.12, or no onset in the stem)"
+ },
+ "bass": {
+  "events": "timing/events/bass__basic_pitch.json",
+  "why": "basic-pitch; shift -3.1 ms; 213 of 1309 notes dropped (ghosts < -55 dBFS, amplitude < 0.12, or no onset in the stem)"
+ },
+ "synth": {
+  "events": "timing/events/synth__basic_pitch.json",
+  "why": "basic-pitch; shift -3.5 ms; 814 of 3438 notes dropped (ghosts < -62 dBFS, amplitude < 0.12, or no onset in the stem)"
+ },
+ "strings": {
+  "events": "timing/events/strings__basic_pitch.json",
+  "why": "basic-pitch; shift -0.2 ms; 153 of 3152 notes dropped (ghosts < -69 dBFS, amplitude < 0.12)"
+ },
+ "brass": {
+  "events": "timing/events/brass__basic_pitch.json",
+  "why": "basic-pitch; shift -9.2 ms; 319 of 2773 notes dropped (ghosts < -68 dBFS, amplitude < 0.12)"
+ }
+}
