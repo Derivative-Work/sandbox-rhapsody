@@ -446,3 +446,15 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 
 - The entry above says 912 contacts were checked. The check (`scenes/blender/anim_test.py`) verifies snare steppers, kick strikers, kick LED pulses and pellet arrivals: 49 + 83 + 97 + 105 + 193 = **527 contacts**, all on their event frames.
 - The 912 counted every event driven in those windows, including crash, piano and bass, which the test drives but doesn't check frame by frame.
+
+## 2026-10-22T08:59:29-04:00 — Step 7 revision: bigger, slower, obvious motion
+
+- **What:** The human said the first rig test was in sync but "not obvious enough … too fast or not large enough". The changes:
+  - **Rigs retuned** (`sr_anim.py`): striker wind-up 14 frames (was 6), a linear fall into contact, a 2-frame hold, rebound and settle over 28 (was 12); key presses held at least 12 and released over 12 (was 6/4); LED decay τ = 0.4 × length, at least 12 frames (was 0.25×, 4); bells at least 45 frames (was 20); steppers over 10 with a 15% overshoot (was 6, 6%); pellets fly at least 30 frames (was 12).
+  - **New `hit_flash` rig:** the struck part lights on contact and fades over 18 frames.
+  - **New kit pieces:** `mallet_pad` (a 34–40 cm mallet arm resting at 40°, winding up to 70°, striking a dark pad that squashes 25% and whose rim and face flash) and `pellet_mesh` (3 cm, glowing, stretched tail).
+  - **Test scene:** kick and snare pads, the turnstile stepping on the snare, the music box's drum stepping 30° per piano note, vents on the squared vocal envelope, and a camera about 1.5 m away.
+  - **Pads:** dark. The first look used red plastic, which read as already lit, so the flash didn't show.
+- **Check:** every contact still lands on its frame (0 off in the 44–54 s window). The frame strip around the kick at 51.40 s shows the wind-up at −9 frames, contact and flash at 0, rebound by +12 and settled by +24.
+- **Outputs:** `renders/step7/anim_test_44-54_v3.mp4`. Superseded: `archive/renders/anim_test_44-54_rejected_too-small-fast.mp4` and `anim_test_44-54_v2_superseded_pad-colour.mp4`. Style spec part 2, "Making machines play themselves", has the new numbers and a size rule: a moving part travels at least a third of its machine's height.
+- **Why:** Human feedback (human interventions), brief step 7.

@@ -4,12 +4,16 @@ Clock: frame f shows song time f / FPS (scene frame_start = 0). Every contact la
 (worst-case 8.3 ms at 60 fps). Everything is procedural: re-running a set after a timing fix rewrites its keys, and
 nothing is keyed by hand.
 
-Rig types (config/instrument_map.json "rig"); timings from the style spec, part 2, "Making machines play themselves":
-  key_press  - down 2 frames before the onset, held for the note (at least 6 frames), up over 4 frames
-  striker    - wind-up from 6 frames before (height by velocity), contact on the onset frame, rebound and settle
-               over 12 frames
-  bell       - damped swing starting on the onset, decaying over the note (at least 20 frames)
-  led_pulse  - full on the onset, exponential decay (tau = 0.25 x note length, at least 4 frames)
+Rig types (config/instrument_map.json "rig"); timings from the style spec, part 2, "Making machines play themselves"
+(retuned after the human's look at the first test: "not obvious enough ... happening too fast or are not large
+enough"; the first values were 6/12/4 frames):
+  key_press  - down 4 frames before the onset, held for the note (at least 12 frames), up over 12 frames
+  striker    - wind-up from 14 frames before (height by velocity), accelerating into contact on the onset frame,
+               held 2 frames, rebound and settle over 28 frames
+  bell       - damped swing starting on the onset, decaying over the note (at least 45 frames)
+  led_pulse  - full on the onset, exponential decay (tau = 0.4 x note length, at least 12 frames)
+  hit_flash  - a light burst on the struck part: full on contact, gone over 18 frames
+When notes crowd, wind-ups shrink and settles are cut short so every contact still lands (_merge).
   envelope   - follows a stem envelope (timing/envelopes/*.npy, already smoothed over 3 frames)
   stepper    - a counter: +1 per event, easing in over 6 frames to land on the onset with a 6% overshoot that
                settles over 8 frames (turnstiles, odometers, split-flaps, dials)
@@ -171,7 +175,7 @@ def prop_path(name):
 
 # ---------------------------------------------------------------- rigs (value curves on a custom property)
 
-def key_press(owner, prop, evs, depth=1.0, pre=2, release=4, min_hold=6):
+def key_press(owner, prop, evs, depth=1.0, pre=4, release=12, min_hold=12):
     per = []
     for e in evs:
         f0, f1 = frame(e["t"]), max(frame(e["end"]), frame(e["t"]) + min_hold)
@@ -180,40 +184,50 @@ def key_press(owner, prop, evs, depth=1.0, pre=2, release=4, min_hold=6):
     return write_keys(owner, prop_path(prop), _merge(per), interp="BEZIER")
 
 
-def striker(owner, prop, evs, wind=6, settle=12):
-    """0 = rest; negative = wound up; 1 = contact. Wind-up height scales with velocity."""
+def striker(owner, prop, evs, wind=14, settle=28):
+    """0 = rest; negative = wound up; 1 = contact. Wind-up height scales with velocity. The fall from the top of the
+    wind-up into contact is linear (fast), so the strike reads as a strike; the rebound overshoots, then settles."""
     per = []
     for e in evs:
         f0 = frame(e["t"])
-        h = 0.4 + 0.6 * e["vel"] / 127
-        per.append([(f0 - wind, 0.0), (f0 - 2, -h, "BEZIER"), (f0, 1.0, "LINEAR", True), (f0 + 3, -0.15 * h),
-                    (f0 + settle, 0.0)])
+        h = 0.5 + 0.5 * e["vel"] / 127
+        per.append([(f0 - wind, 0.0), (f0 - wind // 3, -h, "LINEAR"), (f0, 1.0, "CONSTANT", True), (f0 + 2, 1.0),
+                    (f0 + 8, -0.3 * h), (f0 + 16, 0.1 * h), (f0 + settle, 0.0)])
     return write_keys(owner, prop_path(prop), _merge(per))
 
 
-def bell(owner, prop, evs, min_len=20, cycles_per_s=2.5):
+def bell(owner, prop, evs, min_len=45, cycles_per_s=2.0):
     per = []
     for e in evs:
         f0 = frame(e["t"])
         n = max(min_len, frame(e["end"]) - f0)
-        amp = 0.5 + 0.5 * e["vel"] / 127
+        amp = 0.7 + 0.3 * e["vel"] / 127
         ks = [(f0 + k, amp * math.exp(-3 * k / n) * math.sin(2 * math.pi * cycles_per_s * k / FPS), "LINEAR", k == 0)
               for k in range(0, n + 1, 2)]
         per.append(ks + [(f0 + n + 2, 0.0)])
     return write_keys(owner, prop_path(prop), _merge(per), interp="LINEAR")
 
 
-def led_pulse(owner, prop, evs, floor=0.04, min_tau=4):
+def led_pulse(owner, prop, evs, floor=0.04, min_tau=12):
     per = []
     for e in evs:
         f0 = frame(e["t"])
         n = max(1, frame(e["end"]) - f0)
-        tau = max(min_tau, 0.25 * n)
-        peak = 0.6 + 0.4 * e["vel"] / 127
+        tau = max(min_tau, 0.4 * n)
+        peak = 0.75 + 0.25 * e["vel"] / 127
         ks = [(f0 - 1, floor, "LINEAR")]
-        ks += [(f0 + k, floor + (peak - floor) * math.exp(-k / tau), "LINEAR", k == 0) for k in (0, 1, 2, 4, 8, 16, 32)
-               if k <= 4 * tau]
+        ks += [(f0 + k, floor + (peak - floor) * math.exp(-k / tau), "LINEAR", k == 0)
+               for k in (0, 1, 2, 4, 8, 12, 16, 24, 32, 48, 64) if k <= 4 * tau]
         per.append(ks + [(f0 + int(4 * tau) + 1, floor, "LINEAR")])
+    return write_keys(owner, prop_path(prop), _merge(per), interp="LINEAR")
+
+
+def hit_flash(owner, prop, evs, length=18):
+    per = []
+    for e in evs:
+        f0 = frame(e["t"])
+        per.append([(f0 - 1, 0.0, "LINEAR"), (f0, 1.0, "LINEAR", True), (f0 + 3, 0.7, "LINEAR"),
+                    (f0 + length // 2, 0.2, "LINEAR"), (f0 + length, 0.0, "LINEAR")])
     return write_keys(owner, prop_path(prop), _merge(per), interp="LINEAR")
 
 
@@ -223,7 +237,7 @@ def envelope_rig(owner, prop, env, f0=0, f1=None, step=2, gain=1.0, offset=0.0):
     return write_keys(owner, prop_path(prop), keys, interp="LINEAR")
 
 
-def stepper(owner, prop, evs, pre=6, settle=8, overshoot=0.06, start=0.0):
+def stepper(owner, prop, evs, pre=10, settle=16, overshoot=0.15, start=0.0):
     per, v = [[(0, start, "CONSTANT")]], start
     for e in evs:
         f0 = frame(e["t"])
@@ -261,7 +275,7 @@ def _merge(per_event, contact_value=None):
 
 # ---------------------------------------------------------------- pellets
 
-def launch_times(evs, path_len, speed, min_flight_frames=12):
+def launch_times(evs, path_len, speed, min_flight_frames=30):
     """(launch frame, arrival frame) per event: arrival exactly on the onset frame; the launch is solved back from
     the path length at `speed` (m/s), with at least `min_flight_frames` of flight so every arc is seen."""
     out = []

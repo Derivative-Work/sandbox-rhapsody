@@ -239,19 +239,29 @@ lyric. It honours the style in these ways:
 
 ### Making machines play themselves (rules for step 7)
 
-- **Contact on the onset.** Contact happens on the frame nearest the MIDI onset, or the stem's onset where a track
-  fails validation (step 4).
-- **Strikers:** wind-up starts 6 frames (100 ms) before contact, then rebound and settle over 10–14 frames.
-  Velocity scales wind-up height.
-- **Keys and drawers:** a key (or B's drawer) goes down or out 2 frames before the onset and holds for the note's
-  length, with a minimum of 6 frames.
-- **Bells:** bells swing on the onset and decay over the note.
-- **LEDs and glows:** jump to full on the onset, then decay exponentially over the note (τ = 0.25 × length, minimum
-  4 frames). Vents follow the vocal stem's envelope, smoothed over 3 frames.
-- **Pellets:** launch early so they arrive on the note. The launch time is solved back from the onset and the path
-  length at a constant speed per set, with a minimum flight of 12 frames so every arc is seen.
+Retuned after the human's look at the first rig test ("not obvious enough, like they're happening too fast or are
+not large enough"). The first values were half these or less.
+
+- **Contact on the onset.** Contact happens on the frame nearest the event (timing/, config/event_sources.json).
+  When notes crowd, wind-ups shrink and settles are cut short so that every contact lands.
+- **Strikers:** wind-up starts 14 frames (0.23 s) before contact, then falls fast and linearly into it. The striker
+  holds 2 frames on contact, rebounds with an overshoot, and settles over 28 frames. Velocity scales the wind-up.
+  Arms travel large arcs: the mallet rests at 40° and winds up to 70°.
+- **Hit flash:** every struck part lights on contact and fades over 18 frames. Struck surfaces are dark, so the flash
+  is the contrast.
+- **Keys and drawers:** a key goes down 4 frames before the onset, holds for the note (at least 12 frames), and
+  releases over 12.
+- **Steppers** (turnstiles, odometers, split-flaps, dials): each step eases in over 10 frames, lands on the onset
+  with a 15% overshoot, and settles over 16.
+- **Bells:** they swing on the onset and decay over at least 45 frames.
+- **LEDs and glows:** full on the onset, then an exponential decay (τ = 0.4 × length, at least 12 frames).
+- **Vents:** they follow the vocal envelope squared, so they open decisively instead of hovering half-open.
+- **Pellets:** about 3 cm, glowing, with a stretched tail. Each launches early so it arrives on the note, after at
+  least 30 frames (0.5 s) of flight.
+- **Size:** a moving part should travel at least a third of its machine's height, and be framed large enough that
+  the travel reads. Machines are built for the camera that films them.
 - **One cause per note:** no visible machine moves without a note behind it, apart from the camera, the floor ring
-  (bass) and idle probes' slow LED breathing.
+  (bass) and the idle probes' slow LED breathing.
 
 ### The agent point-of-view layer
 

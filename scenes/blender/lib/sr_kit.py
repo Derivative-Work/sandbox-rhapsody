@@ -795,3 +795,48 @@ def floor_ring(name="floor_ring", radius=1.8, width=0.03, loc=(0, 0, 0.001)):
              major_radius=radius, minor_radius=width, major_segments=128, minor_segments=8)
     bpy.context.active_object.scale = (1, 1, 0.1)
     return root
+
+
+def mallet_pad(name, loc=(0, 0, 0), rot_z=0.0, pad_role="lab", pad_r=0.12, arm_len=0.34, glow_role="amber"):
+    """A struck pad with its mallet: the big, readable strike (human, step 7: motion "not obvious enough").
+    "strike" (sr_anim.striker): 0 rest, arm raised 40 deg; -1 wound up to 70 deg; 1 contact (arm level on the pad).
+    "flash" (sr_anim.hit_flash): the pad's rim lights and the pad squashes 25% on contact."""
+    root = empty(name, loc)
+    root.rotation_euler = (0, 0, rot_z)
+    prop(root, "strike", 0.0, lo=-1.0, hi=1.0)
+    prop(root, "flash", 0.0)
+    stand = mesh_obj(f"{name}.stand", bpy.ops.mesh.primitive_cylinder_add, mat_chrome(f"{name}.stand"), root,
+                     radius=0.012, depth=0.18, location=(0, 0, 0.09))
+    pad_root = empty(f"{name}.pad_root", (0, 0, 0.18), root)
+    drive(pad_root, "scale", 2, root, "flash", "1 - 0.25 * x")
+    pad = mesh_obj(f"{name}.pad", bpy.ops.mesh.primitive_cylinder_add, mat_plastic(f"{name}.pad", pad_role, 0.1),
+                   pad_root, radius=pad_r, depth=0.035, vertices=64, location=(0, 0, 0.0175))
+    bevel(pad, 0.006)
+    rim = mesh_obj(f"{name}.rim", bpy.ops.mesh.primitive_torus_add,
+                   mat_emission(f"{name}.rim", glow_role, 60.0, root, "flash"), pad_root,
+                   major_radius=pad_r, minor_radius=0.01, location=(0, 0, 0.036))
+    # The pad's face glows too on the hit (a dark pad, so the flash is the contrast).
+    face = mesh_obj(f"{name}.face", bpy.ops.mesh.primitive_circle_add,
+                    mat_emission(f"{name}.face", glow_role, 8.0, root, "flash"), pad_root, radius=pad_r * 0.85,
+                    vertices=48, fill_type="NGON", location=(0, 0, 0.0362))
+    # Mallet: a pivot behind the pad, an arm reaching over its centre, a ball head.
+    pivot = empty(f"{name}.pivot", (0, arm_len, 0.18 + 0.075), root)
+    drive(pivot, "rotation_euler", 0, root, "strike", "-(0.698 - 0.698 * max(x, 0) - 0.524 * min(x, 0))")  # +X lowers an arm along -Y
+    post = mesh_obj(f"{name}.post", bpy.ops.mesh.primitive_cylinder_add, mat_chrome(f"{name}.post"), root,
+                    radius=0.01, depth=0.255, location=(0, arm_len, 0.1275))
+    arm = mesh_obj(f"{name}.arm", bpy.ops.mesh.primitive_cylinder_add, mat_chrome(f"{name}.arm"), pivot,
+                   radius=0.008, depth=arm_len, location=(0, -arm_len / 2, 0), rotation=(math.pi / 2, 0, 0))
+    head = mesh_obj(f"{name}.head", bpy.ops.mesh.primitive_uv_sphere_add, mat_plastic(f"{name}.head", "brass", 0.15),
+                    pivot, radius=0.035, location=(0, -arm_len, -0.02))
+    smooth(head)
+    return root
+
+
+def pellet_mesh(name, mat, r=0.015, stretch=2.6):
+    """A glowing pellet with a stretched tail, oriented along its path by Follow Path (curve follow)."""
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=r, segments=16, ring_count=8)
+    o = bpy.context.active_object
+    o.name = name
+    o.scale = (stretch, 1, 1)
+    o.data.materials.append(mat)
+    return o

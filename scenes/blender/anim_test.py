@@ -26,53 +26,57 @@ K.floor()
 K.studio_lights(center=(0, 0, 0.4), radius=4)
 K.reflection_cards(center=(0, 0, 0.4), radius=4)
 
-blade = K.blade("blade", (-0.35, 0, 0.0), width=0.3, height=0.062, depth=0.22)
-box = K.music_box("musicbox", (0.25, 0.05, 0.0), scale=1.4)
-grader = K.turnstile("grader", (0.9, 0.3, 0), rot_z=math.radians(-20))
-probe = K.probe("lead", (-0.35, 0, 0.062 + K.PROBE_R), led=0.2)
-ring = K.floor_ring("ring", radius=1.2)
+blade = K.blade("blade", (-0.75, 0.35, 0.0), width=0.3, height=0.062, depth=0.22)
+box = K.music_box("musicbox", (-0.3, 0.0, 0.0), scale=2.2)
+grader = K.turnstile("grader", (0.95, 0.55, 0), rot_z=math.radians(-20))
+kick_pad = K.mallet_pad("kick_pad", (0.15, -0.05, 0.0), rot_z=math.radians(-15), pad_role="lab_dark", pad_r=0.16,
+                        arm_len=0.40, glow_role="alarm")
+snare_pad = K.mallet_pad("snare_pad", (0.55, 0.15, 0.0), rot_z=math.radians(-30), pad_role="lab_dark", pad_r=0.11,
+                         glow_role="amber")
+probe = K.probe("lead", (-0.75, 0.35, 0.062 + K.PROBE_R), led=0.2)
+ring = K.floor_ring("ring", radius=1.4)
 
-# Tube for pellets.
+# Tube for pellets: from the back left into the music box.
 cd = bpy.data.curves.new("tube", "CURVE")
 cd.dimensions = "3D"
-cd.bevel_depth = 0.012
+cd.bevel_depth = 0.02
 sp = cd.splines.new("BEZIER")
-pts = [(-1.4, 0.8, 0.5), (-0.6, 0.6, 0.6), (0.2, 0.3, 0.3), (0.25, 0.05, 0.2)]
+pts = [(-1.8, 1.4, 0.7), (-1.0, 1.0, 0.8), (-0.5, 0.4, 0.5), (-0.3, 0.05, 0.3)]
 sp.bezier_points.add(len(pts) - 1)
 for bp, p in zip(sp.bezier_points, pts):
     bp.co = p
     bp.handle_left_type = bp.handle_right_type = "AUTO"
 tube = K.link(bpy.data.objects.new("tube", cd))
-tube.data.materials.append(K.mat_acrylic("tube", "lab_glow", alpha=0.4, emit=0.5))
-pmat = K.mat_emission("pellet", "amber", 20.0)
+tube.data.materials.append(K.mat_acrylic("tube", "lab_glow", alpha=0.3, emit=0.3))
+pmat = K.mat_emission("pellet", "amber", 25.0)
 
 
 def make_pellet(i):
-    bpy.ops.mesh.primitive_uv_sphere_add(radius=0.012, segments=12, ring_count=6)
-    o = bpy.context.active_object
-    o.name = f"pellet{i}"
-    o.data.materials.append(pmat)
-    return o
+    return K.pellet_mesh(f"pellet{i}", pmat, r=0.015)
 
 
 # Drive the rigs (config/instrument_map.json, set A + global).
 W = lambda evs: A.between(evs, t0, t1)  # noqa: E731
-A.envelope_rig(blade, "vent", A.envelope("vocal_env"), A.frame(t0), A.frame(t1))
+A.envelope_rig(blade, "vent", A.envelope("vocal_env") ** 2.0, A.frame(t0), A.frame(t1))  # squared: decisive opening
 piano_top = W(A.top_line(A.pitch_range(A.events("piano"), 60)))
-A.key_press(box, "drum", piano_top, depth=0.02)  # the drum creeps on each note (its comb plucks)
+A.stepper(box, "drum", piano_top, pre=4, settle=10, overshoot=0.0)  # a twelfth of a turn per note (driver below)
+box_drv = bpy.data.objects["musicbox.axle"].animation_data.drivers[0].driver
+box_drv.expression = "0.5236 * x"
 snare = W(A.strikes(A.pieces(A.events("kit"), "snare")))
 crash = W(A.strikes(A.pieces(A.events("kit"), "crash")))
 kick = W(A.strikes(A.pieces(A.events("kit"), "kick")))
 A.stepper(grader, "spin", snare)
 A.bell(grader, "bell", crash)
+A.striker(kick_pad, "strike", kick)
+A.hit_flash(kick_pad, "flash", kick)
+A.striker(snare_pad, "strike", snare)
+A.hit_flash(snare_pad, "flash", snare)
 A.led_pulse(probe, "led", kick)
-hammer = K.empty("hammer_test")
-K.prop(hammer, "strike", 0.0, lo=-1.0, hi=1.0)
-A.striker(hammer, "strike", kick)
 bass = W(A.events("bass"))
 A.led_pulse(ring, "pulse", bass)
-synth = W(A.strikes(A.events("synth"), 0.15))
-pel = A.pellets(tube, synth, speed=1.5, make_pellet=make_pellet)
+synth = W(A.strikes(A.events("synth"), 0.2))
+pel = A.pellets(tube, synth, speed=1.2, make_pellet=make_pellet)
+hammer = kick_pad
 
 # Verify contacts land on event frames.
 def value_at(owner, prop, f):
@@ -82,7 +86,7 @@ def value_at(owner, prop, f):
 bad = []
 for k, e in enumerate(snare):
     f = A.frame(e["t"])
-    if abs(value_at(grader, "spin", f) - (k + 1.06)) > 1e-3:
+    if abs(value_at(grader, "spin", f) - (k + 1.15)) > 1e-3:
         bad.append(("stepper", e["t"], value_at(grader, "spin", f)))
 for e in kick:
     f = A.frame(e["t"])
@@ -99,7 +103,7 @@ print(f"CHECK snare strikes {len(snare)}, kicks {len(kick)}, crash {len(crash)},
       f"bass {len(bass)}, pellets {len(pel)}; contacts off their frame: {len(bad)} {bad[:5]}")
 
 if render_dir:
-    K.camera("cam", (0.9, -1.9, 0.75), (0.1, 0.1, 0.25), lens=30)
+    K.camera("cam", (0.55, -1.55, 0.62), (0.05, 0.2, 0.18), lens=28)
     K.bloom(scene)
     scene.render.filepath = str(Path(render_dir) / "f_")
     scene.render.image_settings.file_format = "PNG"
