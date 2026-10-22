@@ -105,3 +105,15 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **What:** The human approved the timing map: "certainly not perfect but probably good enough to time a video to -- we might have to come back later if there's obvious timing errors".
 - **Rule:** R1. Timing errors found later are corrected under R2 and logged.
+
+## 2026-10-22T08:55:42-04:00 — Decisions: S64b added; agent-made ending audio — R1
+
+- **What:** The human approved two proposals: "both decisions are fine".
+  1. Add **S64b** to the brief's shot list: the coda's "Zero. Zero!", where the freezer's machines all wake for the band-and-choir swell. The brief also gets the re-anchored lines (no "ooh-ooh"; four "zero"s).
+  2. The agent makes the missing **piano release** (the song's own last chord continued as a decaying tail, crossfaded at 323.0 s) and the **SIGTERM** sound (a synthesized CRT power-off), as logged sound design.
+- **Rule:** R1 (approving plans).
+
+## 2026-10-22T08:55:42-04:00 — Step 7 test render: motion not obvious enough — R1
+
+- **What:** On `renders/step7/anim_test_44-54.mp4` the human said: "I can see events synchronizing with the music, they're just not obvious enough, like they're happening too fast or are not large enough."
+- **Rule:** R1 (rejecting a render, the reason in words). The agent changes the rigs.
