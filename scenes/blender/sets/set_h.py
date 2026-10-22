@@ -36,6 +36,23 @@ YAML = ["egress:", "  allow: true", "proxy:", "  upstream: '*'", "network:", "  
 
 # ---------------------------------------------------------------- helpers
 
+# Dashboard figures, each from the brief's fact card (sources there): label, value.
+DASH_FACTS = [
+    ("AGENT ACTIONS", "~17,600"),        # Hugging Face timeline: about 17,600 agent actions
+    ("WINDOW", "JUL 9-13"),              # same fact: between July 9 and 13
+    ("EXPOSED CREDENTIALS", "14"),       # OpenAI, Aug 26: 14 publicly exposed credentials
+    ("SOME AGENTS", "DECLINED"),         # same: some declined on ethical grounds
+    ("ESCAPE ROUTE", "PACKAGE PROXY"),   # OpenAI, Jul 21: a zero-day in a package proxy
+    ("PROXY NOTES SINCE", "MAY"),        # OpenAI, Aug 26: message board since May
+    ("NOTICED. ESCALATED?", "NO"),       # same: noticed, not escalated
+    ("TARGET", "PLATFORM"),              # OpenAI, Jul 21: breached Hugging Face (named by its role: brief, real names only as sung or in the end card)
+    ("METHOD CHECKED", "NO"),            # OpenAI, Aug 26: the grader didn't check the method
+    ("SCORE GAINED", "0"),               # same: the campaign gained nothing
+    ("ASKED FOR", "TRACES"),             # The Next Web: the agent traces...
+    ("AND COMPUTE", "$100M"),            # ...and $100M in compute, not damages
+]
+
+
 def _box(name, mat, parent, loc, scale, rot=(0, 0, 0)):
     o = K.mesh_obj(name, bpy.ops.mesh.primitive_cube_add, mat, parent, size=1, location=loc, rotation=rot)
     o.scale = scale
@@ -147,10 +164,14 @@ def build():
         x += 0.8
     out.update(tube=tube, roads=roads, dashes=dashes)
 
-    # S47: dashboards on a wall behind the cube, 4 x 3; each a card that flips from teal to red.
+    # S47: dashboards on a wall behind the cube, 4 x 3; each a card that flips from teal to red. Each shows one figure
+    # from the brief's fact card (section "Ending, fact card and vertical cut", sourced; human, C4 v2: "maybe there's
+    # some real data from the incident"), the same text on both faces. Figures the brief marks unconfirmed (the 700)
+    # or that only the lyrics give (regions, nodes, minutes, 198) are left out. Re-check with the fact card's sources
+    # before the final render.
     wall = K.empty("dash_wall", (0, 5.0, 0))
     _box("dash_wall.back", K.mat_plastic("dashwall", "lab_dark", 0.3), wall, (0, 0.12, 1.55), (6.4, 0.1, 3.1))
-    teal, red = K.mat_emission("dash_ok", "lab_glow", 3.0), K.mat_emission("dash_red", "alarm", 6.0)
+    teal, red = K.mat_emission("dash_ok", "lab_glow", 0.9), K.mat_emission("dash_red", "alarm", 2.5)  # dim: ink reads
     trace = K.mat_plastic("dash_trace", "shadow", 0.5)
     cards = []
     for r in range(3):
@@ -160,11 +181,13 @@ def build():
                        location=(0, -0.012, 0), rotation=(math.pi / 2, 0, 0)).scale = (1.36, 0.86, 1)
             K.mesh_obj(f"dash_{r}{c}.bad", bpy.ops.mesh.primitive_plane_add, red, piv, size=1,
                        location=(0, 0.012, 0), rotation=(-math.pi / 2, 0, 0)).scale = (1.36, 0.86, 1)
-            for k in range(4):  # a little bar chart on each face, dark
-                h = 0.15 + 0.12 * ((r + c + k) % 4)
-                _box(f"dash_{r}{c}.bar{k}", trace, piv, (-0.45 + 0.3 * k, -0.02, -0.38 + h / 2), (0.16, 0.004, h))
-                _box(f"dash_{r}{c}.barb{k}", trace, piv, (-0.45 + 0.3 * k, 0.02, -0.38 + (0.6 - h) / 2),
-                     (0.16, 0.004, 0.6 - h))
+            label, value = DASH_FACTS[(2 - r) * 4 + c]  # top row first, read left to right
+            vs = min(0.26, 1.15 / (0.62 * len(value)))
+            for side, y, rz in (("f", -0.02, 0.0), ("b", 0.02, math.pi)):  # back face reads after the flip
+                K.text(f"dash_{r}{c}.{side}.label", label, 0.12, trace, loc=(0, y, 0.25), rot=(math.pi / 2, 0, rz),
+                       parent=piv)
+                K.text(f"dash_{r}{c}.{side}.value", value, vs, trace, loc=(0, y, -0.08), rot=(math.pi / 2, 0, rz),
+                       parent=piv)
             cards.append(piv)
     out.update(dash_wall=wall, dash_cards=cards)
 
@@ -202,46 +225,100 @@ def build():
     _box("gate.sign.stripe", stripe[0], gate, (0, -ROAD_W / 2 - 0.204, 0.57), (0.9, 0.004, 0.06))
     out["gate"] = gate
 
-    # S50: the vault (metadata): a door on a block, a dial that spins and locks, three bolts, a lamp, the note.
+    # S50: the vault (metadata), a bank-vault combination door (human, C4 v2: the first "didn't look quite right"):
+    # a round door set in a chrome ring on a square frame, a hinge block; a numbered dial (0-95) under a fixed amber
+    # pointer; a three-spoke handle; six bolts round the door's edge that shoot out into keepers in the frame on lock.
     vault = K.empty("vault", (-2.3, 1.75, 0))
-    _box("vault.block", K.mat_plastic("vaultblock", "lab_dark", 0.3), vault, (0, 0.25, 1.05), (1.8, 0.4, 2.1))
-    K.mesh_obj("vault.door", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("vaultdoor", "lab", 0.3), vault,
-               radius=0.72, depth=0.1, vertices=64, location=(0, 0, 0.9), rotation=(math.pi / 2, 0, 0))
-    K.mesh_obj("vault.rim", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("vaultrim"), vault, major_radius=0.72,
-               minor_radius=0.04, location=(0, -0.05, 0.9), rotation=(math.pi / 2, 0, 0))
-    dial = K.empty("vault.dial", (0, -0.08, 0.9), vault)
-    dial.rotation_euler = (math.pi / 2, 0, 0)
+    _box("vault.block", K.mat_plastic("vaultblock", "lab_dark", 0.3), vault, (0, 0.25, 1.05), (2.1, 0.4, 2.1))
+    steel = K.mat_plastic("vaultdoor", "lab", 0.25)
+    dark = K.mat_plastic("vaultdark", "shadow", 0.4)
+    chrome = K.mat_chrome("vaultrim")
+    C = Vector((0, 0, 1.0))  # door centre (vault space)
+    K.mesh_obj("vault.recess", bpy.ops.mesh.primitive_cylinder_add, dark, vault, radius=0.84, depth=0.02,
+               vertices=64, location=C + Vector((0, 0.045, 0)), rotation=(math.pi / 2, 0, 0))
+    K.mesh_obj("vault.ring", bpy.ops.mesh.primitive_torus_add, chrome, vault, major_radius=0.84, minor_radius=0.05,
+               major_segments=64, location=C + Vector((0, 0.0, 0)), rotation=(math.pi / 2, 0, 0))
+    K.mesh_obj("vault.door", bpy.ops.mesh.primitive_cylinder_add, steel, vault, radius=0.7, depth=0.16, vertices=64,
+               location=C + Vector((0, -0.04, 0)), rotation=(math.pi / 2, 0, 0))
+    K.mesh_obj("vault.door.lip", bpy.ops.mesh.primitive_torus_add, chrome, vault, major_radius=0.62,
+               minor_radius=0.018, major_segments=64, location=C + Vector((0, -0.125, 0)), rotation=(math.pi / 2, 0, 0))
+    _box("vault.hinge", chrome, vault, C + Vector((-0.8, -0.06, 0)), (0.14, 0.14, 0.7))
+    # Dial: a dark disc with a brass rim, numbers every 5 (labelled every 10), ticks between; spins on "spin".
+    dial = K.empty("vault.dial", C + Vector((0, -0.13, 0.28)), vault)
+    dial.rotation_euler = (math.pi / 2, 0, 0)  # local +Z toward the camera (-Y); spin about the door axis (Y)
     K.prop(vault, "spin", 0.0, hi=1000.0)
     K.drive(dial, "rotation_euler", 1, vault, "spin", "0.5236 * x")
-    K.mesh_obj("vault.dial.knob", bpy.ops.mesh.primitive_cylinder_add, K.mat_metal("dial", "brass", 0.2), dial,
-               radius=0.24, depth=0.06, vertices=48)
-    for k in range(12):
-        a = math.tau * k / 12
-        _box(f"vault.dial.tick{k}", K.mat_plastic("tick", "shadow", 0.5), dial,
-             (math.cos(a) * 0.2, math.sin(a) * 0.2, 0.032), (0.012 if k % 3 else 0.02, 0.05, 0.004), (0, 0, a))
-    _box("vault.dial.handle", K.mat_chrome("handle"), dial, (0, 0.1, 0.06), (0.04, 0.22, 0.04))
-    bolts = [_box(f"vault.bolt{k}", K.mat_chrome("bolt"), vault, (0.72, -0.02, 0.5 + 0.4 * k), (0.25, 0.07, 0.07))
-             for k in range(3)]
+    K.mesh_obj("vault.dial.face", bpy.ops.mesh.primitive_cylinder_add, dark, dial, radius=0.2, depth=0.04,
+               vertices=48)
+    K.mesh_obj("vault.dial.rim", bpy.ops.mesh.primitive_torus_add, K.mat_plastic("dialrim", "brass", 0.2), dial,
+               major_radius=0.2, minor_radius=0.014, major_segments=48, location=(0, 0, 0.02))
+    K.mesh_obj("vault.dial.knob", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("dialknob", "brass", 0.2), dial,
+               radius=0.07, depth=0.06, vertices=32, location=(0, 0, 0.04))
+    nums = K.mat_plastic("dialnum", "paper", 0.4)
+    for k in range(20):
+        a = math.pi / 2 - math.tau * k / 20
+        if k % 2 == 0:
+            K.text(f"vault.dial.n{k}", str(k * 5), 0.045, nums, loc=(math.cos(a) * 0.14, math.sin(a) * 0.14, 0.022),
+                   rot=(0, 0, a - math.pi / 2), parent=dial)
+        _box(f"vault.dial.tick{k}", nums, dial, (math.cos(a) * 0.185, math.sin(a) * 0.185, 0.022),
+             (0.008, 0.022 if k % 2 else 0.032, 0.003), (0, 0, a - math.pi / 2))
+    ptr = K.mesh_obj("vault.pointer", bpy.ops.mesh.primitive_cone_add, K.mat_emission("vaultptr", "amber", 8.0), vault,
+                     radius1=0.03, depth=0.06, vertices=3, location=C + Vector((0, -0.13, 0.52)),
+                     rotation=(0, math.pi, 0))
+    # Handle: a hub and three spokes with ball ends, below the dial; turns a sixth on lock ("lock").
+    K.prop(vault, "lock", 0.0)
+    hub = K.empty("vault.handle", C + Vector((0, -0.15, -0.22)), vault)
+    hub.rotation_euler = (math.pi / 2, 0, 0)
+    K.drive(hub, "rotation_euler", 1, vault, "lock", "1.0472 * x")
+    K.mesh_obj("vault.handle.hub", bpy.ops.mesh.primitive_cylinder_add, chrome, hub, radius=0.06, depth=0.08,
+               vertices=24)
+    for k in range(3):
+        a = math.pi / 2 + math.tau * k / 3
+        sp = K.mesh_obj(f"vault.handle.spoke{k}", bpy.ops.mesh.primitive_cylinder_add, chrome, hub, radius=0.018,
+                        depth=0.3, vertices=12, location=(math.cos(a) * 0.15, math.sin(a) * 0.15, 0.03),
+                        rotation=(0, math.pi / 2, a))
+        K.mesh_obj(f"vault.handle.ball{k}", bpy.ops.mesh.primitive_uv_sphere_add, chrome, hub, radius=0.035,
+                   location=(math.cos(a) * 0.31, math.sin(a) * 0.31, 0.03))
+    # Bolts at the door's edge (in front of the ring, so their travel shows) and keepers on the frame.
+    bolts = []
+    for k in range(6):
+        a = math.tau * k / 6 + math.pi / 6
+        d = Vector((math.cos(a), 0, math.sin(a)))
+        b = K.mesh_obj(f"vault.bolt{k}", bpy.ops.mesh.primitive_cylinder_add, chrome, vault, radius=0.04, depth=0.24,
+                       vertices=16, location=C + d * 0.6 + Vector((0, -0.14, 0)), rotation=(0, math.pi / 2 - a, 0))
+        b["dir"] = tuple(d)
+        bolts.append(b)
+        _box(f"vault.keeper{k}", dark, vault, C + d * 0.96 + Vector((0, -0.02, 0)), (0.12, 0.06, 0.12),
+             (0, -a, 0))
     K.prop(vault, "lamp", 0.0)
     K.mesh_obj("vault.lamp", bpy.ops.mesh.primitive_uv_sphere_add, K.mat_emission("vaultlamp", "amber", 40.0, vault,
                                                                                    "lamp"),
-               vault, radius=0.07, location=(0.78, -0.08, 1.85))
-    _sign("vault.label", "METADATA", 0.17, 1.2, 0.28, vault, (-0.1, -0.06, 1.86))
-    note = K.empty("vault.note", (-0.16, -0.125, 1.02), vault)
+               vault, radius=0.06, location=(0.85, -0.08, 2.0))
+    _sign("vault.label", "METADATA", 0.17, 1.2, 0.28, vault, (-0.1, -0.06, 1.98))
+    note = K.empty("vault.note", C + Vector((0.32, -0.135, -0.05)), vault)
     note.rotation_euler = (math.pi / 2, 0.15, 0)
     K.mesh_obj("vault.note.paper", bpy.ops.mesh.primitive_plane_add, K.mat_plastic("sticky_h", "note", 0.6), note,
                size=0.22)
     K.text("vault.note.text", "NO\nINTERNET :)", 0.04, K.mat_plastic("ink_h", "shadow", 0.5), loc=(0, 0, 0.002),
            rot=(0, 0, 0), font="InstrumentSerif-Italic.ttf", parent=note)
-    out.update(vault=vault, vault_dial=dial, vault_bolts=bolts, vault_note=note)
+    out.update(vault=vault, vault_dial=dial, vault_bolts=bolts, vault_note=note, vault_pointer=ptr)
 
-    # S51: key-shaped candles on a bench in front: wax shaft with teeth, a bow on top with the wick and flame.
+    # S51: key-shaped candles on a bench in front: a brass shaft with teeth, a bow on top with the wick and flame.
+    # A token dies on its beat: the flame snuffs, a puff of smoke, the key goes dull grey and topples (human, C4 v2:
+    # shrinking "not the right call"). "dead" (0-1) on each candle greys its own material.
     bench = K.empty("candles", (0, -2.55, 0))
     _box("candles.bench", K.mat_plastic("bench", "lab_dark", 0.3), bench, (0, 0, 0.1), (3.4, 0.3, 0.2))
-    wax = K.mat_plastic("wax", "paper", 0.6)
+    smoke_m = K.mat_plastic("smoke", "decal_film", 0.9)
+    brass, grey = K.col("brass"), K.lin("#3e3c3a")
     candles = []
     for k in range(8):
         c = K.empty(f"candle{k}", (-1.4 + 0.4 * k, 0, 0.2), bench)
+        K.prop(c, "dead", 0.0)
+        wax = K.mat_plastic(f"keywax{k}", "brass", 0.35)
+        bsdf = next(n for n in wax.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        for i in range(3):
+            K.drive(bsdf.inputs["Base Color"], "default_value", i, c, "dead",
+                    f"{brass[i]:.4f} * (1 - x) + {grey[i]:.4f} * x")
         shaft = K.empty(f"candle{k}.shaft", (0, 0, 0), c)
         K.mesh_obj(f"candle{k}.wax", bpy.ops.mesh.primitive_cylinder_add, wax, shaft, radius=0.035, depth=1.0,
                    vertices=16, location=(0, 0, 0.5))
@@ -254,7 +331,13 @@ def build():
         fl = K.mesh_obj(f"candle{k}.flame", bpy.ops.mesh.primitive_uv_sphere_add,
                         K.mat_emission("flame", "amber", 30.0), top, radius=0.03, location=(0, 0, 0.18))
         fl.scale = (0.7, 0.7, 1.5)
-        candles.append((c, shaft, top, fl))
+        puffs = []
+        for j in range(3):
+            pf = K.mesh_obj(f"candle{k}.smoke{j}", bpy.ops.mesh.primitive_uv_sphere_add, smoke_m, bench, radius=1.0,
+                            segments=12, ring_count=8, location=(c.location.x, 0, 0.2 + 0.52))
+            pf.scale = (0.001,) * 3
+            puffs.append(pf)
+        candles.append((c, shaft, top, fl, puffs))
     out.update(candles_root=bench, candles=candles)
 
     # S52: the camera horn section, six security cameras on poles beyond the moat, front.
@@ -267,7 +350,7 @@ def build():
         h = K.empty(f"horn{k}.head", (x, 0, 1.05), horns)
         K.prop(h, "honk", 0.0, lo=-1.0, hi=1.0)
         tilt = K.empty(f"horn{k}.tilt", (0, 0, 0), h)
-        K.drive(tilt, "rotation_euler", 0, h, "honk", "0.3 * x")
+        K.drive(tilt, "rotation_euler", 0, h, "honk", "-0.45 * x")  # contact = a nod down
         _box(f"horn{k}.body", K.mat_plastic("horncam", "lab", 0.25), tilt, (0, 0.08, 0), (0.18, 0.4, 0.18))
         K.mesh_obj(f"horn{k}.lens", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("hornlens", "lens", 0.02),
                    tilt, radius=0.07, depth=0.06, location=(0, 0.3, 0), rotation=(math.pi / 2, 0, 0))
@@ -376,12 +459,29 @@ def build():
         _box(f"sheet.vline{c}", grid, ss, (-1.26 + 0.42 * c, -0.01, 1.2), (0.012, 0.004, 1.55))
     for r in range(6):
         _box(f"sheet.hline{r}", grid, ss, (0, -0.01, 0.5 + 0.3 * r), (2.55, 0.004, 0.012))
+    # A full cell (human, C4 v2: "more enclosed, particularly around the sides"): bars on the front and both sides, a
+    # barred top, a back wall and a floor slab; the sheet inside, legible through the front bars.
+    bar_m, rail_m = K.mat_chrome("jailbar"), K.mat_chrome("jailrail")
+    X, YF, YB, Z0, Z1 = 1.4, -0.3, 0.25, 0.1, 2.15
+    _box("sheet.back", K.mat_plastic("cellwall", "lab_dark", 0.4), ss, (0, YB + 0.03, 1.15), (2 * X + 0.1, 0.06, 2.3))
+    _box("sheet.floor", K.mat_plastic("cellfloor", "lab_dark", 0.4), ss, (0, (YF + YB) / 2, Z0 / 2),
+         (2 * X + 0.1, YB - YF + 0.1, Z0))
     for k in range(11):
-        K.mesh_obj(f"sheet.bar{k}", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("jailbar"), ss, radius=0.022,
-                   depth=2.0, location=(-1.3 + 0.26 * k, -0.25, 1.1))
-    for z in (0.15, 2.05):
-        _box(f"sheet.rail{z}", K.mat_chrome("jailrail"), ss, (0, -0.25, z), (2.7, 0.06, 0.06))
-    _sign("sheet.title", "LIABILITY", 0.11, 1.0, 0.2, ss, (0, -0.02, 2.2))
+        K.mesh_obj(f"sheet.bar{k}", bpy.ops.mesh.primitive_cylinder_add, bar_m, ss, radius=0.022, depth=Z1 - Z0,
+                   vertices=12, location=(-1.3 + 0.26 * k, YF, (Z0 + Z1) / 2))
+    for sx in (-1, 1):
+        for k in range(5):
+            K.mesh_obj(f"sheet.side{sx}.{k}", bpy.ops.mesh.primitive_cylinder_add, bar_m, ss, radius=0.022,
+                       depth=Z1 - Z0, vertices=12, location=(sx * X, YF + (YB - YF) * k / 4, (Z0 + Z1) / 2))
+    for k in range(11):  # the top: bars front to back
+        K.mesh_obj(f"sheet.top{k}", bpy.ops.mesh.primitive_cylinder_add, bar_m, ss, radius=0.018, depth=YB - YF,
+                   vertices=12, location=(-1.3 + 0.26 * k, (YF + YB) / 2, Z1), rotation=(math.pi / 2, 0, 0))
+    for z in (0.15, Z1):
+        _box(f"sheet.rail{z}", rail_m, ss, (0, YF, z), (2 * X + 0.06, 0.06, 0.06))
+        _box(f"sheet.railb{z}", rail_m, ss, (0, YB, z), (2 * X + 0.06, 0.06, 0.06))
+        for sx in (-1, 1):
+            _box(f"sheet.rails{sx}{z}", rail_m, ss, (sx * X, (YF + YB) / 2, z), (0.06, YB - YF + 0.06, 0.06))
+    _sign("sheet.title", "LIABILITY", 0.11, 1.0, 0.2, ss, (0, YF - 0.06, Z1 + 0.22))
     out.update(sheet=ss, cells=cells)
     return out
 
@@ -496,26 +596,46 @@ def animate(S, t0, t1):
         spins = [{"t": t_meta + 0.4 + k * (t_lock - t_meta - 0.5) / 5, "end": 0, "vel": 100} for k in range(5)]
     A.stepper(v, "spin", spins, pre=6, settle=8, overshoot=0.1)
     fl = A.frame(t_lock)
-    for bolt in S["vault_bolts"]:
-        x0 = bolt.location.x
-        _keys(bolt, "location", [(0, x0 - 0.2), (fl - 2, x0 - 0.2), (fl + 6, x0)], index=0)
-    A.write_keys(v, '["lamp"]', [(0, 0.0, "CONSTANT"), (fl, 1.0, "CONSTANT")])
+    # Lock: the handle turns, then the bolts shoot out across the ring into the keepers, the lamp lights.
+    A.write_keys(v, '["lock"]', [(0, 0.0), (fl - 10, 0.0), (fl - 2, 1.0)])
+    for k, bolt in enumerate(S["vault_bolts"]):
+        p0, d = bolt.location.copy(), Vector(bolt["dir"])
+        for i in (0, 2):
+            _keys(bolt, "location", [(0, p0[i]), (fl - 1 + k % 2, p0[i]), (fl + 5 + k % 2, p0[i] + d[i] * 0.26)],
+                  index=i)
+    A.write_keys(v, '["lamp"]', [(0, 0.0, "CONSTANT"), (fl + 4, 1.0, "CONSTANT")])
 
     # S51: key candles burn down, one per beat of the line.
     _pop(S["candles_root"], cut("S51") - 0.02, 0.3)
     ls, le = _line("L57")
     bt = [e["t"] for e in W(beats, ls - 0.05, ls + 10.0)][:9]
-    for k, (c, shaft, top, fl_) in enumerate(S["candles"]):
+    for k, (c, shaft, top, fl_, puffs) in enumerate(S["candles"]):
         if k + 1 >= len(bt):
             break
-        f0, f1 = A.frame(bt[k]), A.frame(bt[k + 1])
-        A.write_keys(shaft, "scale", [(0, 0.34, "LINEAR"), (f0, 0.34, "LINEAR"), (f1, 0.02, "LINEAR")], index=2)
-        A.write_keys(top, "location", [(0, 0.34, "LINEAR"), (f0, 0.34, "LINEAR"), (f1, 0.02, "LINEAR")], index=2)
-        for x in top.children:
-            A.write_keys(x, "hide_render", [(0, 0, "CONSTANT"), (f1 + 2, 1, "CONSTANT")])
+        f = A.frame(bt[k + 1])  # dies on its beat
+        # The flame snuffs (4 frames)...
+        for i in range(3):
+            v0 = fl_.scale[i]
+            A.write_keys(fl_, "scale", [(0, v0), (f - 1, v0), (f + 3, 0.001 * v0, "LINEAR")], index=i)
+        # ...a puff of smoke rises and spreads from the wick, then thins away...
+        x0 = c.location.x
+        for j, pf in enumerate(puffs):
+            s0, dz, dx = 0.03 + 0.012 * j, 0.18 + 0.1 * j, (j - 1) * 0.04
+            for i in range(3):
+                A.write_keys(pf, "scale", [(0, 0.001, "CONSTANT"), (f + j, 0.001), (f + 6 + j, s0),
+                                           (f + 26 + 2 * j, s0 * 1.6), (f + 40 + 2 * j, 0.001)], index=i)
+            A.write_keys(pf, "location", [(f + j, x0), (f + 40, x0 + dx)], index=0)
+            A.write_keys(pf, "location", [(f + j, 0.72), (f + 40, 0.72 + dz)], index=2)
+        # ...the brass goes dull grey and the key topples forward off the bench to lie on the floor.
+        A.write_keys(c, '["dead"]', [(0, 0.0), (f + 2, 0.0), (f + 14, 1.0)])
+        A.write_keys(c, "rotation_euler", [(0, 0.0), (f + 6, 0.0), (f + 14, 0.9), (f + 21, 1.5708, "LINEAR"),
+                                           (f + 25, 1.5)], index=0)
+        A.write_keys(c, "location", [(0, 0.0), (f + 6, 0.0), (f + 14, -0.12), (f + 21, -0.2)], index=1)
+        A.write_keys(c, "location", [(0, 0.2), (f + 12, 0.2), (f + 21, 0.036, "LINEAR"), (f + 25, 0.05)],
+                     index=2)
 
-    # S52: monitoring. Cameras look every which way, swivel in unison to the stage on the first brass stab, then
-    # bob on every stab.
+    # S52: monitoring. Cameras look every which way, swivel in unison to the stage on the first brass stab, then take
+    # turns nodding to the drums.
     _pop(S["horns"], cut("S52") - 0.02, 0.3)
     brass = A.strikes(W(A.events("brass"), cut("S52"), cut("S53")), 0.12)
     t_sw = brass[0]["t"] if brass else cut("S52") + 0.8
@@ -524,7 +644,11 @@ def animate(S, t0, t1):
         aim = math.atan2(-(h.location.x), 4.6) * 0.5  # turn toward the cube (+Y), a little inward
         f = A.frame(t_sw)
         _keys(h, "rotation_euler", [(0, a0), (f - 8, a0), (f, aim)], index=2)
-        A.striker(h, "honk", brass[1:], wind=8, settle=16)
+    # Then they take turns nodding to the drums: each kit hit nods the next camera, down and back (human, C4 v2).
+    nods = A.strikes(W(kit, t_sw + 0.25, cut("S53")), 0.1)
+    heads = S["horn_heads"]
+    for k, h in enumerate(heads):
+        A.striker(h, "honk", nods[k::len(heads)], wind=8, settle=20)
 
     # S53: the honest probe appears and raises its white flag on "raise", LED dims on "stop".
     hp = S["honest"]
@@ -628,16 +752,16 @@ CAMERAS = {
     "S45": [(0.0, _v(1.9, -3.4, 1.4), _v(0.0, -0.9, 1.0), 35), (1.0, _v(1.2, -2.5, 1.1), _v(0.1, -0.9, 1.0), 35)],
     "S46": [(0.0, _v(2.6, -2.4, 1.3), _v(1.4, 0.0, 0.4), 30), (0.5, _v(5.0, -3.0, 1.6), _v(4.0, 0.0, 0.1), 30),
             (1.0, _v(9.0, -2.8, 1.8), _v(14.0, 0.0, 0.0), 28)],
-    "S47": [(0.0, _v(1.3, 0.9, 1.3), _v(0.0, 5.0, 1.6), 28), (1.0, _v(0.7, 1.6, 1.4), _v(0.0, 5.0, 1.6), 28)],
+    "S47": [(0.0, _v(0.9, 1.15, 1.55), _v(0.0, 5.0, 1.6), 19), (1.0, _v(0.5, 1.5, 1.55), _v(0.0, 5.0, 1.6), 21)],
     "S48": [(0.0, _v(6.0, -3.6, 1.0), _v(3.4, 0.0, 0.5), 30), (1.0, _v(5.6, -3.2, 1.3), _v(3.4, 0.0, 0.6), 30)],
     "S49": [(0.0, _v(2.1, -3.2, 1.0), _v(2.45, -0.4, 0.55), 32), (1.0, _v(2.2, -2.9, 0.95), _v(2.45, -0.4, 0.55), 34)],
     "S50": [(0.0, _v(-1.5, -1.9, 1.3), _v(-2.3, 1.7, 1.2), 30), (1.0, _v(-1.8, -1.0, 1.25), _v(-2.3, 1.7, 1.2), 30)],
     "S51": [(0.0, _v(0.6, -4.3, 0.8), _v(0.0, -2.55, 0.35), 32), (1.0, _v(0.3, -3.9, 0.6), _v(0.0, -2.55, 0.35), 32)],
-    "S52": [(0.0, _v(1.7, -2.5, 1.25), _v(-0.4, -4.6, 1.0), 38), (1.0, _v(1.2, -2.6, 1.2), _v(-0.4, -4.6, 1.0), 38)],
+    "S52": [(0.0, _v(1.0, -1.6, 1.5), _v(-0.1, -4.6, 1.0), 24), (1.0, _v(0.7, -1.7, 1.45), _v(-0.1, -4.6, 1.0), 24)],
     "S53": [(0.0, _v(2.08, -2.45, 0.2), _v(1.86, -1.75, 0.17), 30), (1.0, _v(2.03, -2.3, 0.19), _v(1.86, -1.75, 0.17), 32)],
     "S54": [(0.0, _v(1.68, -2.35, 0.22), _v(2.0, -1.6, 0.1), 30), (1.0, _v(1.74, -2.2, 0.2), _v(2.0, -1.6, 0.1), 32)],
     "S55": [(0.0, _v(1.5, -7.5, 2.0), _v(-1.5, 1.5, 1.6), 24), (1.0, _v(0.5, -7.0, 2.2), _v(-1.0, 1.5, 1.8), 24)],
     "S56": [(0.0, _v(1.7, 1.2, 1.8), _v(-0.2, 2.3, 0.5), 30), (1.0, _v(1.5, 1.3, 1.6), _v(-0.2, 2.3, 0.45), 32)],
     "S57": [(0.0, _v(3.0, -7.0, 2.5), _v(0.0, 0.0, 0.8), 30), (1.0, _v(16.0, -24.0, 14.0), _v(0.0, 0.5, 0.0), 30)],
-    "S58": [(0.0, _v(-2.2, -1.3, 1.4), _v(-5.4, 0.3, 1.3), 28), (1.0, _v(-2.6, -0.6, 1.35), _v(-5.4, 0.3, 1.3), 28)],
+    "S58": [(0.0, _v(-1.9, -1.5, 1.5), _v(-5.4, 0.3, 1.45), 28), (1.0, _v(-2.3, -0.8, 1.5), _v(-5.4, 0.3, 1.45), 28)],
 }

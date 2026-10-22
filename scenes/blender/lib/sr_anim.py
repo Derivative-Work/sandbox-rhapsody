@@ -318,26 +318,39 @@ def curve_length(curve_obj):
     return sum((pts[i + 1] - pts[i]).length for i in range(len(pts) - 1)) if len(pts) > 1 else 1.0
 
 
-def sing_curve(t0, t1, roles=("lead",), line_ids=None, attack=3, release=6, accent=0.3, accent_len=8):
-    """Per-frame 0-1 "voice" from the sung words (timing map) shaped by the vocal envelope. Inside a word it sits at
-    0.55-1.0 with the stem's level; a fresh word adds an accent that decays over accent_len frames, so repeated words
-    read one by one; it opens over `attack` frames and closes over `release`. The stem's own level is compressed
-    (0.5-0.93 while singing), so on its own it barely moves a machine (human, C4: "too subtle")."""
+def sing_curve(t0, t1, roles=("lead",), line_ids=None, attack=6, release=12, accent=0.12, accent_len=10):
+    """Per-frame 0-1 "voice": the vocal stem's level inside the singer's lines, lifted by its sung words.
+    - Stem: (env - 0.45) / 0.5, clipped, only inside the singer's lines (the stem has every voice). It holds long
+      notes, which the aligned words often end early (human, C4 v2: "not holding out for long words").
+    - Words (timing map): 0.55-1.0 with the stem's level while sung, and a word's hold continues while the stem stays
+      up, until the next word. Without them the compressed stem (0.5-0.93 while singing) barely moves (C4 v1).
+    - A fresh word adds a small accent; it opens over `attack` frames and closes over `release` (v2's 3/6 frames and
+      0.3 accent read as jerky looking up on each word)."""
     env = envelope("vocal_env")
     n = frame(timing_map()["duration_s"]) + 1
+    e = np.zeros(n)
+    e[:len(env)] = env[:n]
+    stem = np.clip((e - 0.45) / 0.5, 0, 1)
+    inline = np.zeros(n, bool)
     target = np.zeros(n)
     acc = np.zeros(n)
     for li in timing_map()["lines"]:
         if (line_ids is None and li["role"] not in roles) or (line_ids is not None and li["id"] not in line_ids):
             continue
-        for w in li["words"]:
-            if not (t0 - 1 <= w["start"] < t1 + 1):
-                continue
-            a, b = frame(w["start"]), max(frame(w["end"]), frame(w["start"]) + 6)
-            lv = np.clip((env[np.minimum(np.arange(a, b), len(env) - 1)] - 0.4) / 0.55, 0, 1)
-            target[a:b] = np.maximum(target[a:b], 0.55 + 0.45 * lv)
-            k = np.arange(accent_len)
-            acc[a:a + accent_len] = np.maximum(acc[a:a + accent_len], accent * (1 - k / accent_len)[:n - a])
+        if li["end"] < t0 - 1 or li["start"] > t1 + 1:
+            continue
+        inline[max(0, frame(li["start"]) - 3):min(n, frame(li["end"]) + 30)] = True
+        ws = li["words"]
+        for k, w in enumerate(ws):
+            a = frame(w["start"])
+            b = max(frame(w["end"]), a + 6)
+            nxt = frame(ws[k + 1]["start"]) if k + 1 < len(ws) else min(n, b + 120)
+            while b < nxt and stem[b] > 0.3:  # held past the aligned word's end
+                b += 1
+            target[a:b] = np.maximum(target[a:b], 0.55 + 0.45 * stem[a:b])
+            kk = np.arange(min(accent_len, n - a))
+            acc[a:a + len(kk)] = np.maximum(acc[a:a + len(kk)], accent * (1 - kk / accent_len))
+    target = np.maximum(target, stem * inline)
     out = np.zeros(n)
     v = 0.0
     for f in range(n):

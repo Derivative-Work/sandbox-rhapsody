@@ -214,22 +214,30 @@ def build():
     # Congress: the kill-switch tower, 3 x 4 giant buttons on its face.
     tower = K.empty("kill_tower", (-2.0, 1.3, 0))
     tower.rotation_euler = (0, 0, math.radians(18))
-    _box("kill_tower.body", black, (0, 0, 0.8), (0.8, 0.4, 1.6), tower, bev=0.02)
+    # Body in the lab's dark grey under its own key light (C4 v2, "completely black": see sr_kit.rebind_drivers),
+    # a lit label plate, brass bezels round each button.
+    _box("kill_tower.body", K.mat_plastic("kill_body", "lab_dark", 0.35), (0, 0, 0.8), (0.8, 0.4, 1.6), tower, bev=0.02)
     _box("kill_tower.trim", brass, (0, -0.205, 1.58), (0.82, 0.02, 0.05), tower)
-    K.text("kill_tower.label", "KILL SWITCH", 0.085, K.mat_plastic("kill_label", "paper", 0.4),
-           loc=(0, -0.205, 1.45), parent=tower)
+    _box("kill_tower.plate", K.mat_emission("kill_plate", "paper", 2.5), (0, -0.203, 1.45), (0.7, 0.01, 0.15), tower)
+    K.text("kill_tower.label", "KILL SWITCH", 0.085, K.mat_plastic("kill_label", "shadow", 0.4),
+           loc=(0, -0.209, 1.45), parent=tower)
     out["kill_buttons"] = []
     for k in range(12):
         cx, cz = (k % 3 - 1) * 0.24, 0.32 + (k // 3) * 0.26
         K.prop(tower, f"press_{k}", 0.0)
         btn = K.empty(f"kill_btn{k}", (cx, -0.2, cz), tower)
-        K.drive(btn, "location", 1, tower, f"press_{k}", "-0.2 + 0.05 * x")
-        cap = K.mesh_obj(f"kill_btn{k}.cap", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("kill_cap", "alarm", 0.15),
-                         btn, radius=0.09, depth=0.07, vertices=40, location=(0, -0.035, 0), rotation=(math.pi / 2, 0, 0))
-        K.bevel(cap, 0.012)
+        K.drive(btn, "location", 1, tower, f"press_{k}", "-0.2 + 0.06 * x")
+        K.mesh_obj(f"kill_btn{k}.bezel", bpy.ops.mesh.primitive_torus_add, brass, tower, major_radius=0.105,
+                   minor_radius=0.014, location=(cx, -0.205, cz), rotation=(math.pi / 2, 0, 0))
+        # A red dome lit from within: glowing low at rest, flaring on its press.
+        cap = K.mesh_obj(f"kill_btn{k}.cap", bpy.ops.mesh.primitive_uv_sphere_add,
+                         K.mat_emission(f"kill_cap{k}", "alarm", 14.0, tower, f"press_{k}", floor=0.12), btn,
+                         radius=0.09, segments=32, ring_count=16, location=(0, -0.005, 0))
+        cap.scale = (1, 0.55, 1)
+        K.smooth(cap)
         K.mesh_obj(f"kill_btn{k}.glow", bpy.ops.mesh.primitive_torus_add,
-                   K.mat_emission(f"kill_glow{k}", "alarm", 15.0, tower, f"press_{k}"), btn, major_radius=0.1,
-                   minor_radius=0.012, location=(0, -0.005, 0), rotation=(math.pi / 2, 0, 0))
+                   K.mat_emission(f"kill_glow{k}", "alarm", 15.0, tower, f"press_{k}", floor=0.15), btn,
+                   major_radius=0.095, minor_radius=0.01, location=(0, 0.0, 0), rotation=(math.pi / 2, 0, 0))
         out["kill_buttons"].append(k)
     out["kill_tower"] = tower
 
@@ -343,7 +351,7 @@ def build():
         a = math.tau * k / 30
         _box(f"stopwatch.tick{k}", K.mat_plastic("tick", "shadow", 0.5),
              (math.sin(a) * 0.36, -0.032, 1.95 + math.cos(a) * 0.36), (0.012, 0.004, 0.05 if k % 5 == 0 else 0.025),
-             sw).rotation_euler = (0, -a, 0)
+             sw).rotation_euler = (0, a, 0)  # long axis along the radius (was -a: mirrored, C4 v2)
     K.prop(sw, "tick", 0.0, lo=0.0, hi=10000.0)
     hand = K.empty("stopwatch.hand", (0, -0.036, 1.95), sw)
     K.drive(hand, "rotation_euler", 1, sw, "tick", "0.2094 * x")  # 30 ticks a turn
@@ -364,7 +372,8 @@ def build():
     K.mesh_obj("vault_wheel", bpy.ops.mesh.primitive_torus_add, brass, door_hinge, major_radius=0.12,
                minor_radius=0.015, location=(-0.045, 0.3, 0), rotation=(0, math.pi / 2, 0))
     out["vault_hinge"] = door_hinge
-    out["frozen"] = [K.probe(f"frozen{k}", (0.6, -1.4, 0.166 + K.PROBE_R * 2.2), led=0.6, scale=2.2) for k in range(6)]
+    # Four (six had the last two pass the door after it shut: human, C4 v2).
+    out["frozen"] = [K.probe(f"frozen{k}", (0.6, -1.4, 0.166 + K.PROBE_R * 2.2), led=0.6, scale=2.2) for k in range(4)]
 
     out["floor_ring"] = K.floor_ring("floor_ring", radius=2.6)
     return out
@@ -373,6 +382,7 @@ def build():
 def lights(S):
     K.studio_lights(center=(0, 3.5, 0.8), radius=10.0, scale=1.4)
     K.reflection_cards(center=(0, 3.5, 0.8), radius=11.0)
+    K.area_light("kill_key", (-1.0, -1.6, 2.6), (-2.0, 1.3, 0.9), 450.0, 1.2, role="key")  # the tower reads (S37)
     red = K.area_light("alarm_light", (-2.2, -0.9, 3.2), (-3.0, 0.1, 1.6), 0.0, 0.6, role="alarm")
     S["alarm_light"] = red
 
@@ -422,11 +432,28 @@ def animate(S, t0, t1):
 
     # The Auditors slam in unison on each "hack!" of the calls; the prints appear on the first slam.
     hacks = [w for w in words if w["w"].lower().startswith("hack") and line["L45a"]["start"] <= w["t"] <= line["L45d"]["end"]]
-    for root, pt in zip(S["stamps"], S["stamp_prints"]):
+    # Fresh paper for every call (human, C4 v2): each arm has a stack of sheets; a slam prints REWARD HACK on the top
+    # sheet, which slides off the front of the table and drops to the floor, uncovering a blank one.
+    sheet_m = K.mat_plastic("stamp_sheet", "paper", 0.7)
+    for i, (root, pt) in enumerate(zip(S["stamps"], S["stamp_prints"])):
         A.striker(root, "strike", hacks)
-        if hacks:
-            A.write_keys(pt, "hide_render", [(0, 1, "CONSTANT"), (A.frame(hacks[0]["t"]), 0, "CONSTANT")],
-                         interp="CONSTANT")
+        pt.hide_render = True  # the build's single print; the sheets carry their own
+        y0 = pt.location.y
+        for j, h in enumerate(hacks):
+            sh = K.mesh_obj(f"stamp{i}.sheet{j}", bpy.ops.mesh.primitive_plane_add, sheet_m, root, size=1,
+                            location=(0, y0, 0.3022 + 0.0002 * (len(hacks) - j)))
+            sh.scale = (0.33, 0.16, 1)
+            sh.rotation_euler = (0, 0, 0.02 * ((i + j) % 3 - 1))
+            ink = K.text(f"stamp{i}.sheet{j}.print", "REWARD\nHACK", 0.06 / 0.33, pt.data.materials[0],
+                         loc=(0, 0, 0.0015), rot=(0, 0, 0), parent=sh)
+            ink.scale = (1, 0.33 / 0.16, 1)  # undo the sheet's scale on the lettering
+            fh = A.frame(h["t"])
+            A.write_keys(ink, "hide_render", [(0, 1), (fh, 0)], interp="CONSTANT")
+            f1 = fh + 14  # once the arm has lifted
+            z = sh.location.z
+            A.write_keys(sh, "location", [(f1, y0), (f1 + 16, y0 - 0.32, "LINEAR"), (f1 + 30, y0 - 0.5)], index=1)
+            A.write_keys(sh, "location", [(f1 + 12, z), (f1 + 16, z, "LINEAR"), (f1 + 30, 0.003 + 0.0005 * j)], index=2)
+            A.write_keys(sh, "rotation_euler", [(f1 + 14, 0.0), (f1 + 30, 0.35 * ((i + j) % 2 * 2 - 1))], index=2)
 
     # The crowd's decal: up on poles across "They told us it's a sim!", down again after the Kill-switch calls begin.
     h = S["held_decal"]

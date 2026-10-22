@@ -127,3 +127,22 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1 (approve or reject).
 - **What:** The human said the piano at the end couldn't be seen and the protagonist's singing was too subtle. The agent made both legible in v2 (production log).
+
+## 2026-10-22T14:19:23-04:00 — C4 review of animatic v2 (R1)
+
+- **Rule:** R1.
+- **What:** Thirteen notes:
+  - singing too jerky and not holding long words;
+  - kill switch black;
+  - new paper per stamp;
+  - stopwatch ticks reversed;
+  - two probes clipping the freezer door;
+  - dashboards as placeholders (suggesting real incident data);
+  - the metadata lock;
+  - candles dying by shrinking;
+  - evals cameras to nod in turn on the drums;
+  - the liability cell to be enclosed;
+  - the ending flag clipping the floor;
+  - closer cuts and more drums at the end.
+
+  All addressed in v3 (production log).

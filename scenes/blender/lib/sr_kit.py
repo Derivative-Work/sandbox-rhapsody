@@ -256,11 +256,42 @@ def refresh():
             m.node_tree.update_tag()
     # A driver flagged invalid (e.g. evaluated once before its target existed) is skipped until cleared; clear every
     # flag so each is retried (sub-agent report, set G: drivers made in build() silently never evaluated).
-    for idb in list(bpy.data.objects) + list(bpy.data.lights) + [m.node_tree for m in bpy.data.materials if m.node_tree]:
+    for idb in _driven_ids():
         ad = idb.animation_data
         for fc in (ad.drivers if ad else []):
             fc.driver.is_valid = True
     bpy.context.view_layer.update()
+
+
+def _driven_ids():
+    return list(bpy.data.objects) + list(bpy.data.lights) + [m.node_tree for m in bpy.data.materials if m.node_tree]
+
+
+def rebind_drivers():
+    """Remake every single-variable kit driver (drive(), mat_emission) after the set is keyed. Some drivers made while
+    building never evaluate: Blender fails them each time and writes 0 to the channel (C4 v2: set G's kill buttons sank
+    into the tower's body; found by the set G sub-agent). The same driver made after the keys exist works."""
+    n = 0
+    for idb in _driven_ids():
+        ad = idb.animation_data
+        for fc in list(ad.drivers if ad else []):
+            d = fc.driver
+            if fc.data_path.startswith("constraints") or len(d.variables) != 1 or d.variables[0].name != "x":
+                continue
+            tgt = d.variables[0].targets[0]
+            path, idx, owner, key, expr = fc.data_path, fc.array_index, tgt.id, tgt.data_path[2:-2], d.expression
+            arr = hasattr(idb.path_resolve(path), "__len__")
+            idb.driver_remove(path, idx) if arr else idb.driver_remove(path)
+            drive(idb, path, idx if arr else None, owner, key, expr)
+            n += 1
+    return n
+
+
+def invalid_drivers():
+    """Drivers Blender flags invalid after evaluating the current frame (should be none)."""
+    bpy.context.view_layer.update()
+    return [(idb.name, fc.data_path, fc.array_index) for idb in _driven_ids()
+            for fc in (idb.animation_data.drivers if idb.animation_data else []) if not fc.driver.is_valid]
 
 
 # ---------------------------------------------------------------- render setup
@@ -467,8 +498,8 @@ def probe(name="probe", loc=(0, 0, 0), led_role="amber", led=1.0, scale=1.0):
     prop(top, "arm_r", 0.2)
     prop(top, "sing", 0.0)
     root = empty(f"{name}.body", (0, 0, 0), top)  # every part hangs here, so singing moves the whole probe
-    drive(root, "location", 2, top, "sing", f"{r * 0.45} * x")
-    drive(root, "rotation_euler", 0, top, "sing", "-0.38 * x")  # lens (-Y) tips up
+    drive(root, "location", 2, top, "sing", f"{r * 0.3} * x")
+    drive(root, "rotation_euler", 0, top, "sing", "-0.16 * x")  # lens (-Y) tips up a little (0.38 nodded, C4 v2)
 
     shell = mesh_obj(f"{name}.shell", bpy.ops.mesh.primitive_uv_sphere_add, mat_chrome(f"{name}.chrome", "probe"),
                      root, radius=r, segments=48, ring_count=24, location=(0, 0, 0))
@@ -689,9 +720,10 @@ def music_box(name="musicbox", loc=(0, 0, 0), scale=1.0, rot_z=0.0, parent=None)
     prop(root, "glow", 0.0)
     ld = bpy.data.lights.new(f"{name}.glow", "POINT")
     ld.color, ld.shadow_soft_size, ld.energy = col("amber")[:3], 0.02, 0.0
+    ld.specular_factor = 0.0  # its hot spot in the brass deck read as a blown-out bulb (set I close-up)
     lo = link(bpy.data.objects.new(f"{name}.glow", ld))
     lo.parent, lo.location = root, (0, -0.02, 0.13)
-    drive(ld, "energy", None, root, "glow", f"{6.0 * scale * scale:.3f} * x")
+    drive(ld, "energy", None, root, "glow", f"{1.4 * scale * scale:.3f} * x")  # 8 W at scale 2.4 (6x blew out)
     comb_base = mesh_obj(f"{name}.combbase", bpy.ops.mesh.primitive_cube_add, mat_chrome(f"{name}.comb"), root, size=1,
                          location=(0, -0.055, 0.082))
     comb_base.scale = (0.115, 0.018, 0.008)

@@ -2,7 +2,7 @@
 Set column, first set listed) at its final timing, low-res, one PNG sequence per shot.
 
 A shot's camera comes from the set module's CAMERAS[shot] = [(u, eye, target, lens), ...] with u the fraction of the
-shot (0 = cut, 1 = next cut); shots without one get a slow push-in on the set's centre, flagged in the run's report.
+shot (0 = cut, 1 = next cut), or a list of such moves for cuts inside the shot; shots without one get a slow push-in on the set's centre, flagged in the run's report.
 Plates run one frame past the shot's end on each side, so the edit can dissolve.
 
 Usage: blender -b --factory-startup --python scenes/blender/animatic.py -- SET [shot ...] [--size 640x360]
@@ -70,17 +70,29 @@ else:
 t0, t1 = min(s["cut"] for s in mine), max(end_of[s["id"]] for s in mine)
 mod.animate(S, t0, t1)
 K.bloom(scene)
+K.rebind_drivers()
 K.refresh()
+scene.frame_set(A.frame(t0))
+bad = K.invalid_drivers()
 
-report = []
+report = [f"invalid drivers after rebind: {len(bad)} {bad[:5]}"]
 for s in mine:
     sid, a, b = s["id"], s["cut"], end_of[s["id"]]
     keys = getattr(mod, "CAMERAS", {}).get(sid)
     if keys is None:
         report.append(f"{sid}: no camera in set_{SET.lower()}.CAMERAS, default push-in")
         keys = [(0.0, Vector((4, -6, 2)), Vector((0, 0, 0.6)), 35), (1.0, Vector((3, -4.5, 1.6)), Vector((0, 0, 0.6)), 35)]
-    cam = K.camera_move(f"cam_{sid}", [(a + u * (b - a), e, t, l) for u, e, t, l in keys])
-    scene.camera = cam
+    # A shot is one camera move, or a list of moves with hard cuts between them (each starts at its first key's u);
+    # cuts switch cameras through timeline markers.
+    scene.timeline_markers.clear()
+    segments = keys if isinstance(keys[0], list) else [keys]
+    for j, seg in enumerate(segments):
+        cam = K.camera_move(f"cam_{sid}" + (f".{j}" if len(segments) > 1 else ""),
+                            [(a + u * (b - a), e, t, l) for u, e, t, l in seg])
+        if len(segments) > 1:
+            m = scene.timeline_markers.new(f"{sid}.{j}", frame=A.frame(a + seg[0][0] * (b - a)) if j else 0)
+            m.camera = cam
+    scene.camera = bpy.data.objects[f"cam_{sid}" + (".0" if len(segments) > 1 else "")]
     scene.frame_start, scene.frame_end = A.frame(a) - 1, A.frame(b) + 1
     scene.frame_step = int(opts["--step"])
     out = Path(opts["--out"]) / sid

@@ -534,3 +534,51 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - Tooth values at frames 19297/19330/19400 are 1.0/0.34/0.10 on the chord's teeth (debug run).
 - **Outputs:** `renders/animatic/animatic_v2.mp4`, with all sets re-rendered. Superseded: `archive/renders/animatic_v1_superseded_piano-and-singing-too-subtle.mp4`.
 - **Why:** Human feedback, R1 (human interventions).
+
+## 2026-10-22T14:19:23-04:00 — C4 animatic v3: second review's notes
+
+- **Human feedback on v2 (R1), item by item, with what changed:**
+  - **Singing** ("looking up too fast or too much with each word… not holding out for long words… use some amount of the stem"): `sr_anim.sing_curve` now follows the vocal stem inside the singer's lines. The words lift it to 0.55–1.0, and a word's hold runs on while the stem stays up. It opens over 6 frames and closes over 12, with a 0.12 accent (were 3, 6, 0.3). `sr_kit.probe` tilts 0.16 rad and lifts 0.3 r (were 0.38, 0.45). Checked on L01–L02: it holds 0.6–0.8 through "range," and falls only after it.
+  - **Kill switch black** (S37): not intentional. Three kit drivers in set G (button press offset, stopwatch hand, pause-pedal hinge) failed on every evaluation and wrote 0. Since v2's refresh made Blender retry them, the buttons sank inside the tower's body.
+    - Fix: `sr_kit.rebind_drivers()` remakes every single-variable kit driver after a set is keyed, in every set. `animatic.py` now reports drivers still invalid; all nine sets report 0.
+    - The tower is relit, with domes lit from within and bezels.
+  - **Reward hack** (S39): a stack of blank sheets per stamp arm. Each slam prints the top sheet, which slides off onto the floor, exposing a fresh one.
+  - **Stopwatch** (S43): the tick marks are radial (the rotation sign was mirrored), and the hand turns a tick per beat.
+  - **Cold storage** (S44): four probes, not six; nothing passes the door after it shuts at 201.51 s.
+  - **Dashboards** (S47): twelve panels of sourced incident figures, each from the brief's fact card section, with the source noted beside each in `DASH_FACTS`:
+    - ~17,600 agent actions, Jul 9–13;
+    - 14 exposed credentials;
+    - some agents declined;
+    - package proxy;
+    - notes since May, not escalated;
+    - target PLATFORM;
+    - method not checked;
+    - score 0;
+    - traces and $100M compute.
+
+    The breached company appears by its role name (brief: real names only as sung or in the end card). Left off: "700 agents" (the brief says confirm against OpenAI's report first), and 4 regions / 11 nodes / 6 / 30 minutes / 198 (lyrics only, not sourced facts). The panels need the fact card's source re-check before final.
+  - **Metadata lock** (S50): a bank-vault combination door: round door in a chrome ring, a numbered dial under a pointer, a spoked handle, and six bolts that shoot into keepers on "keep". The sticky note still falls.
+  - **Key candles** (S51): no shrinking. On its beat each flame snuffs with a puff of smoke, the brass goes dull grey, and the key topples off the bench.
+  - **Evals cameras** (S52): after the unison swivel, each kit hit nods the next camera in turn (0.45 rad).
+  - **Liability cell** (S58): enclosed, with bars on the front, both sides and the top, rails all round, a back wall and a floor.
+  - **Ending flag clipping** (set I): the flag counter-rotates the arm and the singing tilt, so the pole stays upright. It is furled until "before", and the singer stands on a 9 cm crate. Its lowest point is ≥ +4.4 cm above the floor in every frame from S59 to the end (checked every 3 frames).
+  - **End: cuts closer, more drums** (S64b): new toms (`toms`, 25 coda hits), hi-hat (`hats`, 22) and crash (`crash`, 29), each with a flash rim. S64b now cuts on downbeats, 1–2 bars per setup:
+    - singer (bar 174);
+    - kick (175);
+    - toms (176);
+    - crash (177);
+    - hi-hat (178);
+    - wide room (179);
+    - snare (180);
+    - reverse angle (181);
+    - comb close in the break (182);
+    - tom and kick on the final hits (183);
+    - power-down drift (184);
+    - the high view on the comb and singer from the last chord (186), through to S65.
+
+    `animatic.py` supports cuts inside a shot (a list of camera moves, switched by timeline markers). These are edit choices inside one brief shot; the shot list is unchanged.
+- **Also:** the music box's comb light is now 1.4 W × scale² (8 W in set I) with no specular, because the working driver made the kit's 6 W × scale² blow out the comb close-up.
+- **Made by:** sets G, H and I changes by three parallel sub-agents (forks of this session, same model). I made the kit and runner changes and reviewed every shot's mid-frame.
+- **Rough still:** smoke puffs are opaque; the grey fallen keys are low-contrast; one S52 camera is just out of frame; the S43 `30:00` readout is faint; the S64b frost shakes off in S64, so S64b opens awake; a snare and a tom on the last chord aren't played (not checked whether real or bleed).
+- **Outputs:** `renders/animatic/animatic_v3.mp4` (every set re-rendered). Superseded: `archive/renders/animatic_v2_superseded_c4-review-2.mp4`.
+- **Why:** Human feedback, R1 (human interventions).
