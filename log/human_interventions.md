@@ -117,3 +117,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **What:** On `renders/step7/anim_test_44-54.mp4` the human said: "I can see events synchronizing with the music, they're just not obvious enough, like they're happening too fast or are not large enough."
 - **Rule:** R1 (rejecting a render, the reason in words). The agent changes the rigs.
+
+## 2026-10-22T09:02:02-04:00 — Step 7 v3 accepted; transcription accuracy an open item — R1
+
+- **What:** On `renders/step7/anim_test_44-54_v3.mp4` the human said: "movements are legible, but it also makes issues in the transcribed score more obvious too. keep going for now and we'll come back to it later".
+- **Rule:** R1. Transcription accuracy (the notes the machines play) stays open, to be revisited (handoff).
