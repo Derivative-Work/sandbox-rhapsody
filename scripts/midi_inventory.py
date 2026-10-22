@@ -1,0 +1,305 @@
+"""Pre-production step 4: inventory the Suno MIDI and validate it against the stems.
+
+Suno's MIDI is a transcription, and each file holds several "instruments" (its guess at what it heard in that stem,
+split into segments). A track here is one (file, program name) pair, its segments merged.
+
+For each track:
+- inventory: program, note count, note range, time span, segments;
+- timing: MIDI onsets (chords merged within 30 ms) against onsets detected in the matching stem (librosa, 5.8 ms
+  hop). Reports the track's constant shift, then the median, 95th-percentile and worst |offset| that remain, over
+  one-to-one pairs (MIDI and stem onsets that are each other's nearest, within 120 ms);
+- support: share of MIDI onsets where the stem's onset-strength envelope actually rises (its peak within -10/+60 ms
+  of the shifted onset is above the 60th percentile of the surrounding 2 s). This tests that each note is real,
+  which a nearest-onset hit rate can't: in dense parts (distorted guitar, piano) the detector resolves only a few
+  attacks, so most correct MIDI notes have no detected onset near them;
+- coverage (per stem, all its tracks together): share of the stem's detected onsets that some MIDI onset explains
+  within 50 ms, i.e. how much of what is heard the MIDI holds;
+- ghosts: share of MIDI notes whose onset falls where the stem is silent (below -50 dBFS RMS over the note's first
+  80 ms);
+- systematic lag: cross-correlation of the MIDI onset train with the stem's onset-strength envelope (±100 ms).
+
+The onset detector itself lags a true attack, more for soft attacks. calibrate() measures that bias on synthetic
+clicks, plucks and pads at known times, and it is subtracted before anything is judged. Each track's constant
+shift (its median signed offset minus the detector bias) is then removed and the residual scatter judged; a shift
+of more than 10 ms makes the verdict "shift" (apply it), not "usable".
+
+Verdicts (thresholds in VERDICT below; sustained parts are judged more leniently, because onset detection on legato
+strings, pads and voices is itself unreliable):
+  usable      - drive animation from the MIDI as is (onsets snapped to frames);
+  shift       - usable after a constant lag correction (logged);
+  stem        - unusable: derive events from the stem's onsets instead (substitution logged);
+  ignore      - a misattributed fragment (few notes, or mostly ghosts) that drives nothing.
+
+Usage: .venv/bin/python -I scripts/midi_inventory.py  ->  timing/midi_validation.json, timing/midi_inventory.md
+"""
+import json
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+import librosa
+import numpy as np
+import pretty_midi
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import midi_io  # noqa: E402
+
+SR, HOP = 22050, 128
+STEM = "audio/stems/It Was Just a Benchmark ({}).wav"
+MIDI = "audio/stems/midi/It Was Just a Benchmark ({}).mid"
+STEMS = ["Vocals", "Backing Vocals", "Keyboard", "Guitar", "Bass", "Drums", "Synth", "Strings", "Brass", "FX",
+         "Percussion"]
+SUSTAINED = {"String Ensemble 1", "Synth Choir", "Brass Section", "Lead 2 (sawtooth)"}
+VERDICT = {  # (max median residual ms, max p95 residual ms, min support) for percussive/plucked vs sustained parts
+    "percussive": (15.0, 60.0, 0.6),
+    "sustained": (30.0, 100.0, 0.4),
+}
+MIN_NOTES, MAX_GHOSTS, MIN_PAIRS = 12, 0.5, 10
+MIN_COVERAGE_PERCUSSIVE = 0.3  # a percussive stem whose MIDI explains less than this of its onsets: use the stem
+STABS = {"Brass"}  # sustained timbre, but played as stabs that machines hit on (the kill-switch tower): judged like
+                   # percussion for coverage, with the pad detector bias
+
+
+def calibrate():
+    """Detector bias (ms) by attack type, from synthetic onsets at known times (seed 41)."""
+    rng = np.random.default_rng(41)
+    out = {}
+    for kind in ("click", "pluck", "pad"):
+        y = np.zeros(SR * 60)
+        times = np.sort(rng.uniform(1, 59, 150))
+        times = times[np.r_[True, np.diff(times) > 0.15]]
+        n = int(0.3 * SR)
+        tt = np.arange(n) / SR
+        for t in times:
+            if kind == "click":
+                sig = rng.standard_normal(n) * np.exp(-tt * 60)
+            elif kind == "pluck":
+                sig = np.sin(2 * np.pi * 220 * tt) * np.exp(-tt * 8) * np.minimum(1, tt / 0.003)
+            else:
+                sig = np.sin(2 * np.pi * 330 * tt) * np.minimum(1, tt / 0.04) * np.exp(-tt * 2)
+            i = int(t * SR)
+            y[i:i + n] += sig[:len(y) - i]
+        env = librosa.onset.onset_strength(y=y, sr=SR, hop_length=HOP, lag=1, max_size=3)
+        on = librosa.onset.onset_detect(onset_envelope=env, sr=SR, hop_length=HOP, units="time", backtrack=False)
+        out[kind] = float(np.median([on[np.argmin(abs(on - t))] - t for t in times]) * 1000)
+    return out
+
+
+def nearest(on, m_on):
+    idx = np.searchsorted(on, m_on)
+    out = []
+    for t, i in zip(m_on, idx):
+        cands = [on[j] for j in (i - 1, i) if 0 <= j < len(on)]
+        out.append(min(cands, key=lambda c: abs(c - t)) - t if cands else np.inf)
+    return np.array(out) * 1000
+
+
+def mutual(on, m_on, max_ms=120):
+    """Signed offsets (ms, stem minus MIDI) for one-to-one pairs: a MIDI onset and a stem onset that are each
+    other's nearest, within max_ms. A quiet note the detector didn't resolve then drops out instead of borrowing a
+    neighbouring hit's onset (which made dense drums and piano look 85-110 ms off at p95)."""
+    if not len(on) or not len(m_on):
+        return np.array([])
+    i_m = np.clip(np.searchsorted(on, m_on), 1, len(on) - 1)
+    near_on = np.where(np.abs(on[i_m - 1] - m_on) <= np.abs(on[i_m] - m_on), i_m - 1, i_m)
+    i_s = np.clip(np.searchsorted(m_on, on), 1, len(m_on) - 1)
+    near_m = np.where(np.abs(m_on[i_s - 1] - on) <= np.abs(m_on[i_s] - on), i_s - 1, i_s)
+    out = []
+    for k, j in enumerate(near_on):
+        if near_m[j] == k and abs(on[j] - m_on[k]) * 1000 <= max_ms:
+            out.append((on[j] - m_on[k]) * 1000)
+    return np.array(out)
+
+
+def onsets_of(notes, merge=0.03):
+    t = sorted(n.start for n in notes)
+    out = []
+    for x in t:
+        if not out or x - out[-1] > merge:
+            out.append(x)
+    return np.array(out)
+
+
+def analyse_stem(name):
+    y, _ = librosa.load(STEM.format(name), sr=SR, mono=True)
+    env = librosa.onset.onset_strength(y=y, sr=SR, hop_length=HOP, lag=1, max_size=3)
+    on = librosa.onset.onset_detect(onset_envelope=env, sr=SR, hop_length=HOP, units="time", backtrack=False)
+    rms = librosa.feature.rms(y=y, frame_length=1024, hop_length=HOP)[0]
+    db = 20 * np.log10(rms + 1e-9)
+    return on, env, db
+
+
+def lag_xcorr(midi_on, env, max_ms=100):
+    frames = np.round(midi_on * SR / HOP).astype(int)
+    frames = frames[frames < len(env)]
+    e = (env - env.mean()) / (env.std() + 1e-9)
+    max_lag = int(max_ms / 1000 * SR / HOP)
+    scores = [(e[np.clip(frames + k, 0, len(e) - 1)].mean(), k) for k in range(-max_lag, max_lag + 1)]
+    best, k = max(scores)
+    return k * HOP / SR * 1000, float(best)
+
+
+def attack(stem, key):
+    if key == "drums" or stem in ("Drums", "Percussion", "FX"):
+        return "click"
+    return "pad" if key in SUSTAINED else "pluck"
+
+
+def support(env, m_on):
+    """Share of onsets where the onset envelope peaks above its local 60th percentile (2 s window)."""
+    ok = []
+    w = int(1.0 * SR / HOP)
+    for t in m_on:
+        f = int(t * SR / HOP)
+        lo, hi = max(0, f - 2), min(len(env), f + int(0.06 * SR / HOP) + 1)
+        if lo >= hi:
+            continue
+        local = env[max(0, f - w):min(len(env), f + w)]
+        ok.append(env[lo:hi].max() > np.percentile(local, 60))
+    return float(np.mean(ok)) if ok else 0.0
+
+
+def main():
+    bias = calibrate()
+    print("detector bias (ms):", {k: round(v, 1) for k, v in bias.items()})
+    rows, coverage, pending = [], {}, {}
+    for stem in STEMS:
+        on, env, db = analyse_stem(stem)
+        pm = midi_io.load(MIDI.format(stem))
+        groups = defaultdict(list)
+        for inst in pm.instruments:
+            groups["drums" if inst.is_drum else inst.name].append(inst)
+        shifted_all = []
+        for key, insts in groups.items():
+            notes = [n for i in insts for n in i.notes]
+            m_on = onsets_of(notes)
+            b = bias[attack(stem, key)]
+            raw = mutual(on, m_on) - b                       # detector bias removed
+            shift = float(np.median(raw)) if len(raw) else 0.0       # MIDI early by this much (ms) if positive
+            shifted = m_on + shift / 1000
+            matched = mutual(on, shifted) - b               # residual after the track's constant shift
+            sup = support(env, shifted)
+            ghost = float(np.mean([db[min(len(db) - 1, int(n.start * SR / HOP)):
+                                      min(len(db), int((n.start + 0.08) * SR / HOP) + 1)].max() < -50 for n in notes]))
+            lag, lag_score = lag_xcorr(m_on, env)
+            kind = "sustained" if key in SUSTAINED else "percussive"
+            med_abs = float(np.median(np.abs(matched))) if len(matched) else float("inf")
+            p95 = float(np.percentile(np.abs(matched), 95)) if len(matched) else float("inf")
+            max_med, max_p95, min_sup = VERDICT[kind]
+            misattributed = key == "drums" and stem in ("Vocals", "Backing Vocals")  # consonants read as hits
+            if len(notes) < MIN_NOTES or ghost > MAX_GHOSTS or len(matched) < MIN_PAIRS or misattributed:
+                verdict = "ignore"
+            elif med_abs <= max_med and p95 <= max_p95 and sup >= min_sup:
+                verdict = "shift" if abs(shift) > 10 else "usable"
+            else:
+                verdict = "stem"
+            if verdict != "ignore":
+                shifted_all.append(shifted)
+            if verdict in ("usable", "shift"):
+                # Corrected events: shift applied, ghost notes (onset in stem silence) dropped, so no visible hit
+                # ever lands where nothing sounds.
+                ev = []
+                for n in sorted(notes, key=lambda n: (n.start, n.pitch)):
+                    f0 = min(len(db) - 1, int(n.start * SR / HOP))
+                    if db[f0:min(len(db), int((n.start + 0.08) * SR / HOP) + 1)].max() < -50:
+                        continue
+                    ev.append({"t": round(n.start + shift / 1000, 4), "end": round(n.end + shift / 1000, 4),
+                               "pitch": n.pitch, "vel": n.velocity})
+                slug = f"{stem}__{key}".lower().replace(" ", "_").replace("(", "").replace(")", "")
+                pending[slug] = (len(rows), {"stem": stem, "track": key, "shift_ms": round(shift, 1),
+                                             "dropped_ghosts": len(notes) - len(ev), "events": ev})
+            pitches = [n.pitch for n in notes]
+            rows.append({
+                "stem": stem, "track": key, "kind": kind, "attack": attack(stem, key),
+                "program": None if key == "drums" else int(insts[0].program),
+                "segments": len(insts), "notes": len(notes), "onsets": int(len(m_on)),
+                "low": pretty_midi.note_number_to_name(min(pitches)), "high": pretty_midi.note_number_to_name(max(pitches)),
+                "first_s": round(min(n.start for n in notes), 2), "last_s": round(max(n.end for n in notes), 2),
+                "detector_bias_ms": round(b, 1), "shift_ms": round(shift, 1),
+                "median_abs_ms": round(med_abs, 1) if np.isfinite(med_abs) else None,
+                "p95_abs_ms": round(p95, 1) if np.isfinite(p95) else None,
+                "worst_abs_ms": round(float(np.max(np.abs(matched))), 1) if len(matched) else None,
+                "pairs": int(len(matched)), "support": round(sup, 3), "ghost_share": round(ghost, 3),
+                "xcorr_lag_ms": round(lag, 1), "xcorr_score": round(lag_score, 2), "verdict": verdict,
+            })
+            r = rows[-1]
+            print(f"{stem:14s} {key:24s} n={r['notes']:4d} shift={r['shift_ms']:6.1f} med={r['median_abs_ms']} "
+                  f"p95={r['p95_abs_ms']} worst={r['worst_abs_ms']} support={r['support']} ghost={r['ghost_share']} "
+                  f"-> {verdict}")
+        allon = np.sort(np.concatenate(shifted_all)) if shifted_all else np.array([])
+        cov = float(np.mean(np.abs(nearest(allon, on)) <= 50)) if len(allon) and len(on) else 0.0
+        coverage[stem] = {"stem_onsets": int(len(on)), "covered_50ms": round(cov, 3)}
+        print(f"{stem:14s} coverage of stem onsets by its MIDI: {cov:.2f} ({len(on)} onsets)")
+        # Stem substitution: a percussive stem (clicks) whose MIDI holds too little of what is heard drives its
+        # machines from its own detected onsets instead, bias-corrected, with onset strength as velocity.
+        if (attack(stem, "") == "click" or stem in STABS) and cov < MIN_COVERAGE_PERCUSSIVE:
+            b_stem = bias["pad"] if stem in STABS else bias["click"]
+            for r in rows:
+                if r["stem"] == stem and r["verdict"] != "ignore":
+                    r["verdict"] = "stem"
+            strength = env[np.clip((on * SR / HOP).astype(int), 0, len(env) - 1)]
+            ev = [{"t": round(float(t - b_stem / 1000), 4), "strength": round(float(x / strength.max()), 3)}
+                  for t, x in zip(on, strength)]
+            Path("timing/stem_events").mkdir(exist_ok=True)
+            Path(f"timing/stem_events/{stem.lower().replace(' ', '_')}.json").write_text(json.dumps(
+                {"stem": STEM.format(stem), "detector_bias_ms": b_stem, "events": ev}, indent=0) + "\n")
+            print(f"{stem:14s} -> stem substitution: {len(ev)} events in timing/stem_events/")
+    # Event files only for tracks still driven by their MIDI once stem substitutions are decided.
+    Path("timing/events").mkdir(exist_ok=True)
+    for slug, (i, data) in pending.items():
+        if rows[i]["verdict"] in ("usable", "shift"):
+            Path(f"timing/events/{slug}.json").write_text(json.dumps(data) + "\n")
+    Path("timing/midi_validation.json").write_text(json.dumps(
+        {"detector_bias_ms": bias, "verdict_thresholds": VERDICT, "coverage": coverage, "tracks": rows}, indent=1) + "\n")
+    write_report(bias, coverage, rows)
+
+
+def write_report(bias, coverage, rows):
+    L = ["# MIDI inventory and validation", "",
+         "Pre-production step 4. Generated by `scripts/midi_inventory.py` (numbers in `timing/midi_validation.json`); "
+         "the method is in that script's docstring. A track is one (file, program) pair with its segments merged. "
+         "Offsets are in ms; the shift is how early the MIDI runs against the audible attack (positive = early), and "
+         "the timing columns are what remains after it, over one-to-one onset pairs.", "",
+         f"Detector bias removed first (synthetic onsets): clicks {bias['click']:.1f} ms, plucks {bias['pluck']:.1f} ms, "
+         f"pads {bias['pad']:.1f} ms.", "",
+         "| Stem file | Track (Suno's program) | Notes | Range | Span (s) | Shift | Median | p95 | Worst | Pairs | "
+         "Support | Ghosts | Verdict |",
+         "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+    for r in rows:
+        L.append(f"| {r['stem']} | {r['track']} | {r['notes']} | {r['low']}–{r['high']} | {r['first_s']}–{r['last_s']} | "
+                 f"{r['shift_ms']:+.1f} | {r['median_abs_ms']} | {r['p95_abs_ms']} | {r['worst_abs_ms']} | {r['pairs']} | "
+                 f"{r['support']:.2f} | {r['ghost_share']:.2f} | **{r['verdict']}** |")
+    L += ["", "Coverage: the share of each stem's detected onsets that its MIDI tracks explain within 50 ms.", "",
+          "| Stem | Detected onsets | Covered |", "| --- | --- | --- |"]
+    for k, v in coverage.items():
+        L.append(f"| {k} | {v['stem_onsets']} | {v['covered_50ms']:.2f} |")
+    # Drum kit breakdown (GM percussion names) for the instrument map.
+    pm = midi_io.load(MIDI.format("Drums"))
+    counts = defaultdict(int)
+    for inst in pm.instruments:
+        if inst.is_drum:
+            for n in inst.notes:
+                counts[n.pitch] += 1
+    L += ["", "Drums file, kit pieces (General MIDI names, as Suno labelled them):", "",
+          "| Pitch | Kit piece | Hits |", "| --- | --- | --- |"]
+    for k in sorted(counts, key=lambda k: -counts[k]):
+        L.append(f"| {k} | {pretty_midi.note_number_to_drum_name(k)} | {counts[k]} |")
+    L += ["", "Rules applied by the script:",
+          "- **shift**: the track's constant offset is applied when events are exported (`timing/events/`). Every "
+          "percussive part runs 12–26 ms early; soft attacks (strings +33, brass +53) are shifted to their audible "
+          "attack, which is where a visible hit has to land.",
+          "- **ghosts** (onset in stem silence below −50 dBFS) are dropped from the exported events; the counts are in "
+          "each event file.",
+          "- **stem**: Percussion, FX and Brass drive their machines from the stem's own detected onsets "
+          "(`timing/stem_events/`), because their MIDI holds 0%, 9% and 18% of what is heard. Brass is a sustained "
+          "timbre but is played as stabs, and its MIDI misses the biggest ones (`timing/midi_check.png`, 213.75 s and "
+          "216.35 s); its MIDI pitches stay available for which-button-is-pressed, its timing comes from the stem.",
+          "- **ignore**: misattributed or unvalidatable fragments: drums read from consonants in the vocal stem, "
+          "a 49-note sawtooth in the vocal coda, 36 electric-piano notes in the drum stem, 5 percussion notes.",
+          "- The vocal tracks pass on pitch and loose timing only; vents follow the vocal stem's envelope and "
+          "captions follow forced alignment (step 5), not these notes."]
+    Path("timing/midi_inventory.md").write_text("\n".join(L) + "\n")
+
+
+if __name__ == "__main__":
+    main()

@@ -202,3 +202,31 @@ Append-only. One entry per action: timestamp, step (shot ID where relevant), wha
 - **Commands:** `blender -b --factory-startup --python scenes/blender/c1_test_frame.py -- renders/c1/c1_v3_A_wide.png 3840 2160 64 wide`; `.venv/bin/python -I scripts/c1_sheet.py renders/c1/c1_v2_A_close.png renders/c1/c1_v3_A_wide.png renders/c1/c1_v3_sheet.jpg`
 - **Outputs:** `renders/c1/c1_v3_A_wide.png`, `renders/c1/c1_v3_sheet.jpg`. Superseded: `archive/renders/c1/c1_v2_A_wide_superseded_decal-illegible.png` and `c1_v2_sheet_superseded_decal-illegible.jpg`. The close frame (v2) has no decal and is unchanged.
 - **Why:** Human feedback on C1 (R1); a rule for every set: signs must read in the widest shot that shows them.
+
+## 2026-10-22T06:07:23-04:00 — Step 4: MIDI inventory and validation against the stems
+
+- **What:** Listed every MIDI track and validated each against its stem's detected onsets. A track is one (file, program) pair, with Suno's segments merged: 20 tracks in 11 files. Where a track fails, its machines take events from the stem's onsets instead. Exported corrected event lists for step 7, and a check figure for C2.
+- **Commands:** `.venv/bin/python -I scripts/midi_inventory.py`; `.venv/bin/python -I scripts/midi_check_plot.py`
+- **Outputs:**
+  - `timing/midi_inventory.md` (the table for C2)
+  - `timing/midi_validation.json`
+  - `timing/events/*.json` (14 MIDI-driven tracks, shift applied, ghosts dropped)
+  - `timing/stem_events/{brass,fx,percussion}.json` (stem substitutions)
+  - `timing/midi_check.png`
+  - `scripts/midi_inventory.py`, `scripts/midi_check_plot.py`
+- **Method, and how it got there** (each version's flaw is fixed in the next):
+  1. **Nearest-onset timing with a 50 ms hit rate.** Nearly every track came out 20–40 ms late with poor hit rates.
+  2. **Detector bias.** Calibration on synthetic onsets at known times showed the detector itself lags 4.1 ms (clicks), 6.8 ms (plucks) and 11.5 ms (pads). It is now subtracted.
+  3. **Hit rate replaced.** In dense parts (distorted guitar, piano, drums) the detector resolves few attacks, so correct MIDI notes had no onset near them. Two measures replace it: *support* (the stem's onset energy rises at the note) and per-stem *coverage* (the share of detected stem onsets the MIDI explains).
+  4. **One-to-one matching for timing error.** A quiet hi-hat had borrowed a neighbouring hit's onset, making drums look 85 ms off at p95. Now only mutually nearest pairs count: drums are 3.9 ms median and 12.8 ms p95 after their shift.
+- **Results:**
+  - **Suno's MIDI runs early.** Every percussive or plucked part: drums +19.9 ms, bass +25.9, distorted guitar +19.2, picked bass +12.2, piano +23.4, synth +22.3. Soft attacks show the larger offset to their audible attack: strings +32.9, brass +53.3. The shift is applied per track on export, so visible hits land on the attack.
+  - **After the shift,** the percussive parts sit within 3.5–10.5 ms median and 13–58 ms p95, with support 0.90–1.00.
+  - **Stem substitution** (logged per the brief): Percussion (MIDI holds 0% of its 132 onsets), FX (9% of 133) and Brass (18% of 174). In the check figure, brass's MIDI misses the two biggest stabs (213.75 s and 216.35 s), and brass drives the kill-switch stabs. Brass MIDI pitches stay available.
+  - **Ignored:** "drums" in the Vocals file (consonants read as hits); a 49-note sawtooth in the vocal coda (1 pair); 36 electric-piano notes in the Drums file (4 pairs); 5 percussion notes.
+  - **Ghosts:** notes whose onset falls in stem silence are dropped from the events (329 in total, most in strings 172, synth 130 and guitar lead 95).
+  - **Vocal tracks:** they pass on pitch and loose timing only (median 22–23 ms); vents and captions use the envelope and forced alignment.
+  - **Drum kit:** kick 318, snare 258, open hat 219, floor tom 121, crash 91, closed hat 62, other toms 11, side stick 6.
+- **Housekeeping:** an intermediate run had written a brass MIDI event file before the brass substitution was decided. I deleted that run's uncommitted, regenerable outputs (`timing/events`, `timing/stem_events`) and regenerated them; the script now writes event files only after the substitutions.
+- **Why:** Brief, pre-production step 4.
+- **Status:** C2 (audio and MIDI) is ready for review: `log/prompts/suno/takes.md`, `log/human_interventions.md` (Suno and post-filter runs), `timing/master_offset.json` (0 samples), `timing/midi_inventory.md`, `timing/midi_check.png`.
