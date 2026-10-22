@@ -25,7 +25,8 @@ AMBER = "#e08a00"
 # Keys per section (music21 Krumhansl analysis of piano + bass + vocal notes per section, log step 5 / C3): key
 # signatures keep in-key notes free of accidentals (human, C3). The 5 s piano tail joins the coda's E-flat.
 KEYS = {"piano intro": "G", "intro: voice and piano": "g", "intro: band": "c", "ballad": "B-", "guitar solo": "B-",
-        "opera": "B-", "hard rock": "B-", "outro": "B-", "coda": "E-", "piano tail": "E-"}
+        "opera": "B-", "hard rock": "B-", "outro": "B-", "coda": "E-", "piano tail": "E-", "release and SIGTERM": "E-",
+        "silence": "E-"}
 DRUM = {  # piece -> (display step, octave, notehead)
     "kick": ("F", 4, "normal"), "snare": ("C", 5, "normal"), "toms": ("A", 4, "normal"),
     "hats": ("G", 5, "x"), "crash": ("A", 5, "x"),

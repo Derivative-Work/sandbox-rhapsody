@@ -70,9 +70,9 @@ Tags: **[B]** Blender 3D plate · **[J]** JS overlay (HUD and on-screen UI; capt
 | S62 | Outro | I | [B] | 290.78 | 17447 | 1.82 |  |
 | S63 | Outro | I | [B] | 292.60 | 17556 | 3.65 |  |
 | S64 | Outro | I, POV | [B] [J] | 296.25 | 17775 | 3.70 | POV: HUD [J] |
-| S64b | Coda | I | [B] | 299.94 | 17997 | 23.06 | **proposed** |
-| S65 | Outro | I | [B] [F] | 323.00 | 19380 | — | `SIGTERM`; CRT collapse [F]; provisional until the SIGTERM sound exists |
-| S66 | Fact card | — | [J] | 323.00 | 19380 | — |  |
+| S64b | Coda | I | [B] | 299.94 | 17997 | 25.56 |  |
+| S65 | Outro | I | [B] [F] | 325.50 | 19530 | 0.95 | `SIGTERM`; CRT collapse [F] on the SIGTERM (scripts/ending_audio.py) |
+| S66 | Fact card | — | [J] | 326.45 | 19587 | — |  |
 | S67 | End card | — | [F] | — | — | — |  |
 
 Shots: 68 (66 [B], 12 [J] beyond captions, 3 [F]). No generated video or image model anywhere (brief, hard constraint).

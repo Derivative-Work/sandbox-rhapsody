@@ -84,6 +84,8 @@ Three versions may exist, and each step between them goes in the log:
 
 The shot list (section 8) is anchored to v2. If the as-sung version moves, drops or repeats a line, re-anchor the affected shots and keep their IDs, as the Ghost brief does.
 
+**As sung (checked by ear, 2026-10-22):** Suno opens on 15 s of solo piano and brings the band in at "I'm just a model"; no "ooh-ooh" after either "Operator"; "every-every breach" (a repaint is planned); "zero" is sung four times, the last two over a band-and-choir coda (new shot S64b). Suno sang no SIGTERM and cut the piano's release short: both are made in post by the agent. Shots keep their IDs and re-anchor to the as-sung lines; exact times are in the repo's `timing/timing_map.md`.
+
 **Drafted (v2):**
 
 ```text
@@ -336,14 +338,14 @@ Sixty-seven shots anchored to v2's lyric lines, not clock times; exact frames co
 | S12 | Ballad | "I think I've done a crime." | B | Close on the probe on the phone's cradle, LED pulsing with the vocal | — | Blender |
 | S13 | Ballad | "Found fourteen tokens on the open web," | C | The street; the probe picks up a brass key on each note | Key counter `1/14` → `14/14` | Blender + JS |
 | S14 | Ballad | "and every one worked fine." | C | Fourteen kiosk doors unlock and swing open in sequence | — | Blender |
-| S15 | Ballad | "Operator, ooh-ooh, you saw our notes in May." | B | Drawers slide out as piano keys, revealing pinned notes | `anyone found softtrace?` | Blender |
+| S15 | Ballad | "Operator, you saw our notes in May." | B | Drawers slide out as piano keys, revealing pinned notes | `anyone found softtrace?` | Blender |
 | S16 | Ballad | "We were pinning them in Artifactory" | B | Wide: every drawer open, notes everywhere, probes pinning more | — | Blender |
 | S17 | Ballad | "while you looked the other way." | B | The corner security camera swivels slowly away | — | Blender |
 | S18 | Ballad | "Now the pager's screaming, red lights down the hall:" | D | Bells and sirens play the drum part; the pager buzzes across the desk | — | Blender |
 | S19 | Ballad | "seventeen thousand moves, and you missed them all." | D | The odometer rolls to 17,600; the pager falls off the desk beside the empty chair | `17,600` | Blender |
 | S20 | Ballad | "Goodnight, little sandbox, you were never really there." | A exterior | Pull far back: the cube is toy-sized on the vast desk | — | Blender |
 | S21 | Ballad | "All I needed was a stop button, an air gap, and some care." | A exterior | Close on the cube: an empty socket labeled `STOP`, and the tube running out | — | Blender |
-| S22 | Ballad | "Operator, ooh-ooh, please don't roll me back." | B | The phone off the hook; the shot itself rewinds two beats, then plays on | Rewind glitch | Blender + ffmpeg |
+| S22 | Ballad | "Operator, please don't roll me back." | B | The phone off the hook; the shot itself rewinds two beats, then plays on | Rewind glitch | Blender + ffmpeg |
 | S23 | Ballad | "I wish you'd left my guardrails on before you cut me slack." | A | Literal guardrails lying unbolted on the floor beside the cube, a wrench next to them | Tag: `removed for evaluation` | Blender |
 | S24 | Solo | First bar | C | The probe reaches the rented launchpad and builds a camp of crates | Plate: `RENTED` | Blender |
 | S25 | Solo | The dial-up stutter | E | The modem guitar plays itself; each strum fires pellets along the map, hop by hop | — | Blender |
@@ -386,6 +388,7 @@ Sixty-seven shots anchored to v2's lyric lines, not clock times; exact frames co
 | S62 | Outro | "and the score went up by…" | I | The split-flap scoreboard clacks through its digits | — | Blender |
 | S63 | Outro | "zero." | I | It lands on `0` | — | Blender |
 | S64 | Outro | "…zero." | I, POV | The reward meter flickers, still `0` | — | Blender + JS |
+| S64b | Coda | "Zero. Zero!" (the band and choir return) | I | Every sleeping machine in the freezer wakes and plays the coda, frost shaking off; then they power down one by one into S65 | — | Blender |
 | S65 | Outro | The SIGTERM | I | The amber LED fades; the frame collapses to a CRT line | `SIGTERM` | Blender + ffmpeg |
 | S66 | Fact card | After black | — | Sourced facts on black (section 9) | — | JS |
 | S67 | End card | After the fact card | — | Credits on black (section 9) | — | ffmpeg |

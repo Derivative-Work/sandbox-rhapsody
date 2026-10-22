@@ -1,0 +1,20 @@
+{
+ "source": "audio/master/sandbox_rhapsody_master_nofallback.wav",
+ "output": "audio/post/sandbox_rhapsody_final.wav",
+ "sr": 48000,
+ "duration_s": 327.45,
+ "untouched_until_s": 322.6,
+ "crossfade_s": [
+  322.6,
+  322.85
+ ],
+ "freeze_window_s": [
+  322.55,
+  322.8
+ ],
+ "decay_db_per_s": 6.0,
+ "hf_db_per_s_per_khz": 1.5,
+ "sigterm_s": 325.5,
+ "silence_from_s": 325.95,
+ "peak_dbfs": -0.1
+}

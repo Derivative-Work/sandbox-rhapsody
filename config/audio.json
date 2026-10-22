@@ -1,0 +1,6 @@
+{
+ "_doc": "The video's audio track: the post-filtered master (music-deslop M6f 10k, strength 1.0, no fallback; offset to the Suno mix 0 samples) with the agent-made ending (scripts/ending_audio.py: piano release + SIGTERM). Identical to the master before 322.6 s.",
+ "final": "audio/post/sandbox_rhapsody_final.wav",
+ "master": "audio/master/sandbox_rhapsody_master_nofallback.wav",
+ "ending": "timing/ending.json"
+}

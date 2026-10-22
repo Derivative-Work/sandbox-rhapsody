@@ -20,9 +20,6 @@ def brief_rows():
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         if len(cells) == 7 and re.fullmatch(r"S\d+[a-z]?", cells[0]):
             rows[cells[0]] = dict(zip(["id", "section", "anchor", "set", "visual", "gag", "pipeline"], cells))
-    rows["S64b"] = {"id": "S64b", "section": "Coda", "anchor": "\"Zero.\" (coda)", "set": "I",
-                    "visual": "Proposed: the band and choir return; every machine of the freezer wakes for 'Zero. Zero!' "
-                              "and the final swell", "gag": "—", "pipeline": "Blender"}
     return rows
 
 
@@ -62,7 +59,7 @@ def main():
         if s["id"] == "S22":
             notes.append("rewind two beats [F]")
         if s["id"] == "S65":
-            notes.append("CRT collapse [F]; provisional until the SIGTERM sound exists")
+            notes.append("CRT collapse [F] on the SIGTERM (scripts/ending_audio.py)")
         if s.get("proposed"):
             notes.append("**proposed**")
         if r.get("section") == "Opera":

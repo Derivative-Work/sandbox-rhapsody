@@ -1,5 +1,5 @@
 {
- "_doc": "Shot anchors (brief, shot list) re-anchored to the as-sung song (step 5). 'line': the start of the first line whose text starts with it; 'word': the first matching word inside that line; 'event': a musical moment from timing/timing_map.md. Cut = the downbeat at or before the anchor, or the next one when the line is a pickup into it (scripts/timing_map.py, cut_for), except where 'cut' says otherwise. IDs never change; S64b is proposed (as-sung coda).",
+ "_doc": "Shot anchors (brief, shot list) re-anchored to the as-sung song (step 5). 'line': the start of the first line whose text starts with it; 'word': the first matching word inside that line; 'event': a musical moment from timing/timing_map.md. Cut = the downbeat at or before the anchor, or the next one when the line is a pickup into it (scripts/timing_map.py, cut_for), except where 'cut' says otherwise. IDs never change; S64b was added for the as-sung coda (brief rev 15).",
  "shots": [
   {
    "id": "S01",
@@ -266,14 +266,12 @@
   {
    "id": "S64b",
    "line": "Zero.",
-   "proposed": true,
-   "note": "as sung: the band and choir return for 'Zero. Zero!' and a final swell (coda, about 298-318 s). Proposed: not in the brief yet"
+   "note": "as sung: the band and choir return for 'Zero. Zero!' (added to the brief, rev 15)"
   },
   {
    "id": "S65",
    "event": "sigterm",
-   "provisional": true,
-   "note": "Suno sang no SIGTERM and truncated the piano release; both are added in post. Placed at the end of the Suno audio until the release and SIGTERM sound exist",
+   "note": "on the SIGTERM (scripts/ending_audio.py); the CRT collapse lands with it",
    "cut": "anchor"
   },
   {

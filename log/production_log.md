@@ -458,3 +458,18 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Check:** every contact still lands on its frame (0 off in the 44–54 s window). The frame strip around the kick at 51.40 s shows the wind-up at −9 frames, contact and flash at 0, rebound by +12 and settled by +24.
 - **Outputs:** `renders/step7/anim_test_44-54_v3.mp4`. Superseded: `archive/renders/anim_test_44-54_rejected_too-small-fast.mp4` and `anim_test_44-54_v2_superseded_pad-colour.mp4`. Style spec part 2, "Making machines play themselves", has the new numbers and a size rule: a moving part travels at least a third of its machine's height.
 - **Why:** Human feedback (human interventions), brief step 7.
+
+## 2026-10-22T09:05:22-04:00 — Brief updated (S64b, as sung); the ending audio
+
+- **Brief** (Claude Doc rev 13 → 15, mirrored in `docs/brief.md`; the diff is exactly these edits):
+  - S15 and S22 anchors lose the "ooh-ooh";
+  - **S64b** added after S64 (the coda's "Zero. Zero!": the freezer's machines wake, then power down into S65);
+  - an "As sung" note in the Lyrics section.
+
+  The human approved this (human interventions).
+- **Ending audio** (`scripts/ending_audio.py` → `audio/post/sandbox_rhapsody_final.wav`, `timing/ending.json`; agent-made sound design, approved):
+  - **Release:** Suno's last B♭-major chord, cut at 323.0 s at −32 dBFS, continues as a resynthesis of its last steady 0.25 s: the 80 strongest spectral peaks (parabolic-interpolated) as decaying sinusoids, 6 dB/s plus 1.5 dB/s per kHz. It enters with a 0.25 s equal-power crossfade at 322.6 s.
+  - The first try froze the spectrum with a phase vocoder; partials straddling bins beat, leaving a 4–7 dB dip after the crossfade. The sinusoidal version decays smoothly: −34.7 dB at 322.6 s to −53 dB at 325.4 s.
+  - **SIGTERM** at 325.50 s: a click, a falling whine (2.2 kHz → 80 Hz over 0.4 s) and a 55 Hz thump at −24 dBFS peak. The chord is cut with it (12 ms fade). Silence from 325.95 s.
+  - The master before 322.6 s is untouched, sample for sample (asserted). Peak −0.1 dBFS. Length 327.45 s.
+- **Timing:** `config/audio.json` names the final audio. The timing map runs 327.45 s (19,647 frames) and gains sections "release and SIGTERM" (322.6 s) and "silence" (325.95 s). S65 cuts on the SIGTERM (325.50 s, no longer provisional) and S66 at 326.45 s; S67 waits for the fact card's length. The score and `shots/pipeline.md` are regenerated.

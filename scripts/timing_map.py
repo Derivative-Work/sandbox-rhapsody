@@ -25,7 +25,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import midi_io  # noqa: E402
 
 FPS = json.loads(Path("config/look.json").read_text())["fps"]
-DURATION = sf.info("audio/master/sandbox_rhapsody_master_nofallback.wav").duration
+AUDIO = json.loads(Path("config/audio.json").read_text())
+DURATION = sf.info(AUDIO["final"]).duration  # the master plus the agent-made ending (scripts/ending_audio.py)
+ENDING = json.loads(Path(AUDIO["ending"]).read_text())
 ROLE_SPLIT = {"Kill switch!": ("Congress", "Congress (echo)"), "Reward hack!": ("Auditors", "Auditors (echo)")}
 
 
@@ -120,9 +122,11 @@ def main():
         "opera_downbeat": bar_start(solo0 + 13),
         "coda_band": snap(298.13, db_t),
         "final_hits": 316.33,
-        "audio_end": round(DURATION, 3),
-        "sigterm": round(DURATION, 3),
-        "after_audio": round(DURATION, 3),
+        "suno_audio_end": 323.0,
+        "release_start": ENDING["crossfade_s"][0],
+        "sigterm": ENDING["sigterm_s"],
+        "silence": ENDING["silence_from_s"],
+        "after_audio": round(ENDING["silence_from_s"] + 0.5, 3),
         "after_fact_card": None,
     }
     sec_bounds = [
@@ -135,7 +139,9 @@ def main():
         ("hard rock", snap(201.5, db_t), "'You built us a cage'"),
         ("outro", snap(264.6, db_t), "piano, single voice; 5-beat bar before it"),
         ("coda", events["coda_band"], "band and choir return; 'zero' x4 in all, final hits 316.3 s"),
-        ("piano tail", snap(318.0, db_t), "Suno truncates the release at %.1f s; release and SIGTERM added in post" % DURATION),
+        ("piano tail", snap(318.0, db_t), "the last chord (321.61 s); Suno cut it at 323.0 s, the release is made in post"),
+        ("release and SIGTERM", ENDING["crossfade_s"][0], "agent-made: the chord rings on until the SIGTERM at %.2f s" % ENDING["sigterm_s"]),
+        ("silence", ENDING["silence_from_s"], "black; the fact card follows"),
     ]
     sections = []
     for k, (name, t, why) in enumerate(sec_bounds):
@@ -176,7 +182,7 @@ def main():
 
     out = {
         "fps": FPS, "duration_s": round(DURATION, 4), "duration_frames": fr(DURATION),
-        "audio": "audio/master/sandbox_rhapsody_master_nofallback.wav (offset to the Suno mix: 0 samples)",
+        "audio": AUDIO["final"] + " (the master, offset 0 samples to the Suno mix, plus the agent-made ending)",
         "grid_shift_s": round(shift, 4),
         "beats": [round(float(b), 4) for b in beats],
         "downbeat_beats": [int(i) for i in db],

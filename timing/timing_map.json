@@ -1,8 +1,8 @@
 {
  "fps": 60,
- "duration_s": 323.0,
- "duration_frames": 19380,
- "audio": "audio/master/sandbox_rhapsody_master_nofallback.wav (offset to the Suno mix: 0 samples)",
+ "duration_s": 327.45,
+ "duration_frames": 19647,
+ "audio": "audio/post/sandbox_rhapsody_final.wav (the master, offset 0 samples to the Suno mix, plus the agent-made ending)",
  "grid_shift_s": -0.007,
  "beats": [
   -0.007,
@@ -2418,7 +2418,7 @@
    "beat": 734,
    "beats": 4,
    "start": 321.6157,
-   "end": 323.0,
+   "end": 327.45,
    "bpm": 132.0
   }
  ],
@@ -2442,6 +2442,11 @@
    "t": 298.1184,
    "section": "coda",
    "bpm": 134.7
+  },
+  {
+   "t": 322.6,
+   "section": "release and SIGTERM",
+   "bpm": 0.0
   }
  ],
  "sections": [
@@ -2520,10 +2525,26 @@
   {
    "name": "piano tail",
    "start": 317.966,
-   "end": 323.0,
+   "end": 322.6,
    "start_frame": 19078,
    "bpm_median": 132.0,
-   "why": "Suno truncates the release at 323.0 s; release and SIGTERM added in post"
+   "why": "the last chord (321.61 s); Suno cut it at 323.0 s, the release is made in post"
+  },
+  {
+   "name": "release and SIGTERM",
+   "start": 322.6,
+   "end": 325.95,
+   "start_frame": 19356,
+   "bpm_median": 0.0,
+   "why": "agent-made: the chord rings on until the SIGTERM at 325.50 s"
+  },
+  {
+   "name": "silence",
+   "start": 325.95,
+   "end": 327.45,
+   "start_frame": 19557,
+   "bpm_median": 0.0,
+   "why": "black; the fact card follows"
   }
  ],
  "events": {
@@ -2539,9 +2560,11 @@
   "opera_downbeat": 153.7298,
   "coda_band": 298.11843899999985,
   "final_hits": 316.33,
-  "audio_end": 323.0,
-  "sigterm": 323.0,
-  "after_audio": 323.0,
+  "suno_audio_end": 323.0,
+  "release_start": 322.6,
+  "sigterm": 325.5,
+  "silence": 325.95,
+  "after_audio": 326.45,
   "after_fact_card": null
  },
  "lines": [
@@ -8147,27 +8170,24 @@
    "cut": 299.9436,
    "cut_frame": 17997,
    "cut_minus_anchor_ms": -886,
-   "proposed": true,
-   "note": "as sung: the band and choir return for 'Zero. Zero!' and a final swell (coda, about 298-318 s). Proposed: not in the brief yet"
+   "note": "as sung: the band and choir return for 'Zero. Zero!' (added to the brief, rev 15)"
   },
   {
    "id": "S65",
-   "anchor": 323.0,
+   "anchor": 325.5,
    "anchor_source": "sigterm",
-   "cut": 323.0,
-   "cut_frame": 19380,
+   "cut": 325.5,
+   "cut_frame": 19530,
    "cut_minus_anchor_ms": 0,
-   "provisional": true,
-   "note": "Suno sang no SIGTERM and truncated the piano release; both are added in post. Placed at the end of the Suno audio until the release and SIGTERM sound exist"
+   "note": "on the SIGTERM (scripts/ending_audio.py); the CRT collapse lands with it"
   },
   {
    "id": "S66",
-   "anchor": 323.0,
+   "anchor": 326.45,
    "anchor_source": "after_audio",
-   "cut": 323.0,
-   "cut_frame": 19380,
-   "cut_minus_anchor_ms": 0,
-   "cut_note": "downbeat taken by the previous shot; cut on the anchor"
+   "cut": 326.45,
+   "cut_frame": 19587,
+   "cut_minus_anchor_ms": 0
   },
   {
    "id": "S67",
