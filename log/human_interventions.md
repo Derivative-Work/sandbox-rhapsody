@@ -100,3 +100,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **What:** The human reported, at bars 59 and 60: "we're missing eighth note kicks and snare fill into 61".
 - **Rule:** R2. The agent made the changes (production log).
+
+## 2026-10-22T08:23:42-04:00 — C3 approved, provisionally — R1
+
+- **What:** The human approved the timing map: "certainly not perfect but probably good enough to time a video to -- we might have to come back later if there's obvious timing errors".
+- **Rule:** R1. Timing errors found later are corrected under R2 and logged.
