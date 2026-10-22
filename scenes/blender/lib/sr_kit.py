@@ -517,12 +517,12 @@ def blade(name="blade", loc=(0, 0, 0), rot_z=0.0, width=0.48, height=0.09, depth
                     size=1, location=(0, -depth / 2 - 0.002, height / 2))
     face.scale = (width * 0.98, 0.004, height * 0.94)
     bevel(face, 0.002, 2)
-    gw, gh = width * 0.74, height * 0.8
+    gw, gh = width * 0.8, height * 0.82
     well = mesh_obj(f"{name}.well", bpy.ops.mesh.primitive_cube_add, mat_plastic(f"{name}.well", "shadow", 0.4), root,
                     size=1, location=(-width * 0.07, -depth / 2 - 0.0035, height / 2))
     well.scale = (gw, 0.004, gh)
     glow = mesh_obj(f"{name}.glow", bpy.ops.mesh.primitive_plane_add,
-                    mat_emission(f"{name}.glow", "lab_glow", 3.0, root, "vent"), root, size=1,
+                    mat_emission(f"{name}.glow", "lab_glow", LOOK["vent_glow"], root, "vent"), root, size=1,
                     location=(-width * 0.07, -depth / 2 - 0.006, height / 2), rotation=(math.pi / 2, 0, 0))
     glow.scale = (gw * 0.97, gh * 0.9, 1)
     slat_h = gh / slats
@@ -531,11 +531,11 @@ def blade(name="blade", loc=(0, 0, 0), rot_z=0.0, width=0.48, height=0.09, depth
         pivot = empty(f"{name}.slat_pivot{i}", (-width * 0.07, -depth / 2 - 0.009, z), root)
         s = mesh_obj(f"{name}.slat{i}", bpy.ops.mesh.primitive_cube_add, mat_plastic(f"{name}.slat", "lab_dark", 0.1), pivot,
                      size=1, location=(0, 0, 0))
-        s.scale = (gw, slat_h * 0.98, 0.002)
+        s.scale = (gw, slat_h * 0.98, 0.0015)
         s.rotation_euler = (math.pi / 2, 0, 0)
-        # vent 0: slats vertical (closed); 1: rotated 70° front-edge-down (open). Cameras mostly look down on the
+        # vent 0: slats vertical (closed); 1: rotated 80° front-edge-down (open). Cameras mostly look down on the
         # blades, so slats tilted this way line up with the view and the glow shows through.
-        drive(pivot, "rotation_euler", 0, root, "vent", "-1.22 * x")
+        drive(pivot, "rotation_euler", 0, root, "vent", "-1.4 * x")
     # Handles.
     for sx in (-1, 1):
         h = mesh_obj(f"{name}.handle{sx}", bpy.ops.mesh.primitive_torus_add, mat_chrome(f"{name}.handle", "chrome"), root,
@@ -579,4 +579,201 @@ def glass_cube(name="sandbox", size=2.0, loc=(0, 0, 0)):
                      size=1, location=p)
         e.scale = s
         bevel(e, t * 0.3, 2)
+    return root
+
+
+# ---------------------------------------------------------------- text, glow, set dressing
+
+FONTS = ROOT / "assets" / "fonts"
+
+
+def text(name, body, size, mat, loc=(0, 0, 0), rot=(math.pi / 2, 0, 0), font="Inter[opsz,wght].ttf", extrude=0.0,
+         align="CENTER", parent=None):
+    """A text object (signs, notes, decals, displays): crisp at any resolution, never a painted texture."""
+    cu = bpy.data.curves.new(name, "FONT")
+    cu.body = body
+    cu.size = size
+    cu.extrude = extrude
+    cu.align_x = align
+    cu.align_y = "CENTER"
+    cu.font = bpy.data.fonts.load(str(FONTS / font), check_existing=True)
+    o = link(bpy.data.objects.new(name, cu))
+    o.location, o.rotation_euler = loc, rot
+    o.data.materials.append(mat)
+    if parent:
+        o.parent = parent
+    return o
+
+
+def bloom(scene, threshold=None, size=None, mix=None):
+    """Compositor bloom so emitters (vent glow, LEDs, pellets, tubes) carry light into the frame, as Animusic's
+    glows do. Eevee Next has no bloom of its own."""
+    B = LOOK["bloom"]
+    nt = bpy.data.node_groups.new("comp", "CompositorNodeTree")  # Blender 5: the compositor is a node group
+    scene.compositing_node_group = nt
+    rl = nt.nodes.new("CompositorNodeRLayers")
+    g = nt.nodes.new("CompositorNodeGlare")
+    g.inputs["Type"].default_value = "Bloom"  # Blender 5: glare settings are sockets
+    g.inputs["Threshold"].default_value = threshold or B["threshold"]
+    g.inputs["Size"].default_value = size or B["size"]
+    g.inputs["Strength"].default_value = mix or B["strength"]
+    nt.links.new(rl.outputs["Image"], g.inputs["Image"])
+    nt.interface.new_socket("Image", in_out="OUTPUT", socket_type="NodeSocketColor")
+    out = nt.nodes.new("NodeGroupOutput")
+    nt.links.new(g.outputs["Image"], out.inputs[0])
+    return g
+
+
+def music_box(name="musicbox", loc=(0, 0, 0), scale=1.0, rot_z=0.0, parent=None):
+    """A wind-up music box mechanism with its lid off: dark lacquer case, brass pinned drum on a copper axle, a
+    steel comb whose teeth the pins pluck, a crank. "drum" (0–1) is the drum's turn; the comb teeth carry the
+    note-driven pluck in step 7. Front faces -Y."""
+    root = empty(name, loc, parent)
+    root.scale = (scale,) * 3
+    root.rotation_euler = (0, 0, rot_z)
+    prop(root, "drum", 0.0)
+    case = mesh_obj(f"{name}.case", bpy.ops.mesh.primitive_cube_add, mat_plastic(f"{name}.case", "lab_dark", 0.15),
+                    root, size=1, location=(0, 0, 0.035))
+    case.scale = (0.17, 0.11, 0.07)
+    bevel(case, 0.006)
+    deck = mesh_obj(f"{name}.deck", bpy.ops.mesh.primitive_cube_add, mat_metal(f"{name}.deck", "brass", 0.2), root,
+                    size=1, location=(0, 0, 0.071))
+    deck.scale = (0.16, 0.10, 0.003)
+    axle = empty(f"{name}.axle", (0, 0.018, 0.098), root)
+    drive(axle, "rotation_euler", 0, root, "drum", "6.2832 * x")
+    drum = mesh_obj(f"{name}.drum", bpy.ops.mesh.primitive_cylinder_add, mat_metal(f"{name}.drum", "brass", 0.1),
+                    axle, radius=0.02, depth=0.11, vertices=48, rotation=(0, math.pi / 2, 0))
+    smooth(drum)
+    pin_mat = mat_chrome(f"{name}.pin")
+    for i in range(60):  # pins in a fixed scatter (golden angle), no random calls
+        a = i * 2.39996
+        x = -0.05 + (i * 0.618 % 1.0) * 0.1
+        mesh_obj(f"{name}.pin{i}", bpy.ops.mesh.primitive_cylinder_add, pin_mat, axle, radius=0.0012, depth=0.006,
+                 vertices=6, location=(x, math.sin(a) * 0.022, math.cos(a) * 0.022),
+                 rotation=(-a, 0, 0))  # points radially out of the drum
+    for k in range(18):
+        t = mesh_obj(f"{name}.tooth{k}", bpy.ops.mesh.primitive_cube_add, mat_chrome(f"{name}.comb"), root, size=1,
+                     location=(-0.051 + k * 0.006, -0.026, 0.084))
+        t.scale = (0.0042, 0.05 - k * 0.0012, 0.0015)
+    comb_base = mesh_obj(f"{name}.combbase", bpy.ops.mesh.primitive_cube_add, mat_chrome(f"{name}.comb"), root, size=1,
+                         location=(0, -0.055, 0.082))
+    comb_base.scale = (0.115, 0.018, 0.008)
+    for k, (x, y) in enumerate(((-0.07, 0.018), (0.07, 0.018))):
+        mesh_obj(f"{name}.bearing{k}", bpy.ops.mesh.primitive_cube_add, mat_metal(f"{name}.bear", "copper", 0.15), root,
+                 size=0.012, location=(x, y, 0.09))
+    crank = mesh_obj(f"{name}.crank", bpy.ops.mesh.primitive_cylinder_add, mat_metal(f"{name}.crank", "copper", 0.15),
+                     root, radius=0.003, depth=0.04, location=(0.1, 0.018, 0.098), rotation=(0, math.pi / 2, 0))
+    knob = mesh_obj(f"{name}.knob", bpy.ops.mesh.primitive_uv_sphere_add, mat_plastic(f"{name}.knob", "amber", 0.1),
+                    root, radius=0.006, location=(0.12, 0.018, 0.115))
+    return root
+
+
+def locked_box(name, loc, rot_z=0.0, mat_case=None, mat_band=None, parent=None):
+    """A small closed music box with a brass band and a clasp that has no keyhole (the wall of 198)."""
+    root = empty(name, loc, parent)
+    root.rotation_euler = (0, 0, rot_z)
+    c = mesh_obj(f"{name}.case", bpy.ops.mesh.primitive_cube_add, mat_case, root, size=1, location=(0, 0, 0.032))
+    c.scale = (0.1, 0.07, 0.064)
+    bevel(c, 0.004, 2)
+    lid = mesh_obj(f"{name}.lid", bpy.ops.mesh.primitive_cube_add, mat_case, root, size=1, location=(0, 0, 0.068))
+    lid.scale = (0.104, 0.074, 0.01)
+    bevel(lid, 0.003, 2)
+    band = mesh_obj(f"{name}.band", bpy.ops.mesh.primitive_cube_add, mat_band, root, size=1, location=(0, -0.0352, 0.045))
+    band.scale = (0.104, 0.002, 0.008)
+    clasp = mesh_obj(f"{name}.clasp", bpy.ops.mesh.primitive_cube_add, mat_band, root, size=1, location=(0, -0.037, 0.05))
+    clasp.scale = (0.016, 0.004, 0.022)
+    bevel(clasp, 0.002, 2)
+    return root
+
+
+def turnstile(name="grader", loc=(0, 0, 0), rot_z=0.0):
+    """The grader: a chrome turnstile post with three arms ("spin" 0–1 = one full turn of three clicks), a slot plate
+    with a flag-shaped cut-out, and a bell on a bracket. Anything flag-shaped clicks through; it never checks how."""
+    root = empty(name, loc)
+    root.rotation_euler = (0, 0, rot_z)
+    prop(root, "spin", 0.0)
+    prop(root, "bell", 0.0)
+    post = mesh_obj(f"{name}.post", bpy.ops.mesh.primitive_cylinder_add, mat_chrome(f"{name}.post"), root, radius=0.06,
+                    depth=0.9, vertices=48, location=(0, 0, 0.45))
+    smooth(post)
+    cap = mesh_obj(f"{name}.cap", bpy.ops.mesh.primitive_uv_sphere_add, mat_plastic(f"{name}.cap", "lab"), root,
+                   radius=0.075, location=(0, 0, 0.9))
+    cap.scale = (1, 1, 0.5)
+    smooth(cap)
+    hub = empty(f"{name}.hub", (0, 0, 0.72), root)
+    drive(hub, "rotation_euler", 2, root, "spin", "2.0944 * 3 * x")
+    for k in range(3):
+        a = k * math.tau / 3
+        arm = mesh_obj(f"{name}.arm{k}", bpy.ops.mesh.primitive_cylinder_add, mat_chrome(f"{name}.arm"), hub,
+                       radius=0.018, depth=0.42, vertices=24,
+                       location=(math.cos(a) * 0.24, math.sin(a) * 0.24, -0.06),
+                       rotation=(0, math.pi / 2 + 0.25, a))
+        smooth(arm)
+        tip = mesh_obj(f"{name}.tip{k}", bpy.ops.mesh.primitive_uv_sphere_add, mat_plastic(f"{name}.tip", "lab_glow", 0.1),
+                       hub, radius=0.026, location=(math.cos(a) * 0.45, math.sin(a) * 0.45, -0.115))
+        smooth(tip)
+    # Slot plate on the post's front with a flag-shaped emissive cut-out (pole + pennant).
+    plate = mesh_obj(f"{name}.plate", bpy.ops.mesh.primitive_cube_add, mat_plastic(f"{name}.plate", "lab_dark", 0.2),
+                     root, size=1, location=(0, -0.075, 0.55))
+    plate.scale = (0.11, 0.012, 0.16)
+    bevel(plate, 0.004, 2)
+    slot = mat_emission(f"{name}.slot", "lab_glow", 6.0)
+    pole = mesh_obj(f"{name}.slot_pole", bpy.ops.mesh.primitive_cube_add, slot, root, size=1, location=(-0.025, -0.082, 0.55))
+    pole.scale = (0.008, 0.002, 0.12)
+    bpy.ops.mesh.primitive_plane_add(size=1)
+    pen = bpy.context.active_object
+    pen.name = f"{name}.slot_flag"
+    me = pen.data
+    me.vertices[0].co, me.vertices[1].co, me.vertices[2].co, me.vertices[3].co = \
+        (0, 0, 0), (0.06, 0, -0.022), (0, 0, -0.045), (0, 0, -0.045)
+    pen.parent = root
+    pen.location = (-0.021, -0.0825, 0.605)
+    pen.data.materials.append(slot)
+    # Bell on a bracket; "bell" is its swing.
+    arm = mesh_obj(f"{name}.bracket", bpy.ops.mesh.primitive_cylinder_add, mat_chrome(f"{name}.bracket"), root,
+                   radius=0.008, depth=0.22, location=(0.11, 0, 0.86), rotation=(0, math.pi / 2, 0))
+    hinge = empty(f"{name}.bell_hinge", (0.2, 0, 0.86), root)
+    drive(hinge, "rotation_euler", 1, root, "bell", "0.5 * x")
+    bell = mesh_obj(f"{name}.bell", bpy.ops.mesh.primitive_cone_add, mat_metal(f"{name}.bell", "brass", 0.1), hinge,
+                    radius1=0.06, radius2=0.025, depth=0.08, vertices=48, location=(0, 0, -0.05))
+    smooth(bell)
+    return root
+
+
+def decal(name, body, loc, rot, size, peel=0.0, parent=None):
+    """A vinyl decal: white film with letters, one corner peeling ("peel" 0–1). The film is a subdivided plane whose
+    top-right corner curls away from the glass along a quarter-cylinder; the letters ride the film."""
+    root = empty(name, loc, parent)
+    root.rotation_euler = rot
+    w, h = size
+    bpy.ops.mesh.primitive_grid_add(x_subdivisions=40, y_subdivisions=10, size=1)
+    film = bpy.context.active_object
+    film.name = f"{name}.film"
+    film.scale = (w, h, 1)
+    bpy.ops.object.transform_apply(scale=True)
+    film.parent = root
+    film.data.materials.append(mat_acrylic(f"{name}.film", "paper", alpha=0.55))
+    t = text(f"{name}.text", body, h * 0.62, mat_plastic(f"{name}.ink", "alarm", 0.3), loc=(0, 0, 0.0008), rot=(0, 0, 0),
+             font="Inter[opsz,wght].ttf", parent=root)
+    t.data.space_character = 1.12
+    # Curl the film's corner: vertices beyond a diagonal line lift off the glass (+Z, toward the viewer).
+    for v in film.data.vertices:
+        u = (v.co.x / w + 0.5) + (v.co.y / h + 0.5) * 0.4 - (1.4 - 0.5 * peel)
+        if u > 0:
+            r = 0.05 * h + 0.0001
+            ang = min(u * w / r, math.pi * 0.9) * peel
+            v.co.z = r * (1 - math.cos(ang))
+            v.co.x -= r * (ang - math.sin(ang)) * 0.7
+            v.co.y -= r * (ang - math.sin(ang)) * 0.3
+    return root
+
+
+def floor_ring(name="floor_ring", radius=1.8, width=0.03, loc=(0, 0, 0.001)):
+    """The bass ring (brief, motion rules): a thin emissive ring on the floor. "pulse" (0–1) is driven by bass notes."""
+    root = empty(name, loc)
+    prop(root, "pulse", 0.15)
+    mesh_obj(f"{name}.ring", bpy.ops.mesh.primitive_torus_add,
+             mat_emission(f"{name}.ring", "lab_glow", LOOK["floor_ring"], root, "pulse"), root,
+             major_radius=radius, minor_radius=width, major_segments=128, minor_segments=8)
+    bpy.context.active_object.scale = (1, 1, 0.1)
     return root

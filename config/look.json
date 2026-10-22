@@ -47,5 +47,12 @@
     "cool": 0.7,
     "top": 0.15
   },
-  "probe_resolution": "1024"
+  "probe_resolution": "1024",
+  "vent_glow": 8.0,
+  "floor_ring": 4.0,
+  "bloom": {
+    "threshold": 0.9,
+    "size": 0.5,
+    "strength": 0.6
+  }
 }

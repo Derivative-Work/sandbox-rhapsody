@@ -164,3 +164,30 @@ Append-only. One entry per action: timestamp, step (shot ID where relevant), wha
   - no SIGTERM and a truncated piano release, which the agent adds in post.
 - **Step 2 is now complete** except for the repaint, which the human will supply.
 - **Why:** Brief, pre-production step 2 and "Lyrics"; the human's answers of today.
+
+## 2026-10-22T05:46:22-04:00 — Step 3 / C1 revision: stronger vents, set A fully dressed
+
+- **What:** Revised the C1 frames after the human's rejection (vents too subtle, scene too sparse).
+  - **Vents:**
+    - the grille covers 80% of the face;
+    - thinner louvres swing 80° (was 70°);
+    - the glow strength is in `config/look.json` (`vent_glow` 8);
+    - a compositor bloom (`K.bloom`, threshold 0.9, size 0.5, strength 0.6) carries emitters into the frame, as Animusic's glows do.
+  - **Set A as its own module** (`scenes/blender/sets/set_a.py`), built from the kit, with everything the brief lists:
+    - 20 blades on the rack (10 × 2);
+    - a music box on a plinth: pinned brass drum, steel comb, crank;
+    - the proxy tube out through a chrome grommet, plugged with the "NO INTERNET :)" sticky note (text, Instrument Serif Italic);
+    - the SIMULATION decal peeling at one corner;
+    - the grader turnstile: three arms, a flag-shaped glowing slot, a bell, and a tray of flags;
+    - the wall of 198 locked boxes with keyhole-less clasps (33 × 6, arc behind the cube);
+    - the bass floor ring;
+    - three idle probes.
+  - **New kit pieces:** `text`, `bloom`, `music_box`, `locked_box`, `turnstile`, `decal`, `floor_ring`, each with driven properties for step 7 (`drum`, `spin`, `bell`, `pulse`, `vent`).
+- **Commands:**
+  - `blender -b --factory-startup --python scenes/blender/c1_test_frame.py -- renders/c1/c1_v2_A_{close,wide}.png 3840 2160 64 {close,wide}` (about 2 min 12 s each; most of it is building ~2,500 objects with `bpy.ops`)
+  - `.venv/bin/python -I scripts/c1_sheet.py … renders/c1/c1_v2_sheet.jpg`
+- **Outputs:** `scenes/blender/sets/set_a.py`, `scenes/blender/lib/sr_kit.py`, `scenes/blender/c1_test_frame.py`, `config/look.json`, `renders/c1/c1_v2_A_close.png`, `renders/c1/c1_v2_A_wide.png`, `renders/c1/c1_v2_sheet.jpg`
+- **Archived** (rejected, R1): `archive/renders/c1/c1_test_frame_A_{close,wide}_rejected_sparse-subtle-vents.png` and `c1_sheet_rejected_sparse-subtle-vents.jpg`
+- **Fixes on the way:** Blender 5 has no `scene.node_tree`; the compositor is now a node group, and the Glare node's type and size are sockets.
+- **Known and deferred:** the build time. The wall of 198 and the swarm (700 probes) move to geometry-nodes instancing when step 7 builds the animated sets; the brief already asks for this.
+- **Why:** Human interventions, C1 rejection (R1).
