@@ -441,3 +441,8 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - No set code uses randomness yet (set A is arithmetic).
 - **Step 9 — pipeline per shot:** `shots/pipeline.md` via `scripts/pipeline_table.py`, with Folks Like Us-style tags ([B] Blender, [J] JS overlay, [F] ffmpeg effect). 68 shots including the proposed S64b: 66 [B], 12 [J] beyond captions, 3 [F]. Cut times, frames and lengths come from the timing map.
 - **Why:** Brief, pre-production steps 7–9.
+
+## 2026-10-22T08:47:36-04:00 — Log correction: step 7 contact count
+
+- The entry above says 912 contacts were checked. The check (`scenes/blender/anim_test.py`) verifies snare steppers, kick strikers, kick LED pulses and pellet arrivals: 49 + 83 + 97 + 105 + 193 = **527 contacts**, all on their event frames.
+- The 912 counted every event driven in those windows, including crash, piano and bass, which the test drives but doesn't check frame by frame.
