@@ -12,6 +12,8 @@ dependencies = [
     "mido",
     "pretty_midi",
     "faster-whisper",
+    "nvidia-cublas-cu12>=12.9.2.10",
+    "nvidia-cudnn-cu12==9.*",
 ]
 
 [tool.uv]

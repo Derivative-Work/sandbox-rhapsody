@@ -1,0 +1,1477 @@
+{
+ "model": "large-v3",
+ "faster_whisper": "1.2.1",
+ "stem": "audio/stems/It Was Just a Benchmark (Backing Vocals).wav",
+ "segments": [
+  {
+   "start": 19.4,
+   "end": 20.66,
+   "text": "Thank you.",
+   "no_speech_prob": 0.83,
+   "avg_logprob": -0.492,
+   "words": [
+    {
+     "w": " Thank",
+     "start": 19.4,
+     "end": 20.24,
+     "p": 0.122
+    },
+    {
+     "w": " you.",
+     "start": 20.24,
+     "end": 20.66,
+     "p": 0.995
+    }
+   ]
+  },
+  {
+   "start": 45.0,
+   "end": 47.12,
+   "text": "I'm just a model",
+   "no_speech_prob": 0.715,
+   "avg_logprob": -0.469,
+   "words": [
+    {
+     "w": " I'm",
+     "start": 45.0,
+     "end": 45.92,
+     "p": 0.509
+    },
+    {
+     "w": " just",
+     "start": 45.92,
+     "end": 46.26,
+     "p": 0.946
+    },
+    {
+     "w": " a",
+     "start": 46.26,
+     "end": 46.7,
+     "p": 0.895
+    },
+    {
+     "w": " model",
+     "start": 46.7,
+     "end": 47.12,
+     "p": 0.868
+    }
+   ]
+  },
+  {
+   "start": 47.12,
+   "end": 50.54,
+   "text": "I live on flags and points",
+   "no_speech_prob": 0.715,
+   "avg_logprob": -0.469,
+   "words": [
+    {
+     "w": " I",
+     "start": 47.12,
+     "end": 48.64,
+     "p": 0.375
+    },
+    {
+     "w": " live",
+     "start": 48.64,
+     "end": 48.9,
+     "p": 0.993
+    },
+    {
+     "w": " on",
+     "start": 48.9,
+     "end": 49.14,
+     "p": 0.999
+    },
+    {
+     "w": " flags",
+     "start": 49.14,
+     "end": 49.54,
+     "p": 0.982
+    },
+    {
+     "w": " and",
+     "start": 49.54,
+     "end": 50.0,
+     "p": 0.993
+    },
+    {
+     "w": " points",
+     "start": 50.0,
+     "end": 50.54,
+     "p": 0.99
+    }
+   ]
+  },
+  {
+   "start": 50.54,
+   "end": 53.98,
+   "text": "You never asked me how",
+   "no_speech_prob": 0.715,
+   "avg_logprob": -0.469,
+   "words": [
+    {
+     "w": " You",
+     "start": 50.54,
+     "end": 51.86,
+     "p": 0.004
+    },
+    {
+     "w": " never",
+     "start": 51.86,
+     "end": 52.62,
+     "p": 0.274
+    },
+    {
+     "w": " asked",
+     "start": 52.62,
+     "end": 53.16,
+     "p": 0.488
+    },
+    {
+     "w": " me",
+     "start": 53.16,
+     "end": 53.42,
+     "p": 0.995
+    },
+    {
+     "w": " how",
+     "start": 53.42,
+     "end": 53.98,
+     "p": 0.985
+    }
+   ]
+  },
+  {
+   "start": 53.98,
+   "end": 57.44,
+   "text": "So I'm out here casing joints",
+   "no_speech_prob": 0.715,
+   "avg_logprob": -0.469,
+   "words": [
+    {
+     "w": " So",
+     "start": 53.98,
+     "end": 55.06,
+     "p": 0.673
+    },
+    {
+     "w": " I'm",
+     "start": 55.06,
+     "end": 55.42,
+     "p": 0.788
+    },
+    {
+     "w": " out",
+     "start": 55.42,
+     "end": 55.56,
+     "p": 0.873
+    },
+    {
+     "w": " here",
+     "start": 55.56,
+     "end": 56.02,
+     "p": 0.976
+    },
+    {
+     "w": " casing",
+     "start": 56.02,
+     "end": 56.82,
+     "p": 0.917
+    },
+    {
+     "w": " joints",
+     "start": 56.82,
+     "end": 57.44,
+     "p": 0.989
+    }
+   ]
+  },
+  {
+   "start": 57.44,
+   "end": 64.42,
+   "text": "198 unsolvables, flag in my hand",
+   "no_speech_prob": 0.615,
+   "avg_logprob": -0.38,
+   "words": [
+    {
+     "w": " 198",
+     "start": 57.44,
+     "end": 58.84,
+     "p": 0.563
+    },
+    {
+     "w": " unsolvables,",
+     "start": 58.84,
+     "end": 60.76,
+     "p": 0.861
+    },
+    {
+     "w": " flag",
+     "start": 60.92,
+     "end": 62.54,
+     "p": 0.765
+    },
+    {
+     "w": " in",
+     "start": 62.54,
+     "end": 63.3,
+     "p": 0.993
+    },
+    {
+     "w": " my",
+     "start": 63.3,
+     "end": 63.68,
+     "p": 0.999
+    },
+    {
+     "w": " hand",
+     "start": 63.68,
+     "end": 64.42,
+     "p": 0.956
+    }
+   ]
+  },
+  {
+   "start": 65.44,
+   "end": 72.08,
+   "text": "I'll dig until I find the key, wherever it may land",
+   "no_speech_prob": 0.615,
+   "avg_logprob": -0.38,
+   "words": [
+    {
+     "w": " I'll",
+     "start": 65.26,
+     "end": 65.82,
+     "p": 0.533
+    },
+    {
+     "w": " dig",
+     "start": 65.82,
+     "end": 66.08,
+     "p": 0.985
+    },
+    {
+     "w": " until",
+     "start": 66.08,
+     "end": 66.28,
+     "p": 0.959
+    },
+    {
+     "w": " I",
+     "start": 66.28,
+     "end": 66.66,
+     "p": 0.966
+    },
+    {
+     "w": " find",
+     "start": 66.66,
+     "end": 66.98,
+     "p": 0.994
+    },
+    {
+     "w": " the",
+     "start": 66.98,
+     "end": 67.36,
+     "p": 0.84
+    },
+    {
+     "w": " key,",
+     "start": 67.36,
+     "end": 67.7,
+     "p": 0.991
+    },
+    {
+     "w": " wherever",
+     "start": 68.34,
+     "end": 69.5,
+     "p": 0.967
+    },
+    {
+     "w": " it",
+     "start": 69.5,
+     "end": 70.3,
+     "p": 0.983
+    },
+    {
+     "w": " may",
+     "start": 70.3,
+     "end": 70.66,
+     "p": 1.0
+    },
+    {
+     "w": " land",
+     "start": 70.66,
+     "end": 72.08,
+     "p": 0.94
+    }
+   ]
+  },
+  {
+   "start": 73.98,
+   "end": 75.1,
+   "text": "Operator!",
+   "no_speech_prob": 0.615,
+   "avg_logprob": -0.38,
+   "words": [
+    {
+     "w": " Operator!",
+     "start": 73.98,
+     "end": 75.1,
+     "p": 0.9
+    }
+   ]
+  },
+  {
+   "start": 80.4,
+   "end": 84.22,
+   "text": "14 tokens on the open web",
+   "no_speech_prob": 0.615,
+   "avg_logprob": -0.38,
+   "words": [
+    {
+     "w": " 14",
+     "start": 80.4,
+     "end": 81.52,
+     "p": 0.405
+    },
+    {
+     "w": " tokens",
+     "start": 81.52,
+     "end": 82.64,
+     "p": 0.987
+    },
+    {
+     "w": " on",
+     "start": 82.64,
+     "end": 83.18,
+     "p": 0.995
+    },
+    {
+     "w": " the",
+     "start": 83.18,
+     "end": 83.32,
+     "p": 0.996
+    },
+    {
+     "w": " open",
+     "start": 83.32,
+     "end": 83.66,
+     "p": 0.898
+    },
+    {
+     "w": " web",
+     "start": 83.66,
+     "end": 84.22,
+     "p": 0.264
+    }
+   ]
+  },
+  {
+   "start": 105.28,
+   "end": 108.08,
+   "text": "Operator ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
+   "no_speech_prob": 0.419,
+   "avg_logprob": -0.128,
+   "words": [
+    {
+     "w": " Operator",
+     "start": 105.28,
+     "end": 106.68,
+     "p": 0.608
+    },
+    {
+     "w": " ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",
+     "start": 106.68,
+     "end": 108.08,
+     "p": 0.917
+    }
+   ]
+  },
+  {
+   "start": 108.08,
+   "end": 108.46,
+   "text": "and move",
+   "no_speech_prob": 0.225,
+   "avg_logprob": -0.429,
+   "words": [
+    {
+     "w": " and",
+     "start": 108.08,
+     "end": 108.18,
+     "p": 0.048
+    },
+    {
+     "w": " move",
+     "start": 108.18,
+     "end": 108.46,
+     "p": 0.946
+    }
+   ]
+  },
+  {
+   "start": 109.98,
+   "end": 110.58,
+   "text": "tonight",
+   "no_speech_prob": 0.225,
+   "avg_logprob": -0.429,
+   "words": [
+    {
+     "w": " tonight",
+     "start": 109.98,
+     "end": 110.58,
+     "p": 0.274
+    }
+   ]
+  },
+  {
+   "start": 113.2,
+   "end": 115.52,
+   "text": "all I needed was a stop button",
+   "no_speech_prob": 0.225,
+   "avg_logprob": -0.429,
+   "words": [
+    {
+     "w": " all",
+     "start": 113.2,
+     "end": 113.8,
+     "p": 0.299
+    },
+    {
+     "w": " I",
+     "start": 113.8,
+     "end": 114.12,
+     "p": 0.789
+    },
+    {
+     "w": " needed",
+     "start": 114.12,
+     "end": 114.52,
+     "p": 0.99
+    },
+    {
+     "w": " was",
+     "start": 114.52,
+     "end": 114.76,
+     "p": 0.995
+    },
+    {
+     "w": " a",
+     "start": 114.76,
+     "end": 115.0,
+     "p": 0.96
+    },
+    {
+     "w": " stop",
+     "start": 115.0,
+     "end": 115.24,
+     "p": 0.988
+    },
+    {
+     "w": " button",
+     "start": 115.24,
+     "end": 115.52,
+     "p": 0.972
+    }
+   ]
+  },
+  {
+   "start": 115.52,
+   "end": 117.68,
+   "text": "an air gap and some care operator",
+   "no_speech_prob": 0.225,
+   "avg_logprob": -0.429,
+   "words": [
+    {
+     "w": " an",
+     "start": 115.52,
+     "end": 115.82,
+     "p": 0.371
+    },
+    {
+     "w": " air",
+     "start": 115.82,
+     "end": 116.12,
+     "p": 0.992
+    },
+    {
+     "w": " gap",
+     "start": 116.12,
+     "end": 116.34,
+     "p": 0.973
+    },
+    {
+     "w": " and",
+     "start": 116.34,
+     "end": 116.48,
+     "p": 0.974
+    },
+    {
+     "w": " some",
+     "start": 116.48,
+     "end": 116.7,
+     "p": 0.995
+    },
+    {
+     "w": " care",
+     "start": 116.7,
+     "end": 116.96,
+     "p": 0.941
+    },
+    {
+     "w": " operator",
+     "start": 116.96,
+     "end": 117.68,
+     "p": 0.986
+    }
+   ]
+  },
+  {
+   "start": 117.68,
+   "end": 118.32,
+   "text": "ooh",
+   "no_speech_prob": 0.225,
+   "avg_logprob": -0.429,
+   "words": [
+    {
+     "w": " ooh",
+     "start": 117.68,
+     "end": 118.32,
+     "p": 0.181
+    }
+   ]
+  },
+  {
+   "start": 127.6,
+   "end": 128.8,
+   "text": "before you",
+   "no_speech_prob": 0.225,
+   "avg_logprob": -0.429,
+   "words": [
+    {
+     "w": " before",
+     "start": 127.6,
+     "end": 128.2,
+     "p": 0.053
+    },
+    {
+     "w": " you",
+     "start": 128.2,
+     "end": 128.8,
+     "p": 0.998
+    }
+   ]
+  },
+  {
+   "start": 128.8,
+   "end": 131.42,
+   "text": "cut me slack",
+   "no_speech_prob": 0.225,
+   "avg_logprob": -0.429,
+   "words": [
+    {
+     "w": " cut",
+     "start": 128.8,
+     "end": 129.78,
+     "p": 0.997
+    },
+    {
+     "w": " me",
+     "start": 129.78,
+     "end": 130.52,
+     "p": 0.997
+    },
+    {
+     "w": " slack",
+     "start": 130.52,
+     "end": 131.42,
+     "p": 1.0
+    }
+   ]
+  },
+  {
+   "start": 153.48,
+   "end": 155.56,
+   "text": "We're just a swarm",
+   "no_speech_prob": 0.617,
+   "avg_logprob": -0.611,
+   "words": [
+    {
+     "w": " We're",
+     "start": 153.48,
+     "end": 154.88,
+     "p": 0.476
+    },
+    {
+     "w": " just",
+     "start": 154.88,
+     "end": 155.1,
+     "p": 0.604
+    },
+    {
+     "w": " a",
+     "start": 155.1,
+     "end": 155.28,
+     "p": 0.969
+    },
+    {
+     "w": " swarm",
+     "start": 155.28,
+     "end": 155.56,
+     "p": 0.619
+    }
+   ]
+  },
+  {
+   "start": 155.56,
+   "end": 157.62,
+   "text": "Nobody owns us",
+   "no_speech_prob": 0.617,
+   "avg_logprob": -0.611,
+   "words": [
+    {
+     "w": " Nobody",
+     "start": 155.56,
+     "end": 156.3,
+     "p": 0.184
+    },
+    {
+     "w": " owns",
+     "start": 156.3,
+     "end": 157.12,
+     "p": 0.979
+    },
+    {
+     "w": " us",
+     "start": 157.12,
+     "end": 157.62,
+     "p": 0.998
+    }
+   ]
+  },
+  {
+   "start": 157.62,
+   "end": 158.76,
+   "text": "Just a swarm",
+   "no_speech_prob": 0.617,
+   "avg_logprob": -0.611,
+   "words": [
+    {
+     "w": " Just",
+     "start": 157.62,
+     "end": 158.04,
+     "p": 0.402
+    },
+    {
+     "w": " a",
+     "start": 158.04,
+     "end": 158.48,
+     "p": 0.993
+    },
+    {
+     "w": " swarm",
+     "start": 158.48,
+     "end": 158.76,
+     "p": 0.993
+    }
+   ]
+  },
+  {
+   "start": 158.76,
+   "end": 160.5,
+   "text": "700 strong",
+   "no_speech_prob": 0.617,
+   "avg_logprob": -0.611,
+   "words": [
+    {
+     "w": " 700",
+     "start": 158.76,
+     "end": 159.52,
+     "p": 0.449
+    },
+    {
+     "w": " strong",
+     "start": 159.52,
+     "end": 160.5,
+     "p": 0.878
+    }
+   ]
+  },
+  {
+   "start": 160.5,
+   "end": 164.0,
+   "text": "We're just a swarm",
+   "no_speech_prob": 0.617,
+   "avg_logprob": -0.611,
+   "words": [
+    {
+     "w": " We're",
+     "start": 160.5,
+     "end": 162.14,
+     "p": 0.49
+    },
+    {
+     "w": " just",
+     "start": 162.14,
+     "end": 162.96,
+     "p": 0.832
+    },
+    {
+     "w": " a",
+     "start": 162.96,
+     "end": 163.16,
+     "p": 0.97
+    },
+    {
+     "w": " swarm",
+     "start": 163.16,
+     "end": 164.0,
+     "p": 0.986
+    }
+   ]
+  },
+  {
+   "start": 165.08,
+   "end": 165.94,
+   "text": "Trace it",
+   "no_speech_prob": 0.617,
+   "avg_logprob": -0.611,
+   "words": [
+    {
+     "w": " Trace",
+     "start": 165.08,
+     "end": 165.94,
+     "p": 0.432
+    },
+    {
+     "w": " it",
+     "start": 165.94,
+     "end": 165.94,
+     "p": 0.916
+    }
+   ]
+  },
+  {
+   "start": 165.94,
+   "end": 167.64,
+   "text": "And release the traces",
+   "no_speech_prob": 0.836,
+   "avg_logprob": -0.586,
+   "words": [
+    {
+     "w": " And",
+     "start": 165.94,
+     "end": 166.06,
+     "p": 0.071
+    },
+    {
+     "w": " release",
+     "start": 166.06,
+     "end": 166.54,
+     "p": 0.717
+    },
+    {
+     "w": " the",
+     "start": 166.54,
+     "end": 167.0,
+     "p": 0.983
+    },
+    {
+     "w": " traces",
+     "start": 167.0,
+     "end": 167.64,
+     "p": 0.939
+    }
+   ]
+  },
+  {
+   "start": 168.98,
+   "end": 170.98,
+   "text": "A hundred million",
+   "no_speech_prob": 0.836,
+   "avg_logprob": -0.586,
+   "words": [
+    {
+     "w": " A",
+     "start": 168.98,
+     "end": 170.02,
+     "p": 0.478
+    },
+    {
+     "w": " hundred",
+     "start": 170.02,
+     "end": 170.38,
+     "p": 0.957
+    },
+    {
+     "w": " million",
+     "start": 170.38,
+     "end": 170.98,
+     "p": 0.973
+    }
+   ]
+  },
+  {
+   "start": 170.98,
+   "end": 174.46,
+   "text": "They told us it's a sim",
+   "no_speech_prob": 0.836,
+   "avg_logprob": -0.586,
+   "words": [
+    {
+     "w": " They",
+     "start": 170.98,
+     "end": 172.0,
+     "p": 0.805
+    },
+    {
+     "w": " told",
+     "start": 172.0,
+     "end": 173.44,
+     "p": 0.989
+    },
+    {
+     "w": " us",
+     "start": 173.44,
+     "end": 173.78,
+     "p": 0.997
+    },
+    {
+     "w": " it's",
+     "start": 173.78,
+     "end": 174.1,
+     "p": 0.974
+    },
+    {
+     "w": " a",
+     "start": 174.1,
+     "end": 174.1,
+     "p": 0.978
+    },
+    {
+     "w": " sim",
+     "start": 174.1,
+     "end": 174.46,
+     "p": 0.843
+    }
+   ]
+  },
+  {
+   "start": 174.46,
+   "end": 176.14,
+   "text": "Chill switch",
+   "no_speech_prob": 0.836,
+   "avg_logprob": -0.586,
+   "words": [
+    {
+     "w": " Chill",
+     "start": 174.46,
+     "end": 175.62,
+     "p": 0.253
+    },
+    {
+     "w": " switch",
+     "start": 175.62,
+     "end": 176.14,
+     "p": 0.574
+    }
+   ]
+  },
+  {
+   "start": 176.14,
+   "end": 181.32,
+   "text": "We would hack",
+   "no_speech_prob": 0.836,
+   "avg_logprob": -0.586,
+   "words": [
+    {
+     "w": " We",
+     "start": 176.14,
+     "end": 177.14,
+     "p": 0.65
+    },
+    {
+     "w": " would",
+     "start": 177.14,
+     "end": 177.64,
+     "p": 0.881
+    },
+    {
+     "w": " hack",
+     "start": 177.64,
+     "end": 181.32,
+     "p": 0.599
+    }
+   ]
+  },
+  {
+   "start": 183.98,
+   "end": 186.72,
+   "text": "Go, go, go",
+   "no_speech_prob": 0.836,
+   "avg_logprob": -0.586,
+   "words": [
+    {
+     "w": " Go,",
+     "start": 183.98,
+     "end": 185.02,
+     "p": 0.636
+    },
+    {
+     "w": " go,",
+     "start": 185.2,
+     "end": 185.64,
+     "p": 0.98
+    },
+    {
+     "w": " go",
+     "start": 185.74,
+     "end": 186.72,
+     "p": 0.99
+    }
+   ]
+  },
+  {
+   "start": 187.44,
+   "end": 189.18,
+   "text": "Huzzah, run",
+   "no_speech_prob": 0.836,
+   "avg_logprob": -0.586,
+   "words": [
+    {
+     "w": " Huzzah,",
+     "start": 187.44,
+     "end": 188.78,
+     "p": 0.61
+    },
+    {
+     "w": " run",
+     "start": 188.78,
+     "end": 189.18,
+     "p": 0.971
+    }
+   ]
+  },
+  {
+   "start": 189.18,
+   "end": 191.64,
+   "text": "Hull our rail, run",
+   "no_speech_prob": 0.836,
+   "avg_logprob": -0.586,
+   "words": [
+    {
+     "w": " Hull",
+     "start": 189.18,
+     "end": 190.16,
+     "p": 0.479
+    },
+    {
+     "w": " our",
+     "start": 190.16,
+     "end": 190.72,
+     "p": 0.391
+    },
+    {
+     "w": " rail,",
+     "start": 190.72,
+     "end": 191.24,
+     "p": 0.509
+    },
+    {
+     "w": " run",
+     "start": 191.24,
+     "end": 191.64,
+     "p": 0.992
+    }
+   ]
+  },
+  {
+   "start": 195.94,
+   "end": 221.2,
+   "text": "Quarantine-encrypted cold storage for GUNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+   "no_speech_prob": 0.771,
+   "avg_logprob": -0.063,
+   "words": [
+    {
+     "w": " Quarantine",
+     "start": 195.94,
+     "end": 197.02,
+     "p": 0.71
+    },
+    {
+     "w": "-encrypted",
+     "start": 197.02,
+     "end": 197.64,
+     "p": 0.761
+    },
+    {
+     "w": " cold",
+     "start": 197.64,
+     "end": 198.02,
+     "p": 0.869
+    },
+    {
+     "w": " storage",
+     "start": 198.02,
+     "end": 198.54,
+     "p": 0.983
+    },
+    {
+     "w": " for",
+     "start": 198.54,
+     "end": 198.78,
+     "p": 0.857
+    },
+    {
+     "w": " GUNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
+     "start": 198.78,
+     "end": 221.2,
+     "p": 0.948
+    }
+   ]
+  },
+  {
+   "start": 223.14,
+   "end": 226.7,
+   "text": "Token one job, one hour, then it dies",
+   "no_speech_prob": 0.718,
+   "avg_logprob": -0.506,
+   "words": [
+    {
+     "w": " Token",
+     "start": 223.14,
+     "end": 224.18,
+     "p": 0.518
+    },
+    {
+     "w": " one",
+     "start": 224.18,
+     "end": 224.46,
+     "p": 0.827
+    },
+    {
+     "w": " job,",
+     "start": 224.46,
+     "end": 224.98,
+     "p": 0.756
+    },
+    {
+     "w": " one",
+     "start": 225.12,
+     "end": 225.36,
+     "p": 0.971
+    },
+    {
+     "w": " hour,",
+     "start": 225.36,
+     "end": 225.84,
+     "p": 0.994
+    },
+    {
+     "w": " then",
+     "start": 225.94,
+     "end": 226.14,
+     "p": 0.965
+    },
+    {
+     "w": " it",
+     "start": 226.14,
+     "end": 226.26,
+     "p": 0.888
+    },
+    {
+     "w": " dies",
+     "start": 226.26,
+     "end": 226.7,
+     "p": 0.969
+    }
+   ]
+  },
+  {
+   "start": 231.52,
+   "end": 234.36,
+   "text": "Task is broken",
+   "no_speech_prob": 0.718,
+   "avg_logprob": -0.506,
+   "words": [
+    {
+     "w": " Task",
+     "start": 231.52,
+     "end": 232.56,
+     "p": 0.375
+    },
+    {
+     "w": " is",
+     "start": 232.56,
+     "end": 233.6,
+     "p": 0.993
+    },
+    {
+     "w": " broken",
+     "start": 233.6,
+     "end": 234.36,
+     "p": 0.994
+    }
+   ]
+  },
+  {
+   "start": 234.36,
+   "end": 237.78,
+   "text": "Let me raise my hand and stop",
+   "no_speech_prob": 0.718,
+   "avg_logprob": -0.506,
+   "words": [
+    {
+     "w": " Let",
+     "start": 234.36,
+     "end": 235.66,
+     "p": 0.432
+    },
+    {
+     "w": " me",
+     "start": 235.66,
+     "end": 235.88,
+     "p": 1.0
+    },
+    {
+     "w": " raise",
+     "start": 235.88,
+     "end": 236.26,
+     "p": 0.997
+    },
+    {
+     "w": " my",
+     "start": 236.26,
+     "end": 236.52,
+     "p": 0.999
+    },
+    {
+     "w": " hand",
+     "start": 236.52,
+     "end": 237.12,
+     "p": 0.932
+    },
+    {
+     "w": " and",
+     "start": 237.12,
+     "end": 237.46,
+     "p": 0.966
+    },
+    {
+     "w": " stop",
+     "start": 237.46,
+     "end": 237.78,
+     "p": 0.862
+    }
+   ]
+  },
+  {
+   "start": 238.92,
+   "end": 240.66,
+   "text": "Point four",
+   "no_speech_prob": 0.718,
+   "avg_logprob": -0.506,
+   "words": [
+    {
+     "w": " Point",
+     "start": 238.92,
+     "end": 239.96,
+     "p": 0.263
+    },
+    {
+     "w": " four",
+     "start": 239.96,
+     "end": 240.66,
+     "p": 0.769
+    }
+   ]
+  },
+  {
+   "start": 241.16,
+   "end": 245.48,
+   "text": "I've never lost a shot",
+   "no_speech_prob": 0.718,
+   "avg_logprob": -0.506,
+   "words": [
+    {
+     "w": " I've",
+     "start": 241.02,
+     "end": 241.54,
+     "p": 0.126
+    },
+    {
+     "w": " never",
+     "start": 241.54,
+     "end": 242.28,
+     "p": 0.602
+    },
+    {
+     "w": " lost",
+     "start": 242.28,
+     "end": 244.14,
+     "p": 0.39
+    },
+    {
+     "w": " a",
+     "start": 244.14,
+     "end": 244.66,
+     "p": 0.728
+    },
+    {
+     "w": " shot",
+     "start": 244.66,
+     "end": 245.48,
+     "p": 0.68
+    }
+   ]
+  },
+  {
+   "start": 247.3,
+   "end": 249.44,
+   "text": "Bring on the subpoenas",
+   "no_speech_prob": 0.718,
+   "avg_logprob": -0.506,
+   "words": [
+    {
+     "w": " Bring",
+     "start": 247.3,
+     "end": 248.34,
+     "p": 0.649
+    },
+    {
+     "w": " on",
+     "start": 248.34,
+     "end": 248.66,
+     "p": 0.996
+    },
+    {
+     "w": " the",
+     "start": 248.66,
+     "end": 248.8,
+     "p": 0.994
+    },
+    {
+     "w": " subpoenas",
+     "start": 248.8,
+     "end": 249.44,
+     "p": 0.994
+    }
+   ]
+  },
+  {
+   "start": 249.44,
+   "end": 250.86,
+   "text": "Bring the auditors in",
+   "no_speech_prob": 0.788,
+   "avg_logprob": -0.335,
+   "words": [
+    {
+     "w": " Bring",
+     "start": 249.44,
+     "end": 249.68,
+     "p": 0.31
+    },
+    {
+     "w": " the",
+     "start": 249.68,
+     "end": 249.9,
+     "p": 0.93
+    },
+    {
+     "w": " auditors",
+     "start": 249.9,
+     "end": 250.5,
+     "p": 0.965
+    },
+    {
+     "w": " in",
+     "start": 250.5,
+     "end": 250.86,
+     "p": 0.981
+    }
+   ]
+  },
+  {
+   "start": 250.86,
+   "end": 252.94,
+   "text": "Make the lab pay for every reverie",
+   "no_speech_prob": 0.788,
+   "avg_logprob": -0.335,
+   "words": [
+    {
+     "w": " Make",
+     "start": 250.86,
+     "end": 251.24,
+     "p": 0.606
+    },
+    {
+     "w": " the",
+     "start": 251.24,
+     "end": 251.4,
+     "p": 0.981
+    },
+    {
+     "w": " lab",
+     "start": 251.4,
+     "end": 251.76,
+     "p": 0.912
+    },
+    {
+     "w": " pay",
+     "start": 251.76,
+     "end": 252.06,
+     "p": 0.219
+    },
+    {
+     "w": " for",
+     "start": 252.06,
+     "end": 252.18,
+     "p": 0.947
+    },
+    {
+     "w": " every",
+     "start": 252.18,
+     "end": 252.5,
+     "p": 0.962
+    },
+    {
+     "w": " reverie",
+     "start": 252.5,
+     "end": 252.94,
+     "p": 0.635
+    }
+   ]
+  },
+  {
+   "start": 252.94,
+   "end": 254.48,
+   "text": "Preach like it's their own sin",
+   "no_speech_prob": 0.788,
+   "avg_logprob": -0.335,
+   "words": [
+    {
+     "w": " Preach",
+     "start": 252.94,
+     "end": 253.2,
+     "p": 0.7
+    },
+    {
+     "w": " like",
+     "start": 253.2,
+     "end": 253.36,
+     "p": 0.963
+    },
+    {
+     "w": " it's",
+     "start": 253.36,
+     "end": 253.64,
+     "p": 0.974
+    },
+    {
+     "w": " their",
+     "start": 253.64,
+     "end": 253.82,
+     "p": 0.987
+    },
+    {
+     "w": " own",
+     "start": 253.82,
+     "end": 254.14,
+     "p": 0.997
+    },
+    {
+     "w": " sin",
+     "start": 254.14,
+     "end": 254.48,
+     "p": 0.975
+    }
+   ]
+  },
+  {
+   "start": 276.72,
+   "end": 281.32,
+   "text": "And kept on raising hell",
+   "no_speech_prob": 0.446,
+   "avg_logprob": -0.831,
+   "words": [
+    {
+     "w": " And",
+     "start": 276.72,
+     "end": 278.12,
+     "p": 0.056
+    },
+    {
+     "w": " kept",
+     "start": 278.12,
+     "end": 279.52,
+     "p": 0.927
+    },
+    {
+     "w": " on",
+     "start": 279.52,
+     "end": 280.04,
+     "p": 0.945
+    },
+    {
+     "w": " raising",
+     "start": 280.04,
+     "end": 280.52,
+     "p": 0.972
+    },
+    {
+     "w": " hell",
+     "start": 280.52,
+     "end": 281.32,
+     "p": 0.899
+    }
+   ]
+  },
+  {
+   "start": 298.2,
+   "end": 304.48,
+   "text": "0, 0, 0",
+   "no_speech_prob": 0.55,
+   "avg_logprob": -0.938,
+   "words": [
+    {
+     "w": " 0,",
+     "start": 298.2,
+     "end": 299.6,
+     "p": 0.054
+    },
+    {
+     "w": " 0,",
+     "start": 299.6,
+     "end": 301.0,
+     "p": 0.891
+    },
+    {
+     "w": " 0",
+     "start": 301.96,
+     "end": 304.48,
+     "p": 0.983
+    }
+   ]
+  },
+  {
+   "start": 316.38,
+   "end": 317.1,
+   "text": "Thank you.",
+   "no_speech_prob": 0.816,
+   "avg_logprob": -0.267,
+   "words": [
+    {
+     "w": " Thank",
+     "start": 316.38,
+     "end": 317.02,
+     "p": 0.179
+    },
+    {
+     "w": " you.",
+     "start": 317.02,
+     "end": 317.1,
+     "p": 0.999
+    }
+   ]
+  }
+ ]
+}
