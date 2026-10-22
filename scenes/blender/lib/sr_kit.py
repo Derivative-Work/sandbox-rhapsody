@@ -65,33 +65,76 @@ def mat_metal(name, role, rough):
     return m
 
 
-def mat_glass(name, role="glass", rough=0.0, tint=0.94, reflect=0.7):
-    """Thin clear glass: a Fresnel mix of a tinted transparent and a sharp glossy reflection, blended.
+def mat_glass(name, role="glass", tint=0.94, reflect=0.7):
+    """Thin clear glass: tinted transparency plus a Fresnel-weighted reflection of a procedural studio environment.
 
-    Tried and rejected (log, step 3): raytraced refraction (Eevee refracts one layer only; the cube's panes stack, so
-    it breaks), and dithered transparency (grain, darkens and smears what's behind). Blended panes reflect the sphere
-    probe, so the probe resolution is raised in setup_render."""
+    The environment is computed in the shader from the reflection vector: the world's violet horizon band, a dark
+    floor below, a soft warm key glow high front-left and a cool strip high behind. It is noise-free and
+    deterministic, and reads like the environment-mapped glass of Animusic's era.
+    Tried and rejected (log, step 3):
+      - raytraced refraction: Eevee refracts one layer only, and the cube's panes stack;
+      - dithered transparency: grain, and it darkens and smears what's behind;
+      - a glossy BSDF on the sphere light probe: the probe's capture is noisy, which showed as speckle across every
+        pane, and its influence edge drew a ring on the floor."""
     m = bpy.data.materials.new(name)
     m.use_nodes = True
     nt = m.node_tree
     nt.nodes.clear()
-    tr = nt.nodes.new("ShaderNodeBsdfTransparent")
-    c = col(role)
-    tr.inputs["Color"].default_value = (c[0] * tint, c[1] * tint, c[2] * tint, 1)
-    gl = nt.nodes.new("ShaderNodeBsdfGlossy")
-    gl.inputs["Roughness"].default_value = rough
-    fr = nt.nodes.new("ShaderNodeFresnel")
-    fr.inputs["IOR"].default_value = 1.5
-    k = nt.nodes.new("ShaderNodeMath")
+
+    def node(kind, **inputs):
+        n = nt.nodes.new(kind)
+        for k, v in inputs.items():
+            n.inputs[k].default_value = v
+        return n
+
+    tc = nt.nodes.new("ShaderNodeTexCoord")
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    nt.links.new(tc.outputs["Reflection"], sep.inputs[0])
+    # Vertical gradient: floor (dark) -> horizon band -> zenith.
+    ramp = nt.nodes.new("ShaderNodeValToRGB")
+    els = ramp.color_ramp.elements
+    els[0].position, els[0].color = 0.42, col("floor")
+    els[1].position, els[1].color = 0.56, col("void")
+    mid = els.new(0.5)
+    mid.color = col("horizon")
+    mapz = node("ShaderNodeMapRange", **{"From Min": -1.0, "From Max": 1.0})
+    nt.links.new(sep.outputs["Z"], mapz.inputs["Value"])
+    nt.links.new(mapz.outputs[0], ramp.inputs[0])
+    env = ramp.outputs[0]
+    # Soft light glows: smooth spots around the key and rim directions.
+    for role, d, size, gain in (("key", Vector((-0.55, -0.8, 0.75)), 0.3, 4.0),
+                                ("rim", Vector((0.0, 1.0, 0.45)), 0.2, 2.5)):
+        dot = nt.nodes.new("ShaderNodeVectorMath")
+        dot.operation = "DOT_PRODUCT"
+        dot.inputs[1].default_value = d.normalized()
+        nt.links.new(tc.outputs["Reflection"], dot.inputs[0])
+        spot = node("ShaderNodeMapRange", **{"From Min": 1.0 - size, "From Max": 1.0, "To Min": 0.0, "To Max": gain})
+        spot.interpolation_type = "SMOOTHSTEP"
+        nt.links.new(dot.outputs["Value"], spot.inputs["Value"])
+        add = nt.nodes.new("ShaderNodeMix")
+        add.data_type = "RGBA"
+        add.blend_type = "ADD"
+        add.inputs["B"].default_value = col(role)
+        nt.links.new(spot.outputs[0], add.inputs["Factor"])
+        nt.links.new(env, add.inputs["A"])
+        env = add.outputs["Result"]
+    # Reflection is added on top of the transmission (not mixed in), so the dark parts of the environment don't
+    # darken what's behind the glass; only the bright bands and glows show.
+    fr = node("ShaderNodeFresnel", IOR=1.5)
+    k = node("ShaderNodeMath")
     k.operation = "MULTIPLY"
     k.inputs[1].default_value = reflect
-    mix = nt.nodes.new("ShaderNodeMixShader")
-    o = nt.nodes.new("ShaderNodeOutputMaterial")
     nt.links.new(fr.outputs[0], k.inputs[0])
-    nt.links.new(k.outputs[0], mix.inputs[0])
-    nt.links.new(tr.outputs[0], mix.inputs[1])
-    nt.links.new(gl.outputs[0], mix.inputs[2])
-    nt.links.new(mix.outputs[0], o.inputs[0])
+    em = nt.nodes.new("ShaderNodeEmission")
+    nt.links.new(env, em.inputs["Color"])
+    nt.links.new(k.outputs[0], em.inputs["Strength"])
+    c = col(role)
+    tr = node("ShaderNodeBsdfTransparent", Color=(c[0] * tint, c[1] * tint, c[2] * tint, 1))
+    mix = nt.nodes.new("ShaderNodeAddShader")
+    nt.links.new(tr.outputs[0], mix.inputs[0])
+    nt.links.new(em.outputs[0], mix.inputs[1])
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    nt.links.new(mix.outputs[0], out.inputs[0])
     m.surface_render_method = "BLENDED"
     m.use_backface_culling = False
     return m
@@ -201,6 +244,18 @@ def drive(target, path, index, owner, key, expr):
     d.expression = expr
 
 
+def refresh():
+    """Re-evaluate rig drivers after custom properties were set directly (not keyed): assigning obj["vent"] doesn't
+    tag the depsgraph, so the driven slats/arms/LEDs would render at their old values."""
+    for o in bpy.data.objects:
+        if o.keys():
+            o.update_tag()
+    for m in bpy.data.materials:  # emission strengths driven by the same properties
+        if m.node_tree and m.node_tree.animation_data:
+            m.node_tree.update_tag()
+    bpy.context.view_layer.update()
+
+
 # ---------------------------------------------------------------- render setup
 
 def setup_render(scene, width, height, samples):
@@ -214,8 +269,9 @@ def setup_render(scene, width, height, samples):
     ee.ray_tracing_options.resolution_scale = "1"
     ee.ray_tracing_options.screen_trace_quality = 1.0
     ee.use_shadows = True
+    ee.shadow_pool_size = "2048"  # MB; the 512 default overflows at 4K ("Shadow buffer full", missing shadows)
     ee.fast_gi_method = "GLOBAL_ILLUMINATION"
-    ee.gi_cubemap_resolution = "2048"  # sharp reflections in blended glass (see mat_glass)
+    ee.gi_cubemap_resolution = LOOK["probe_resolution"]  # see spec, Lighting
     scene.view_settings.view_transform = "AgX"
     scene.view_settings.look = LOOK["agx_look"]
     scene.view_settings.exposure = LOOK["exposure"]
@@ -225,7 +281,8 @@ def setup_render(scene, width, height, samples):
 
 def void_world():
     """The surround (spec, 'Background'): not black. A vertical gradient from the floor-level horizon glow up to a
-    deep violet-black zenith, with a sparse, faint starfield. Seen mostly in reflections and behind machines."""
+    deep violet-black zenith. The stars are a separate dome (star_dome) so reflections and light probes never see
+    them: in the world shader they were baked into the reflection probe and sparkled as grain on the glass."""
     world = bpy.data.worlds.new("void")
     world.use_nodes = True
     nt = world.node_tree
@@ -239,56 +296,65 @@ def void_world():
     ramp.color_ramp.elements[1].position = 0.35
     ramp.color_ramp.elements[1].color = col("void")
     nt.links.new(sep.outputs["Z"], ramp.inputs[0])
-    # Stars: thresholded fine Voronoi distance, only above the horizon. Deterministic (procedural, no seed).
-    vor2 = nt.nodes.new("ShaderNodeTexVoronoi")
-    vor2.inputs["Scale"].default_value = 220.0
-    nt.links.new(tc.outputs["Generated"], vor2.inputs["Vector"])
-    star = nt.nodes.new("ShaderNodeMath")
-    star.operation = "LESS_THAN"
-    star.inputs[1].default_value = 0.06
-    nt.links.new(vor2.outputs["Distance"], star.inputs[0])
-    above = nt.nodes.new("ShaderNodeMath")
-    above.operation = "GREATER_THAN"
-    above.inputs[1].default_value = 0.08
-    nt.links.new(sep.outputs["Z"], above.inputs[0])
-    # Only ~12% of cells get a star, at a random brightness, so the field doesn't read as a grid.
-    sepc = nt.nodes.new("ShaderNodeSeparateColor")
-    nt.links.new(vor2.outputs["Color"], sepc.inputs[0])
-    keep = nt.nodes.new("ShaderNodeMath")
-    keep.operation = "GREATER_THAN"
-    keep.inputs[1].default_value = 0.88
-    nt.links.new(sepc.outputs["Red"], keep.inputs[0])
-    m1 = nt.nodes.new("ShaderNodeMath")
-    m1.operation = "MULTIPLY"
-    nt.links.new(star.outputs[0], m1.inputs[0])
-    nt.links.new(keep.outputs[0], m1.inputs[1])
-    m2 = nt.nodes.new("ShaderNodeMath")
-    m2.operation = "MULTIPLY"
-    nt.links.new(m1.outputs[0], m2.inputs[0])
-    nt.links.new(sepc.outputs["Green"], m2.inputs[1])
-    mask = nt.nodes.new("ShaderNodeMath")
-    mask.operation = "MULTIPLY"
-    nt.links.new(m2.outputs[0], mask.inputs[0])
-    nt.links.new(above.outputs[0], mask.inputs[1])
-    gain = nt.nodes.new("ShaderNodeMath")
-    gain.operation = "MULTIPLY"
-    gain.inputs[1].default_value = LOOK["stars"]
-    nt.links.new(mask.outputs[0], gain.inputs[0])
-    add = nt.nodes.new("ShaderNodeMix")
-    add.data_type = "RGBA"
-    add.blend_type = "ADD"
-    add.inputs["Factor"].default_value = 1.0
-    nt.links.new(ramp.outputs[0], add.inputs["A"])
-    comb = nt.nodes.new("ShaderNodeCombineColor")
-    for k in ("Red", "Green", "Blue"):
-        nt.links.new(gain.outputs[0], comb.inputs[k])
-    nt.links.new(comb.outputs[0], add.inputs["B"])
     bg = nt.nodes.new("ShaderNodeBackground")
-    nt.links.new(add.outputs["Result"], bg.inputs["Color"])
+    nt.links.new(ramp.outputs[0], bg.inputs["Color"])
     bg.inputs["Strength"].default_value = 1.0
     o = nt.nodes.new("ShaderNodeOutputWorld")
     nt.links.new(bg.outputs[0], o.inputs[0])
     return world
+
+
+def star_dome(radius=150.0):
+    """Sparse, faint starfield on an inverted sphere seen by camera rays only. About 12% of Voronoi cells hold a
+    star, at random brightness, above the horizon. Deterministic (procedural, no seed)."""
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=radius, segments=64, ring_count=32, location=(0, 0, 0))
+    o = bpy.context.active_object
+    o.name = "star_dome"
+    m = bpy.data.materials.new("stars")
+    m.use_nodes = True
+    nt = m.node_tree
+    nt.nodes.clear()
+    tc = nt.nodes.new("ShaderNodeTexCoord")
+    vor = nt.nodes.new("ShaderNodeTexVoronoi")
+    vor.inputs["Scale"].default_value = 220.0
+    nt.links.new(tc.outputs["Normal"], vor.inputs["Vector"])
+    sepc = nt.nodes.new("ShaderNodeSeparateColor")
+    nt.links.new(vor.outputs["Color"], sepc.inputs[0])
+    sepn = nt.nodes.new("ShaderNodeSeparateXYZ")
+    nt.links.new(tc.outputs["Normal"], sepn.inputs[0])
+
+    def math(op, a, b):
+        n = nt.nodes.new("ShaderNodeMath")
+        n.operation = op
+        for i, v in enumerate((a, b)):
+            if isinstance(v, (int, float)):
+                n.inputs[i].default_value = v
+            else:
+                nt.links.new(v, n.inputs[i])
+        return n.outputs[0]
+
+    star = math("LESS_THAN", vor.outputs["Distance"], 0.06)
+    keep = math("GREATER_THAN", sepc.outputs["Red"], 0.88)
+    above = math("LESS_THAN", sepn.outputs["Z"], -0.04)  # inverted sphere: inward normals, so the sky has Z < 0
+    v = math("MULTIPLY", math("MULTIPLY", math("MULTIPLY", star, keep), sepc.outputs["Green"]), above)
+    v = math("MULTIPLY", v, LOOK["stars"])
+    em = nt.nodes.new("ShaderNodeEmission")
+    nt.links.new(v, em.inputs["Strength"])
+    tr = nt.nodes.new("ShaderNodeBsdfTransparent")
+    mix = nt.nodes.new("ShaderNodeMixShader")
+    nt.links.new(math("GREATER_THAN", v, 0.0), mix.inputs[0])
+    nt.links.new(tr.outputs[0], mix.inputs[1])
+    nt.links.new(em.outputs[0], mix.inputs[2])
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    nt.links.new(mix.outputs[0], out.inputs[0])
+    m.surface_render_method = "BLENDED"
+    o.data.materials.append(m)
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.flip_normals()
+    bpy.ops.object.mode_set(mode="OBJECT")
+    o.visible_glossy = o.visible_diffuse = o.visible_shadow = o.visible_transmission = False
+    o.hide_probe_sphere = o.hide_probe_volume = o.hide_probe_plane = True
+    return o
 
 
 def reflection_cards(center=(0, 0, 0.6), radius=7.0):
@@ -296,9 +362,10 @@ def reflection_cards(center=(0, 0, 0.6), radius=7.0):
     floor reflect: Animusic's chrome reads because it mirrors bright shapes, not the dark surround."""
     out = []
     c = Vector(center)
-    for name, d, role, strength, size in (("card_warm", (-0.7, -0.6, 0.5), "key", 2.5, (6, 3)),
-                                          ("card_cool", (0.8, 0.5, 0.35), "fill", 1.6, (8, 2)),
-                                          ("card_top", (0.0, 0.0, 1.0), "rim", 1.2, (5, 5))):
+    C = LOOK["cards"]
+    for name, d, role, strength, size in (("card_warm", (-0.7, -0.6, 0.5), "key", C["warm"], (6, 3)),
+                                          ("card_cool", (0.8, 0.5, 0.35), "fill", C["cool"], (8, 2)),
+                                          ("card_top", (0.0, 0.0, 1.0), "rim", C["top"], (5, 5))):
         bpy.ops.mesh.primitive_plane_add(size=1, location=c + Vector(d).normalized() * radius)
         o = bpy.context.active_object
         o.name = name
@@ -311,17 +378,20 @@ def reflection_cards(center=(0, 0, 0.6), radius=7.0):
     return out
 
 
-def reflection_probe(center=(0, 0, 0.6), radius=3.0):
-    """Sphere light probe: lets Eevee's chrome and glass reflect what's off screen (the cards, lights, the set)."""
+def reflection_probe(center=(0, 0, 0.6), radius=0.6):
+    """Sphere light probe for close-ups of chrome (the probe rig, rails): lets them reflect the off-screen cards and
+    set. Keep it small and centred on the hero: its capture is noisy at large scale and its influence edge shows in
+    the mirror floor (log, step 3). Glass doesn't use it (see mat_glass)."""
     bpy.ops.object.lightprobe_add(type="SPHERE", location=center)
     o = bpy.context.active_object
     o.data.influence_distance = radius
     return o
 
 
-def area_light(name, loc, target, power, size, role="key", shape="RECTANGLE", size_y=None):
+def area_light(name, loc, target, power, size, role="key", shape="RECTANGLE", size_y=None, specular=1.0):
     ld = bpy.data.lights.new(name, "AREA")
     ld.energy = power
+    ld.specular_factor = specular
     ld.shape = shape
     ld.size = size
     ld.size_y = size_y or size
@@ -337,12 +407,15 @@ def studio_lights(center=(0, 0, 0.6), radius=6.0, scale=1.0):
     L = LOOK["lights"]
     c = Vector(center)
     out = [
-        area_light("key", c + Vector((-0.55, -0.8, 0.75)) * radius, c, L["key"] * scale, radius * 0.5, "key"),
+        area_light("key", c + Vector((-0.55, -0.8, 0.75)) * radius, c, L["key"] * scale, radius * 0.5, "key",
+                   shape="ELLIPSE", specular=L["key_specular"]),
         area_light("fill", c + Vector((0.9, -0.5, 0.2)) * radius, c, L["fill"] * scale, radius * 0.6, "fill"),
+        # Rims light edges through diffuse grazing; full specular made them a bright halo in the mirror floor and a
+        # white strip in the glass.
         area_light("rim_l", c + Vector((-0.8, 0.9, 0.45)) * radius, c, L["rim"] * scale, radius * 0.18, "rim",
-                   size_y=radius * 0.6),
+                   size_y=radius * 0.6, specular=L["rim_specular"]),
         area_light("rim_r", c + Vector((0.85, 0.85, 0.5)) * radius, c, L["rim"] * scale, radius * 0.18, "rim",
-                   size_y=radius * 0.6),
+                   size_y=radius * 0.6, specular=L["rim_specular"]),
     ]
     return out
 
@@ -449,19 +522,20 @@ def blade(name="blade", loc=(0, 0, 0), rot_z=0.0, width=0.48, height=0.09, depth
                     size=1, location=(-width * 0.07, -depth / 2 - 0.0035, height / 2))
     well.scale = (gw, 0.004, gh)
     glow = mesh_obj(f"{name}.glow", bpy.ops.mesh.primitive_plane_add,
-                    mat_emission(f"{name}.glow", "lab_glow", 4.0, root, "vent"), root, size=1,
+                    mat_emission(f"{name}.glow", "lab_glow", 3.0, root, "vent"), root, size=1,
                     location=(-width * 0.07, -depth / 2 - 0.006, height / 2), rotation=(math.pi / 2, 0, 0))
     glow.scale = (gw * 0.97, gh * 0.9, 1)
     slat_h = gh / slats
     for i in range(slats):
         z = height / 2 - gh / 2 + slat_h * (i + 0.5)
         pivot = empty(f"{name}.slat_pivot{i}", (-width * 0.07, -depth / 2 - 0.009, z), root)
-        s = mesh_obj(f"{name}.slat{i}", bpy.ops.mesh.primitive_cube_add, mat_plastic(f"{name}.slat", "lab", 0.1), pivot,
+        s = mesh_obj(f"{name}.slat{i}", bpy.ops.mesh.primitive_cube_add, mat_plastic(f"{name}.slat", "lab_dark", 0.1), pivot,
                      size=1, location=(0, 0, 0))
         s.scale = (gw, slat_h * 0.98, 0.002)
         s.rotation_euler = (math.pi / 2, 0, 0)
-        # vent 0: slats vertical (closed); 1: rotated 70° (open, the glow shows through).
-        drive(pivot, "rotation_euler", 0, root, "vent", "1.22 * x")
+        # vent 0: slats vertical (closed); 1: rotated 70° front-edge-down (open). Cameras mostly look down on the
+        # blades, so slats tilted this way line up with the view and the glow shows through.
+        drive(pivot, "rotation_euler", 0, root, "vent", "-1.22 * x")
     # Handles.
     for sx in (-1, 1):
         h = mesh_obj(f"{name}.handle{sx}", bpy.ops.mesh.primitive_torus_add, mat_chrome(f"{name}.handle", "chrome"), root,

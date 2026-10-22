@@ -1,5 +1,5 @@
 {
-  "_doc": "The video's look as numbers, read by scenes/blender/lib/sr_kit.py. PROVISIONAL until style/style_spec.md is written from the reference measurements; every value there is copied here.",
+  "_doc": "The video's look as numbers, read by scenes/blender/lib/sr_kit.py. Every value comes from style/style_spec.md part 2; change them there first.",
   "fps": 60,
   "agx_look": "AgX - Punchy",
   "exposure": 0.0,
@@ -11,27 +11,41 @@
     "lens": "#0b0d12",
     "shadow": "#0a0c12",
     "amber": "#ffa21f",
-    "lab": "#e6edf5",
+    "lab": "#b9cbe8",
     "lab_dark": "#2a3442",
-    "lab_glow": "#9cc8ff",
+    "lab_glow": "#3f8cff",
     "glass": "#f4f8ff",
     "brass": "#c8963c",
     "note": "#f2d64b",
     "key": "#ffcf8f",
     "fill": "#7a63d6",
     "rim": "#a9d2ff",
-    "horizon": "#2a2046"
+    "horizon": "#2a2046",
+    "web": "#e040c8",
+    "web2": "#7a3bff",
+    "platform": "#14b8a6",
+    "alarm": "#ff3b30",
+    "paper": "#efe8da",
+    "copper": "#b36f44"
   },
   "materials": {
     "plastic_roughness": 0.12,
     "plastic_coat": 0.6,
     "chrome_roughness": 0.05,
-    "floor_roughness": 0.06
+    "floor_roughness": 0.1
   },
   "lights": {
-    "key": 5000,
-    "fill": 1500,
-    "rim": 6000
+    "key": 3600,
+    "fill": 2600,
+    "rim": 4500,
+    "key_specular": 0.6,
+    "rim_specular": 0.1
   },
-  "stars": 1.2
+  "stars": 1.2,
+  "cards": {
+    "warm": 0.5,
+    "cool": 0.7,
+    "top": 0.15
+  },
+  "probe_resolution": "1024"
 }

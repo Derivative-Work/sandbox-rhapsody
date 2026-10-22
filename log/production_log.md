@@ -99,3 +99,40 @@ Append-only. One entry per action: timestamp, step (shot ID where relevant), wha
   - 01:15:37 — lyric correlation (logged as 01:50)
   - 01:31:12 — stills and measurements (logged as 02:30, a time that hadn't happened yet)
 - **Why:** The log is append-only, so the entries stay as written and this one corrects them. From here on, timestamps come from `date -Iseconds` when the entry is written.
+
+## 2026-10-22T04:56:23-04:00 — Step 3: style spec, look config, shared kit and the C1 test frames
+
+- **What:**
+  - Finished the camera-motion pass over all 15 references.
+  - Measured warm/cool shares and highlight and shadow colours per piece.
+  - Wrote `style/style_spec.md`: part 1 is the measurements; part 2 is this video's version (palette roles as hex, materials, lighting, background, camera speeds, pacing, the note-to-motion rules for step 7, the POV HUD, captions). Every part 2 number is in `config/look.json`.
+  - Built the first shared-kit pieces as Python (`scenes/blender/lib/sr_kit.py`): probe rig, server blade with driven louvres, glass cube, mirror floor, sky gradient, star dome, lights, reflection cards and probe.
+  - Rendered set A's C1 test frames (close and wide) at 3840×2160, plus a review sheet.
+- **Commands:**
+  - `.venv/bin/python -I scripts/camera_motion.py` (9 m 47 s)
+  - Hue roles, run inline: `style/hue_roles.json`
+  - `blender -b --factory-startup --python scenes/blender/c1_test_frame.py -- renders/c1/c1_test_frame_A_{close,wide}.png 3840 2160 64 {close,wide}` (about 8.5 s per frame on the RTX 5090)
+  - `.venv/bin/python -I scripts/c1_sheet.py renders/c1/c1_test_frame_A_close.png renders/c1/c1_test_frame_A_wide.png renders/c1/c1_sheet.jpg`
+  - `scripts/manifest.sh`
+- **Outputs:** `style/style_spec.md`, `style/camera_motion.json`, `style/hue_roles.json`, `config/look.json`, `scenes/blender/lib/sr_kit.py`, `scenes/blender/c1_test_frame.py`, `scripts/c1_sheet.py`, `assets/fonts/` (Inter, JetBrains Mono, Instrument Serif, OFL, copied from Ghost), `renders/c1/c1_test_frame_A_close.png`, `renders/c1/c1_test_frame_A_wide.png`, `renders/c1/c1_sheet.jpg`
+- **Key findings:**
+  - Camera, medians over 15 pieces: drift 0.8% of frame width per second (90th percentile 3.6%), push 1.7%/s, roll 0.5°/s. The camera is static 21% of the time.
+  - Shots: median 9.2 s, mean 15.2 s over 274 shots; Aqua Harp is one move with one cut, and Drum Machine has no hard cut.
+  - Frame rate chosen: 60 fps.
+- **Problems met and fixed while building the look** (the reasons are in the spec and code comments):
+  1. **Chrome rendered black:** it had nothing to reflect. Fixed with reflection cards the camera never sees.
+  2. **Glass:** a solidified cube went near-opaque. Raytraced refraction broke (Eevee refracts one layer only, and the panes stack). Dithered glass was grainy and smeared the probe behind it. Blended glossy glass reflected the sphere probe, whose capture is noisy: speckle on every pane, plus a ring in the floor at its influence edge. Final: blended panes that reflect a procedural studio environment computed in the shader, added on top of transmission.
+  3. **Starfield:** it read as a grid until thinned to a random 12% of cells; it now lives on a camera-only dome.
+  4. **Rim lights:** at full specular they drew a halo in the mirror floor and a white strip in the glass. Specular is now 0.1.
+  5. **Driven properties set directly (not keyed) didn't re-evaluate:** added `refresh()`, which tags objects and materials.
+  6. **Louvres:** pale louvres hid a pale glow, which AgX desaturates to white. Now dark slats, a saturated blue glow, and slats that open front-edge-down.
+  7. **Shadows:** at 4K Eevee's 512 MB shadow pool overflowed ("Shadow buffer full"). The pool is now 2048 MB, and both frames re-rendered clean.
+- **Asset notes:**
+  - The first 4K frame (vents closed, pre-fix look) moved to `archive/renders/c1/c1_test_frame_A_superseded_vents-closed.png`.
+  - The two 4K frames rendered with the shadow overflow were overwritten minutes later by the clean re-render, before anyone reviewed them. That breaks the never-overwrite rule. Both renders are deterministic and regenerate from this commit's parent with the 512 MB pool, so nothing is lost, but it is logged here as a lapse.
+- **Self-assessment for C1:**
+  - The close frame shows the look working: lavender lab plastic under a violet fill, glowing louvres open versus closed, the chrome probe with its amber LED, and the violet surround.
+  - Next to the references, set A is cooler and sparser. Coolness is the brief's Lab colour role. Sparseness is because set A's dressing isn't built yet (music box detail, grader turnstile, wall of 198, SIMULATION decal).
+  - The warm key reads weakly, and the wide frame is dark.
+- **Why:** Brief, pre-production step 3 and checkpoint C1.
+- **Status:** **C1 is ready for review.** The agent stops here for approval, per the brief.
