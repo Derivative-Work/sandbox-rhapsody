@@ -687,12 +687,13 @@ def locked_box(name, loc, rot_z=0.0, mat_case=None, mat_band=None, parent=None):
 
 
 def turnstile(name="grader", loc=(0, 0, 0), rot_z=0.0):
-    """The grader: a chrome turnstile post with three arms ("spin" 0–1 = one full turn of three clicks), a slot plate
+    """The grader: a chrome turnstile post with three arms ("spin" counts clicks: each +1 is a third of a turn, driven
+    by sr_anim.stepper), a slot plate
     with a flag-shaped cut-out, and a bell on a bracket. Anything flag-shaped clicks through; it never checks how."""
     root = empty(name, loc)
     root.rotation_euler = (0, 0, rot_z)
-    prop(root, "spin", 0.0)
-    prop(root, "bell", 0.0)
+    prop(root, "spin", 0.0, lo=0.0, hi=10000.0)
+    prop(root, "bell", 0.0, lo=-1.0, hi=1.0)
     post = mesh_obj(f"{name}.post", bpy.ops.mesh.primitive_cylinder_add, mat_chrome(f"{name}.post"), root, radius=0.06,
                     depth=0.9, vertices=48, location=(0, 0, 0.45))
     smooth(post)
@@ -701,7 +702,7 @@ def turnstile(name="grader", loc=(0, 0, 0), rot_z=0.0):
     cap.scale = (1, 1, 0.5)
     smooth(cap)
     hub = empty(f"{name}.hub", (0, 0, 0.72), root)
-    drive(hub, "rotation_euler", 2, root, "spin", "2.0944 * 3 * x")
+    drive(hub, "rotation_euler", 2, root, "spin", "2.0944 * x")
     for k in range(3):
         a = k * math.tau / 3
         arm = mesh_obj(f"{name}.arm{k}", bpy.ops.mesh.primitive_cylinder_add, mat_chrome(f"{name}.arm"), hub,

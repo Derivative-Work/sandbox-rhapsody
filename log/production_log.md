@@ -425,3 +425,19 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - **Everywhere:** the floor ring is the bass (the piano's left hand before the bass enters).
 - **Check:** every machine has events while its set is on screen (`timing/instrument_map.md`). On-screen time per set: A 89 s, B 38, C 14, D 7, E 9, F 12, G 48, H 63, I 57.
 - **Why:** Brief, pre-production step 6.
+
+## 2026-10-22T08:47:27-04:00 — Steps 7–9: animation library, seeds, pipeline per shot
+
+- **Step 7 — note-driven animation library** (`scenes/blender/lib/sr_anim.py`):
+  - **Clock and loading:** frame f = song time f/60 (frame_start 0). Events load from `config/instrument_map.json` sources, with composable filters (time window, pitch range, kit piece, top line, sung line, words, section, one-per-strike).
+  - **Rigs:** `key_press`, `striker` (6-frame wind-up by velocity, contact on the onset frame, 12-frame settle), `bell` (damped swing), `led_pulse` (exponential decay, τ = 0.25 × length, at least 4 frames), `envelope_rig`, `stepper` (+1 per event with a 6% overshoot; turnstiles, odometers, split-flaps; the turnstile driver is now 120° per click), `continuous`, and `pellets` (Follow Path, launch solved back from path length at constant speed, at least 12 frames of flight, arrival on the onset).
+  - **Keys:** written in bulk through Blender 5 layered actions (`fcurve_ensure_for_datablock`).
+  - **Crowding:** when notes crowd, the merge keeps every contact; wind-ups shrink and settles are cut short. The first version dropped contacts for kicks a sixteenth apart, caught by the check.
+  - **Envelopes:** per-frame stem envelopes, 19,380 frames each (`scripts/stem_envelopes.py` → `timing/envelopes/*.npy`).
+  - **Check** (`scenes/blender/anim_test.py`, set A rigs on real events): five windows (44–54, 130–140, 174–184, 214–224, 296–318 s) with 912 contacts in total (steppers, strikers, LED pulses, pellet arrivals). All on their event frame. A 10 s look (`renders/step7/anim_test_44-54.mp4`) and a frame strip around a snare hit confirm wind-up, contact and settle. The frame sequence was deleted after the encode (regenerable).
+- **Step 8 — seeds:**
+  - `config/seeds.json`: main 41, plus the named random processes to come (swarm placement, pellet scatter, token rain, analysis).
+  - `scripts/check_seeds.sh`: two renders of the C1 frame differ by at most 1 level on 0.046% of pixels. That is GPU float rounding, with bloom the suspected source (Ghost had no bloom and was bit-identical). It passes at a tolerance of ≤ 1 level on < 0.1% of pixels.
+  - No set code uses randomness yet (set A is arithmetic).
+- **Step 9 — pipeline per shot:** `shots/pipeline.md` via `scripts/pipeline_table.py`, with Folks Like Us-style tags ([B] Blender, [J] JS overlay, [F] ffmpeg effect). 68 shots including the proposed S64b: 66 [B], 12 [J] beyond captions, 3 [F]. Cut times, frames and lengths come from the timing map.
+- **Why:** Brief, pre-production steps 7–9.

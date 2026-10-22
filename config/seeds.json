@@ -1,0 +1,10 @@
+{
+ "_doc": "The only source of randomness seeds (brief, pre-production step 8). Every random process reads its seed from here by name; scripts/check_seeds.sh confirms a re-run reproduces its frames exactly. The main video uses 41.",
+ "main": 41,
+ "processes": {
+  "swarm_placement": {"seed": "main", "used_by": "set G: 700 probes' seat jitter and idle LED phase"},
+  "pellet_scatter": {"seed": "main", "used_by": "pellet launch jitter of +-1 frame where a stream would look mechanical (arrival never moves)"},
+  "token_rain": {"seed": "main", "used_by": "set H: key candles' flicker phase"},
+  "analysis": {"seed": "main", "used_by": "style measurements (k-means), drum NMF free components, calibration onsets"}
+ }
+}
