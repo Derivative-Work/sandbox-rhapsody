@@ -90,3 +90,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
   They added that the rest will probably be fixed once the detectors work in those cases.
 - **Rule:** R2 (timing-data correctness). The human named problems; the agent made every change.
+
+## 2026-10-22T08:04:30-04:00 — C3: "this is inventing drum hits that don't exist" — R2
+
+- **What:** The human reported invented drum hits in the revised preview.
+- **Rule:** R2. The agent made the changes (production log).

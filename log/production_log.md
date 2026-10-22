@@ -365,3 +365,19 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 7. **Reproducibility:** `uv sync` reproduces every transcription note count (re-run under the lock: guitar 2,631, bass 1,309, synth 3,438, strings 3,152, brass 2,773, keyboard 4,376).
 
 - **Why:** Human feedback at C3 (human interventions); brief, steps 4–5 ("where a track fails, derive events from the stem").
+
+## 2026-10-22T08:04:30-04:00 — C3 revision 3: no invented drum hits
+
+- **Measured:**
+  - 204 of the LarsNet kit's 895 strike times (23%) had no onset in the original drum stem (locally normalised onset strength, ±40 ms). Suno's hits: 9%.
+  - Separation bleed also credited pieces at real strikes: a kick's bleed rises in the hi-hat stem at the kick's strike.
+- **Changes** (`scripts/drums_larsnet.py`):
+  1. Every hit must coincide with a drum-stem onset (215 dropped).
+  2. Level and rise are measured in each piece's own band: kick 30–120 Hz, snare 150–4,000, toms 70–400, hats 6–16 kHz, cymbals 4–14 kHz.
+  3. A hit Suno's MIDI lacks must reach the 25th percentile of level *and* rise of that piece's Suno-confirmed hits, because a missed hit is better than an invented one. 536 dropped; 303 additions remain, almost all on beats and "and"s: kick 24, snare 5, toms 69, hats 101, crash 104.
+  4. Suno hits at real strikes where LarsNet found no piece are kept with Suno's label (51). Where LarsNet found a piece, its labels stand.
+- **Result:**
+  - 619 strike times, all at drum-stem onsets (Suno: 623). They cover 67% of the drum stem's detected onsets.
+  - Pieces: kick 320, snare 143, toms 174, hats 299, crash 171.
+  - Open: snares are fewer than Suno's 264, because LarsNet hears kick or toms at many of Suno's snare strikes. The human's ear decides.
+- **Rebuilt:** score, `renders/c3/c3_score_preview.mp4`, `renders/c3/c3_preview.mp4`. Superseded files: `archive/timing/drums__kit_larsnet_superseded_unsupported-hits.json` and `archive/renders/c3/*_superseded_invented-drum-hits.mp4`.
