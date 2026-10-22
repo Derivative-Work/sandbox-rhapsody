@@ -58,3 +58,9 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **What:** The human reviewed `renders/c1/c1_sheet.jpg` and asked for two changes: "the vents are a little too subtle", and more things in most scenes ("this one is very sparse").
 - **Rule:** R1 (rejecting a render, with the reason in words). The agent makes the changes.
+
+## 2026-10-22T06:02:31-04:00 — C1 approved — R1
+
+- **What:** The human approved C1 ("much better, keep going"): `style/style_spec.md`, `config/look.json`, and the set A test frames `renders/c1/c1_v2_A_close.png` and `renders/c1/c1_v3_A_wide.png` (sheet `renders/c1/c1_v3_sheet.jpg`).
+- **Decided with it:** 60 fps; the coloured violet surround as the reading of "dark void"; the set A dressing as built.
+- **Rule:** R1.
