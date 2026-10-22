@@ -1,0 +1,10 @@
+{
+  "_doc": "Bar structure over the MIDI beat grid (beat indices into the shared tempo map). Each segment: downbeats every 4 beats from 'first_downbeat'. Derived in step 5 from bass/piano-bass changes, crashes, kick/snare placement and vocal phrase starts; see log/production_log.md (step 5) and timing/timing_map.md.",
+  "grid_shift_s": "measured",
+  "segments": [
+    {"first_downbeat": 1, "why": "piano intro: piano bass changes on beats 13, 17, 21, 25, 33"},
+    {"first_downbeat": 35, "why": "2-beat bar 33-35; voice enters with an eighth pickup into beat 35 (15.66 s); piano bass changes every 2 bars on 43, 51, 59, 67, 75, 79"},
+    {"first_downbeat": 101, "why": "2-beat bar 99-101 (drum fill 44.51 s on beat 99); band sections: bass changes, crashes and kick/snare all on beats = 1 mod 4 through the hard rock"},
+    {"first_downbeat": 610, "why": "5-beat bar 605-610; outro starts on 264.59 s; piano bass on beats 650, 654, 658, 662; coda drums enter on beat 682 (298.13 s)"}
+  ]
+}

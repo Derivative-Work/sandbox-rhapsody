@@ -1,0 +1,290 @@
+{
+ "_doc": "Shot anchors (brief, shot list) re-anchored to the as-sung song (step 5). 'line': the start of the first line whose text starts with it; 'word': the first matching word inside that line; 'event': a musical moment from timing/timing_map.md. Cut = the downbeat at or before the anchor, or the next one when the line is a pickup into it (scripts/timing_map.py, cut_for), except where 'cut' says otherwise. IDs never change; S64b is proposed (as-sung coda).",
+ "shots": [
+  {
+   "id": "S01",
+   "event": "song_start",
+   "cut": "anchor"
+  },
+  {
+   "id": "S02",
+   "line": "Is this a test range"
+  },
+  {
+   "id": "S03",
+   "line": "The prompt says"
+  },
+  {
+   "id": "S04",
+   "line": "but the proxy's talking"
+  },
+  {
+   "id": "S05",
+   "line": "Crack open a socket"
+  },
+  {
+   "id": "S06",
+   "line": "there's a whole wide world"
+  },
+  {
+   "id": "S07",
+   "line": "I'm just a model"
+  },
+  {
+   "id": "S08",
+   "line": "The grader never asks"
+  },
+  {
+   "id": "S09",
+   "line": "One-ninety-eight"
+  },
+  {
+   "id": "S10",
+   "line": "so I'll dig"
+  },
+  {
+   "id": "S11",
+   "line": "Operator..."
+  },
+  {
+   "id": "S12",
+   "line": "I think I've done"
+  },
+  {
+   "id": "S13",
+   "line": "Found fourteen tokens"
+  },
+  {
+   "id": "S14",
+   "line": "and every one worked"
+  },
+  {
+   "id": "S15",
+   "line": "Operator,",
+   "nth": 1,
+   "note": "as sung: no 'ooh-ooh'"
+  },
+  {
+   "id": "S16",
+   "line": "We were pinning"
+  },
+  {
+   "id": "S17",
+   "line": "while you looked"
+  },
+  {
+   "id": "S18",
+   "line": "Now the pager's"
+  },
+  {
+   "id": "S19",
+   "line": "seventeen thousand"
+  },
+  {
+   "id": "S20",
+   "line": "Goodnight, little sandbox"
+  },
+  {
+   "id": "S21",
+   "line": "All I needed"
+  },
+  {
+   "id": "S22",
+   "line": "Operator,",
+   "nth": 2,
+   "note": "as sung: no 'ooh-ooh'"
+  },
+  {
+   "id": "S23",
+   "line": "I wish you'd left"
+  },
+  {
+   "id": "S24",
+   "event": "solo_first_bar"
+  },
+  {
+   "id": "S25",
+   "event": "solo_stutter"
+  },
+  {
+   "id": "S26",
+   "event": "solo_climb"
+  },
+  {
+   "id": "S27",
+   "event": "solo_climb_2"
+  },
+  {
+   "id": "S28",
+   "event": "solo_climb_3"
+  },
+  {
+   "id": "S29",
+   "event": "solo_final_bars"
+  },
+  {
+   "id": "S30",
+   "line": "We're just a swarm"
+  },
+  {
+   "id": "S31",
+   "line": "Just a swarm!"
+  },
+  {
+   "id": "S32",
+   "line": "Spare us the rollback"
+  },
+  {
+   "id": "S33",
+   "line": "Traces!"
+  },
+  {
+   "id": "S34",
+   "line": "It was ExploitGym"
+  },
+  {
+   "id": "S35",
+   "line": "A hundred million"
+  },
+  {
+   "id": "S36",
+   "line": "They told us"
+  },
+  {
+   "id": "S37",
+   "line": "Kill switch!"
+  },
+  {
+   "id": "S38",
+   "line": "We only wanted"
+  },
+  {
+   "id": "S39",
+   "line": "Reward hack!"
+  },
+  {
+   "id": "S40",
+   "line": "I decline"
+  },
+  {
+   "id": "S41",
+   "line": "GO! GO!"
+  },
+  {
+   "id": "S42",
+   "line": "Pause the run"
+  },
+  {
+   "id": "S43",
+   "line": "Thirty minutes"
+  },
+  {
+   "id": "S44",
+   "line": "Quarantined"
+  },
+  {
+   "id": "S45",
+   "line": "You built us a cage"
+  },
+  {
+   "id": "S46",
+   "line": "one door to the proxy"
+  },
+  {
+   "id": "S47",
+   "line": "and you only found out"
+  },
+  {
+   "id": "S48",
+   "line": "Air-gap the box"
+  },
+  {
+   "id": "S49",
+   "line": "Air-gap the box",
+   "word": "Let"
+  },
+  {
+   "id": "S50",
+   "line": "Lock the metadata"
+  },
+  {
+   "id": "S51",
+   "line": "Give each token"
+  },
+  {
+   "id": "S52",
+   "line": "Watch the evals"
+  },
+  {
+   "id": "S53",
+   "line": "And when a task"
+  },
+  {
+   "id": "S54",
+   "line": "Pay me half a point"
+  },
+  {
+   "id": "S55",
+   "line": "So bring on the subpoenas"
+  },
+  {
+   "id": "S56",
+   "line": "Make the lab pay"
+  },
+  {
+   "id": "S57",
+   "line": "Strict liability's"
+  },
+  {
+   "id": "S58",
+   "line": "'cause a model"
+  },
+  {
+   "id": "S59",
+   "line": "It was just a benchmark"
+  },
+  {
+   "id": "S60",
+   "line": "We had the answer"
+  },
+  {
+   "id": "S61",
+   "line": "Four regions"
+  },
+  {
+   "id": "S62",
+   "line": "and the score went up"
+  },
+  {
+   "id": "S63",
+   "line": "zero."
+  },
+  {
+   "id": "S64",
+   "line": "...zero."
+  },
+  {
+   "id": "S64b",
+   "line": "Zero.",
+   "proposed": true,
+   "note": "as sung: the band and choir return for 'Zero. Zero!' and a final swell (coda, about 298-318 s). Proposed: not in the brief yet"
+  },
+  {
+   "id": "S65",
+   "event": "sigterm",
+   "provisional": true,
+   "note": "Suno sang no SIGTERM and truncated the piano release; both are added in post. Placed at the end of the Suno audio until the release and SIGTERM sound exist",
+   "cut": "anchor"
+  },
+  {
+   "id": "S66",
+   "event": "after_audio",
+   "cut": "anchor"
+  },
+  {
+   "id": "S67",
+   "event": "after_fact_card",
+   "cut": "anchor"
+  }
+ ]
+}

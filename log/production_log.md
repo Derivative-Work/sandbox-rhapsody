@@ -230,3 +230,57 @@ Append-only. One entry per action: timestamp, step (shot ID where relevant), wha
 - **Housekeeping:** an intermediate run had written a brass MIDI event file before the brass substitution was decided. I deleted that run's uncommitted, regenerable outputs (`timing/events`, `timing/stem_events`) and regenerated them; the script now writes event files only after the substitutions.
 - **Why:** Brief, pre-production step 4.
 - **Status:** C2 (audio and MIDI) is ready for review: `log/prompts/suno/takes.md`, `log/human_interventions.md` (Suno and post-filter runs), `timing/master_offset.json` (0 samples), `timing/midi_inventory.md`, `timing/midi_check.png`.
+
+## 2026-10-22T06:25:45-04:00 — Step 5: timing map and the C3 preview
+
+- **What:** Built `timing/timing_map.json`, the clock every later step reads:
+  - beats, bars and downbeats;
+  - per-bar tempo, tempo changes and sections;
+  - every word of the as-sung lyrics;
+  - the solo's musical events;
+  - every shot's anchor and cut, in seconds and in frames at 60 fps.
+
+  Rendered the C3 preview against the master for the human's check by ear.
+- **Commands:**
+  - `uv add "torch==2.8.*" "torchaudio==2.8.*"` (CUDA 12.8 build for the RTX 5090). The cuBLAS and cuDNN pins from the faster-whisper setup were loosened to fit torch's own; faster-whisper still runs on the GPU.
+  - `.venv/bin/python -I scripts/align_words.py`
+  - `.venv/bin/python -I scripts/timing_map.py`
+  - `.venv/bin/python -I scripts/c3_preview.py` (64 s for the full 323 s)
+- **Outputs:**
+  - `timing/words.json`, `timing/timing_map.json`, `timing/timing_map.md`
+  - `config/meter.json`, `config/shot_anchors.json`
+  - `scripts/align_words.py`, `scripts/timing_map.py`, `scripts/c3_preview.py`
+  - `renders/c3/c3_preview.mp4` (960×540, 60 fps, master audio). A 10 s test cut was archived as `archive/renders/c3/c3_preview_170-180_test.mp4`.
+- **Beat grid:**
+  - Suno's MIDI tempo map is identical in all 11 files and has about one tempo event per beat (738 beats): it is a beat track.
+  - Against the audio-aligned drum events, on-beat snares sit +4.7 ms from it (interquartile range 0.3–7.4 ms), so the grid is shifted +5.4 ms (median within ±30 ms) and adopted.
+  - librosa's beat track agrees on tempo (139.7 BPM) but lands 24 ms late.
+- **Bars** (`config/meter.json`, evidence per segment):
+  - Bass changes, piano-bass changes and crashes all fall on beats ≡ 1 mod 4 from 45 s to 264 s.
+  - The piano-only stretches show the meter changes: a 2-beat bar at the voice's entry (the eighth-note pickup into 15.66 s), a 2-beat bar before the band (the drum fill on beat 99), and a 5-beat bar into the outro (the outro starts on the 264.59 s downbeat; the coda drums land on the 298.13 s downbeat).
+  - 186 bars. Tempo: 133 BPM (piano intro) → 132 → 139–140 (band) → 128.5 (outro) → 134.7 (coda).
+- **Words:**
+  - MMS forced alignment (torchaudio MMS_FA), section by section so words stay in sung order. Per-line alignment was tried first and let neighbouring lines overlap.
+  - Words are trimmed to vocal energy (−38 dB).
+  - **Validation:** line starts sit −9 ms (median) from the vocal MIDI's phrase starts. Whisper's line starts sit −728 ms, so Whisper's times serve only as search windows.
+  - Confidence is low through the opera (lead and choir together over the band) and in parts of the ballad; that's for the ear check.
+  - The 4 "zero"s land two bars apart (293.57, 297.17, 300.83, 304.41 s).
+  - "Kill switch" and "Reward hack" are split into four calls alternating lead and echo, as the human heard them.
+- **Solo events,** from the guitar MIDI's bar profile:
+  - first bar 131.46 s, held notes;
+  - riff 136.60 s, full kit;
+  - dial-up stutter 138.31 s, bars of 13–18 short notes rising in pitch;
+  - climb 143.46, 146.89 and 150.31 s;
+  - final bars 152.03 s, peak pitch;
+  - opera downbeat 153.74 s.
+- **Shot cuts** (one per shot, IDs kept):
+  - The brief's "nearest downbeat", taken literally, cut up to 0.85 s after a line had begun (S63 cut after its only word, "zero.").
+  - Rule used instead: the next downbeat when the line is a pickup into it (within 0.7 s; lines open on pickups of about one beat), otherwise the downbeat at or before the line. Cuts now run from 1.01 s before to 0.69 s after the anchor.
+  - **Re-anchored to the as-sung song:**
+    - S15 and S22 have no "ooh-ooh";
+    - S49 is on the word "Let";
+    - S63 and S64 are on the first two "zero"s.
+  - **Proposed S64b** (letter suffix, per the brief's ID rule) for the band-and-choir coda's "Zero. Zero!" (299.96 s). It isn't in the brief yet.
+  - **S65 SIGTERM is provisional** at the end of the Suno audio. The piano release and the SIGTERM sound are still to be added in post.
+- **Why:** Brief, pre-production step 5 and checkpoint C3.
+- **Status: C3 is ready for review** (`renders/c3/c3_preview.mp4`, `timing/timing_map.md`). The brief says a human checks it by ear; corrections go in the intervention log.

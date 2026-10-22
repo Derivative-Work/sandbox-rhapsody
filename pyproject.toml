@@ -12,10 +12,12 @@ dependencies = [
     "mido",
     "pretty_midi",
     "faster-whisper",
-    "nvidia-cublas-cu12>=12.9.2.10",
-    "nvidia-cudnn-cu12==9.*",
+    "nvidia-cublas-cu12",
+    "nvidia-cudnn-cu12",
     "scikit-learn>=1.9.1",
     "opencv-python-headless>=5.0.0.93",
+    "torch==2.8.*",
+    "torchaudio==2.8.*",
 ]
 
 [tool.uv]
@@ -25,3 +27,13 @@ package = false
 dev = [
     "matplotlib>=3.11.2",
 ]
+
+# CUDA 12.8 PyTorch for the RTX 5090 (Blackwell, sm_120), used for forced alignment (torchaudio MMS_FA).
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+torchaudio = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

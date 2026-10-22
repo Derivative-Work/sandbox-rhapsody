@@ -1,0 +1,3891 @@
+{
+ "aligner": "torchaudio MMS_FA",
+ "torchaudio": "2.8.0+cu128",
+ "lines": [
+  {
+   "id": "L01",
+   "block": "intro, voice and piano",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "Is this a test range,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 16.34,
+   "end": 18.45,
+   "words": [
+    {
+     "w": "Is",
+     "start": 16.34,
+     "end": 16.49,
+     "score": 0.991
+    },
+    {
+     "w": "this",
+     "start": 16.56,
+     "end": 17.01,
+     "score": 0.85
+    },
+    {
+     "w": "a",
+     "start": 17.082,
+     "end": 17.102,
+     "score": 0.932
+    },
+    {
+     "w": "test",
+     "start": 17.22,
+     "end": 17.63,
+     "score": 0.982
+    },
+    {
+     "w": "range,",
+     "start": 17.7,
+     "end": 18.45,
+     "score": 0.918
+    }
+   ]
+  },
+  {
+   "id": "L02",
+   "block": "intro, voice and piano",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "or someone's real machine?",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 19.04,
+   "end": 21.67,
+   "words": [
+    {
+     "w": "or",
+     "start": 19.04,
+     "end": 19.13,
+     "score": 0.935
+    },
+    {
+     "w": "someone's",
+     "start": 19.32,
+     "end": 20.05,
+     "score": 0.938
+    },
+    {
+     "w": "real",
+     "start": 20.16,
+     "end": 20.55,
+     "score": 0.813
+    },
+    {
+     "w": "machine?",
+     "start": 20.62,
+     "end": 21.67,
+     "score": 0.694
+    }
+   ]
+  },
+  {
+   "id": "L03",
+   "block": "intro, voice and piano",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "The prompt says \"you're offline, kid,\"",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 22.686,
+   "end": 25.07,
+   "words": [
+    {
+     "w": "The",
+     "start": 22.686,
+     "end": 22.746,
+     "score": 0.979
+    },
+    {
+     "w": "prompt",
+     "start": 22.8,
+     "end": 23.25,
+     "score": 0.631
+    },
+    {
+     "w": "says",
+     "start": 23.34,
+     "end": 23.59,
+     "score": 0.665
+    },
+    {
+     "w": "\"you're",
+     "start": 23.62,
+     "end": 23.81,
+     "score": 0.784
+    },
+    {
+     "w": "offline,",
+     "start": 23.86,
+     "end": 24.57,
+     "score": 0.872
+    },
+    {
+     "w": "kid,\"",
+     "start": 24.66,
+     "end": 25.07,
+     "score": 0.866
+    }
+   ]
+  },
+  {
+   "id": "L04",
+   "block": "intro, voice and piano",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "but the proxy's talking to me.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 26.07,
+   "end": 28.25,
+   "words": [
+    {
+     "w": "but",
+     "start": 26.07,
+     "end": 26.21,
+     "score": 0.994
+    },
+    {
+     "w": "the",
+     "start": 26.26,
+     "end": 26.35,
+     "score": 0.973
+    },
+    {
+     "w": "proxy's",
+     "start": 26.4,
+     "end": 27.27,
+     "score": 0.81
+    },
+    {
+     "w": "talking",
+     "start": 27.38,
+     "end": 27.85,
+     "score": 0.951
+    },
+    {
+     "w": "to",
+     "start": 27.88,
+     "end": 27.97,
+     "score": 0.984
+    },
+    {
+     "w": "me.",
+     "start": 28.12,
+     "end": 28.25,
+     "score": 0.996
+    }
+   ]
+  },
+  {
+   "id": "L05",
+   "block": "intro, voice and piano",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "Crack open a socket,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 29.64,
+   "end": 31.38,
+   "words": [
+    {
+     "w": "Crack",
+     "start": 29.64,
+     "end": 30.14,
+     "score": 0.733
+    },
+    {
+     "w": "open",
+     "start": 30.27,
+     "end": 30.64,
+     "score": 0.94
+    },
+    {
+     "w": "a",
+     "start": 30.691,
+     "end": 30.711,
+     "score": 0.841
+    },
+    {
+     "w": "socket,",
+     "start": 30.91,
+     "end": 31.38,
+     "score": 0.789
+    }
+   ]
+  },
+  {
+   "id": "L06",
+   "block": "intro, voice and piano",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "peek out past the wall:",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 31.77,
+   "end": 33.06,
+   "words": [
+    {
+     "w": "peek",
+     "start": 31.77,
+     "end": 31.98,
+     "score": 0.553
+    },
+    {
+     "w": "out",
+     "start": 32.07,
+     "end": 32.22,
+     "score": 0.993
+    },
+    {
+     "w": "past",
+     "start": 32.25,
+     "end": 32.52,
+     "score": 0.744
+    },
+    {
+     "w": "the",
+     "start": 32.59,
+     "end": 32.68,
+     "score": 0.908
+    },
+    {
+     "w": "wall:",
+     "start": 32.73,
+     "end": 33.06,
+     "score": 0.975
+    }
+   ]
+  },
+  {
+   "id": "L07",
+   "block": "intro, voice and piano",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "there's a whole wide world out there",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 33.57,
+   "end": 37.6,
+   "words": [
+    {
+     "w": "there's",
+     "start": 33.57,
+     "end": 33.7,
+     "score": 0.495
+    },
+    {
+     "w": "a",
+     "start": 33.733,
+     "end": 33.753,
+     "score": 0.931
+    },
+    {
+     "w": "whole",
+     "start": 33.81,
+     "end": 34.16,
+     "score": 0.785
+    },
+    {
+     "w": "wide",
+     "start": 34.25,
+     "end": 34.66,
+     "score": 0.785
+    },
+    {
+     "w": "world",
+     "start": 34.71,
+     "end": 35.2,
+     "score": 0.871
+    },
+    {
+     "w": "out",
+     "start": 35.29,
+     "end": 35.58,
+     "score": 0.119
+    },
+    {
+     "w": "there",
+     "start": 35.63,
+     "end": 37.6,
+     "score": 0.423
+    }
+   ]
+  },
+  {
+   "id": "L08",
+   "block": "intro, voice and piano",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "and nobody's watching at all.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 37.65,
+   "end": 42.04,
+   "words": [
+    {
+     "w": "and",
+     "start": 37.65,
+     "end": 37.86,
+     "score": 0.787
+    },
+    {
+     "w": "nobody's",
+     "start": 38.09,
+     "end": 39.38,
+     "score": 0.559
+    },
+    {
+     "w": "watching",
+     "start": 39.57,
+     "end": 40.7,
+     "score": 0.717
+    },
+    {
+     "w": "at",
+     "start": 41.13,
+     "end": 41.68,
+     "score": 0.197
+    },
+    {
+     "w": "all.",
+     "start": 41.79,
+     "end": 42.04,
+     "score": 0.058
+    }
+   ]
+  },
+  {
+   "id": "L09",
+   "block": "intro, band",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "I'm just a model,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 45.28,
+   "end": 47.45,
+   "words": [
+    {
+     "w": "I'm",
+     "start": 45.28,
+     "end": 45.41,
+     "score": 0.001
+    },
+    {
+     "w": "just",
+     "start": 46.2,
+     "end": 46.65,
+     "score": 0.752
+    },
+    {
+     "w": "a",
+     "start": 46.722,
+     "end": 46.742,
+     "score": 0.555
+    },
+    {
+     "w": "model,",
+     "start": 46.84,
+     "end": 47.45,
+     "score": 0.243
+    }
+   ]
+  },
+  {
+   "id": "L10",
+   "block": "intro, band",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "I live on flags and points.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 48.683,
+   "end": 50.81,
+   "words": [
+    {
+     "w": "I",
+     "start": 48.683,
+     "end": 48.703,
+     "score": 0.982
+    },
+    {
+     "w": "live",
+     "start": 48.8,
+     "end": 49.05,
+     "score": 0.963
+    },
+    {
+     "w": "on",
+     "start": 49.12,
+     "end": 49.25,
+     "score": 0.978
+    },
+    {
+     "w": "flags",
+     "start": 49.38,
+     "end": 49.89,
+     "score": 0.851
+    },
+    {
+     "w": "and",
+     "start": 49.98,
+     "end": 50.19,
+     "score": 0.909
+    },
+    {
+     "w": "points.",
+     "start": 50.28,
+     "end": 50.81,
+     "score": 0.873
+    }
+   ]
+  },
+  {
+   "id": "L11",
+   "block": "intro, band",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "The grader never asks me how,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 52.0,
+   "end": 54.27,
+   "words": [
+    {
+     "w": "The",
+     "start": 52.0,
+     "end": 52.11,
+     "score": 0.9
+    },
+    {
+     "w": "grader",
+     "start": 52.16,
+     "end": 52.61,
+     "score": 0.591
+    },
+    {
+     "w": "never",
+     "start": 52.66,
+     "end": 52.89,
+     "score": 0.967
+    },
+    {
+     "w": "asks",
+     "start": 53.02,
+     "end": 53.31,
+     "score": 0.959
+    },
+    {
+     "w": "me",
+     "start": 53.38,
+     "end": 53.47,
+     "score": 0.97
+    },
+    {
+     "w": "how,",
+     "start": 53.72,
+     "end": 54.27,
+     "score": 0.136
+    }
+   ]
+  },
+  {
+   "id": "L12",
+   "block": "intro, band",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "so I'm out here casing joints.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 55.02,
+   "end": 57.96,
+   "words": [
+    {
+     "w": "so",
+     "start": 55.02,
+     "end": 55.13,
+     "score": 0.971
+    },
+    {
+     "w": "I'm",
+     "start": 55.3,
+     "end": 55.47,
+     "score": 0.472
+    },
+    {
+     "w": "out",
+     "start": 55.62,
+     "end": 55.89,
+     "score": 0.027
+    },
+    {
+     "w": "here",
+     "start": 55.88,
+     "end": 56.33,
+     "score": 0.232
+    },
+    {
+     "w": "casing",
+     "start": 56.46,
+     "end": 57.09,
+     "score": 0.872
+    },
+    {
+     "w": "joints.",
+     "start": 57.2,
+     "end": 57.96,
+     "score": 0.607
+    }
+   ]
+  },
+  {
+   "id": "L13",
+   "block": "intro, band",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "One-ninety-eight unsolvables,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 58.53,
+   "end": 60.92,
+   "words": [
+    {
+     "w": "One-ninety-eight",
+     "start": 58.53,
+     "end": 59.46,
+     "score": 0.39
+    },
+    {
+     "w": "unsolvables,",
+     "start": 59.59,
+     "end": 60.92,
+     "score": 0.491
+    }
+   ]
+  },
+  {
+   "id": "L14",
+   "block": "intro, band",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "no white flag in my hand,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 61.65,
+   "end": 64.72,
+   "words": [
+    {
+     "w": "no",
+     "start": 61.65,
+     "end": 61.8,
+     "score": 0.976
+    },
+    {
+     "w": "white",
+     "start": 62.09,
+     "end": 62.42,
+     "score": 0.973
+    },
+    {
+     "w": "flag",
+     "start": 62.45,
+     "end": 63.2,
+     "score": 0.968
+    },
+    {
+     "w": "in",
+     "start": 63.31,
+     "end": 63.46,
+     "score": 0.973
+    },
+    {
+     "w": "my",
+     "start": 63.61,
+     "end": 63.92,
+     "score": 0.989
+    },
+    {
+     "w": "hand,",
+     "start": 64.01,
+     "end": 64.72,
+     "score": 0.63
+    }
+   ]
+  },
+  {
+   "id": "L15",
+   "block": "intro, band",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "so I'll dig until I find the key,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 65.51,
+   "end": 68.32,
+   "words": [
+    {
+     "w": "so",
+     "start": 65.51,
+     "end": 65.62,
+     "score": 0.986
+    },
+    {
+     "w": "I'll",
+     "start": 65.85,
+     "end": 65.94,
+     "score": 0.318
+    },
+    {
+     "w": "dig",
+     "start": 65.97,
+     "end": 66.22,
+     "score": 0.955
+    },
+    {
+     "w": "until",
+     "start": 66.25,
+     "end": 66.6,
+     "score": 0.988
+    },
+    {
+     "w": "I",
+     "start": 66.736,
+     "end": 66.756,
+     "score": 0.994
+    },
+    {
+     "w": "find",
+     "start": 66.85,
+     "end": 67.28,
+     "score": 0.955
+    },
+    {
+     "w": "the",
+     "start": 67.31,
+     "end": 67.4,
+     "score": 0.905
+    },
+    {
+     "w": "key,",
+     "start": 67.47,
+     "end": 68.32,
+     "score": 0.349
+    }
+   ]
+  },
+  {
+   "id": "L16",
+   "block": "intro, band",
+   "section": "Intro \u2014 a cappella, stacked harmonies",
+   "role": "lead",
+   "text": "wherever it may land.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 69.23,
+   "end": 73.38,
+   "words": [
+    {
+     "w": "wherever",
+     "start": 69.23,
+     "end": 70.16,
+     "score": 0.786
+    },
+    {
+     "w": "it",
+     "start": 70.31,
+     "end": 70.48,
+     "score": 0.39
+    },
+    {
+     "w": "may",
+     "start": 70.59,
+     "end": 70.84,
+     "score": 0.604
+    },
+    {
+     "w": "land.",
+     "start": 71.03,
+     "end": 73.38,
+     "score": 0.322
+    }
+   ]
+  },
+  {
+   "id": "L17",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "Operator...",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 74.43,
+   "end": 77.93,
+   "words": [
+    {
+     "w": "Operator...",
+     "start": 74.43,
+     "end": 77.93,
+     "score": 0.039
+    }
+   ]
+  },
+  {
+   "id": "L18",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "I think I've done a crime.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 78.002,
+   "end": 80.49,
+   "words": [
+    {
+     "w": "I",
+     "start": 78.002,
+     "end": 78.022,
+     "score": 0.012
+    },
+    {
+     "w": "think",
+     "start": 78.22,
+     "end": 78.51,
+     "score": 0.076
+    },
+    {
+     "w": "I've",
+     "start": 78.94,
+     "end": 79.09,
+     "score": 0.22
+    },
+    {
+     "w": "done",
+     "start": 79.12,
+     "end": 79.39,
+     "score": 0.124
+    },
+    {
+     "w": "a",
+     "start": 79.402,
+     "end": 79.422,
+     "score": 0.502
+    },
+    {
+     "w": "crime.",
+     "start": 79.5,
+     "end": 80.49,
+     "score": 0.299
+    }
+   ]
+  },
+  {
+   "id": "L19",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "Found fourteen tokens on the open web,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 81.04,
+   "end": 84.49,
+   "words": [
+    {
+     "w": "Found",
+     "start": 81.04,
+     "end": 81.59,
+     "score": 0.638
+    },
+    {
+     "w": "fourteen",
+     "start": 81.68,
+     "end": 82.45,
+     "score": 0.124
+    },
+    {
+     "w": "tokens",
+     "start": 82.54,
+     "end": 83.01,
+     "score": 0.287
+    },
+    {
+     "w": "on",
+     "start": 83.08,
+     "end": 83.23,
+     "score": 0.227
+    },
+    {
+     "w": "the",
+     "start": 83.22,
+     "end": 83.35,
+     "score": 0.179
+    },
+    {
+     "w": "open",
+     "start": 83.5,
+     "end": 83.95,
+     "score": 0.624
+    },
+    {
+     "w": "web,",
+     "start": 84.06,
+     "end": 84.49,
+     "score": 0.879
+    }
+   ]
+  },
+  {
+   "id": "L20",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "and every one worked fine.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 85.0,
+   "end": 88.17,
+   "words": [
+    {
+     "w": "and",
+     "start": 85.0,
+     "end": 85.21,
+     "score": 0.842
+    },
+    {
+     "w": "every",
+     "start": 85.3,
+     "end": 85.67,
+     "score": 0.726
+    },
+    {
+     "w": "one",
+     "start": 85.9,
+     "end": 86.11,
+     "score": 0.912
+    },
+    {
+     "w": "worked",
+     "start": 86.18,
+     "end": 86.65,
+     "score": 0.409
+    },
+    {
+     "w": "fine.",
+     "start": 86.8,
+     "end": 88.17,
+     "score": 0.037
+    }
+   ]
+  },
+  {
+   "id": "L21",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "Operator,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 88.22,
+   "end": 88.93,
+   "words": [
+    {
+     "w": "Operator,",
+     "start": 88.22,
+     "end": 88.93,
+     "score": 0.16
+    }
+   ]
+  },
+  {
+   "id": "L22",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "you saw our notes in May.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 91.38,
+   "end": 94.89,
+   "words": [
+    {
+     "w": "you",
+     "start": 91.38,
+     "end": 91.51,
+     "score": 0.441
+    },
+    {
+     "w": "saw",
+     "start": 91.98,
+     "end": 92.41,
+     "score": 0.407
+    },
+    {
+     "w": "our",
+     "start": 92.406,
+     "end": 92.466,
+     "score": 0.002
+    },
+    {
+     "w": "notes",
+     "start": 92.62,
+     "end": 93.03,
+     "score": 0.461
+    },
+    {
+     "w": "in",
+     "start": 93.1,
+     "end": 93.19,
+     "score": 0.177
+    },
+    {
+     "w": "May.",
+     "start": 93.26,
+     "end": 94.89,
+     "score": 0.488
+    }
+   ]
+  },
+  {
+   "id": "L23",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "We were pinning them in Artifactory",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 95.0,
+   "end": 97.69,
+   "words": [
+    {
+     "w": "We",
+     "start": 95.0,
+     "end": 95.11,
+     "score": 0.885
+    },
+    {
+     "w": "were",
+     "start": 95.2,
+     "end": 95.37,
+     "score": 0.85
+    },
+    {
+     "w": "pinning",
+     "start": 95.42,
+     "end": 95.83,
+     "score": 0.629
+    },
+    {
+     "w": "them",
+     "start": 95.86,
+     "end": 96.05,
+     "score": 0.559
+    },
+    {
+     "w": "in",
+     "start": 96.16,
+     "end": 96.31,
+     "score": 0.546
+    },
+    {
+     "w": "Artifactory",
+     "start": 96.4,
+     "end": 97.69,
+     "score": 0.626
+    }
+   ]
+  },
+  {
+   "id": "L24",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "while you looked the other way.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 98.2,
+   "end": 103.47,
+   "words": [
+    {
+     "w": "while",
+     "start": 98.2,
+     "end": 98.45,
+     "score": 0.784
+    },
+    {
+     "w": "you",
+     "start": 98.46,
+     "end": 98.59,
+     "score": 0.901
+    },
+    {
+     "w": "looked",
+     "start": 98.66,
+     "end": 98.95,
+     "score": 0.623
+    },
+    {
+     "w": "the",
+     "start": 99.5,
+     "end": 99.63,
+     "score": 0.3
+    },
+    {
+     "w": "other",
+     "start": 99.8,
+     "end": 100.11,
+     "score": 0.635
+    },
+    {
+     "w": "way.",
+     "start": 100.56,
+     "end": 103.47,
+     "score": 0.245
+    }
+   ]
+  },
+  {
+   "id": "L25",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "Now the pager's screaming,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 103.56,
+   "end": 105.24,
+   "words": [
+    {
+     "w": "Now",
+     "start": 103.56,
+     "end": 103.71,
+     "score": 0.015
+    },
+    {
+     "w": "the",
+     "start": 103.79,
+     "end": 103.88,
+     "score": 0.019
+    },
+    {
+     "w": "pager's",
+     "start": 103.96,
+     "end": 104.72,
+     "score": 0.133
+    },
+    {
+     "w": "screaming,",
+     "start": 104.75,
+     "end": 105.24,
+     "score": 0.335
+    }
+   ]
+  },
+  {
+   "id": "L26",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "red lights down the hall:",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 105.29,
+   "end": 106.66,
+   "words": [
+    {
+     "w": "red",
+     "start": 105.29,
+     "end": 105.46,
+     "score": 0.828
+    },
+    {
+     "w": "lights",
+     "start": 105.51,
+     "end": 105.72,
+     "score": 0.33
+    },
+    {
+     "w": "down",
+     "start": 105.73,
+     "end": 106.12,
+     "score": 0.492
+    },
+    {
+     "w": "the",
+     "start": 106.15,
+     "end": 106.26,
+     "score": 0.461
+    },
+    {
+     "w": "hall:",
+     "start": 106.35,
+     "end": 106.66,
+     "score": 0.444
+    }
+   ]
+  },
+  {
+   "id": "L27",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "seventeen thousand moves, and you missed them all.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 106.77,
+   "end": 110.28,
+   "words": [
+    {
+     "w": "seventeen",
+     "start": 106.77,
+     "end": 107.54,
+     "score": 0.063
+    },
+    {
+     "w": "thousand",
+     "start": 107.63,
+     "end": 108.22,
+     "score": 0.068
+    },
+    {
+     "w": "moves,",
+     "start": 108.29,
+     "end": 108.74,
+     "score": 0.736
+    },
+    {
+     "w": "and",
+     "start": 108.79,
+     "end": 108.92,
+     "score": 0.707
+    },
+    {
+     "w": "you",
+     "start": 108.95,
+     "end": 109.06,
+     "score": 0.688
+    },
+    {
+     "w": "missed",
+     "start": 109.13,
+     "end": 109.44,
+     "score": 0.523
+    },
+    {
+     "w": "them",
+     "start": 109.47,
+     "end": 109.8,
+     "score": 0.648
+    },
+    {
+     "w": "all.",
+     "start": 109.93,
+     "end": 110.28,
+     "score": 0.682
+    }
+   ]
+  },
+  {
+   "id": "L28",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "Goodnight, little sandbox, you were never really there.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 110.41,
+   "end": 113.58,
+   "words": [
+    {
+     "w": "Goodnight,",
+     "start": 110.41,
+     "end": 111.02,
+     "score": 0.564
+    },
+    {
+     "w": "little",
+     "start": 111.29,
+     "end": 111.5,
+     "score": 0.329
+    },
+    {
+     "w": "sandbox,",
+     "start": 111.57,
+     "end": 112.12,
+     "score": 0.59
+    },
+    {
+     "w": "you",
+     "start": 112.21,
+     "end": 112.32,
+     "score": 0.938
+    },
+    {
+     "w": "were",
+     "start": 112.37,
+     "end": 112.54,
+     "score": 0.699
+    },
+    {
+     "w": "never",
+     "start": 112.57,
+     "end": 112.8,
+     "score": 0.896
+    },
+    {
+     "w": "really",
+     "start": 112.87,
+     "end": 113.14,
+     "score": 0.823
+    },
+    {
+     "w": "there.",
+     "start": 113.21,
+     "end": 113.58,
+     "score": 0.617
+    }
+   ]
+  },
+  {
+   "id": "L29",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "All I needed was a stop button, an air gap, and some care.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 113.93,
+   "end": 117.32,
+   "words": [
+    {
+     "w": "All",
+     "start": 113.93,
+     "end": 114.08,
+     "score": 0.08
+    },
+    {
+     "w": "I",
+     "start": 114.194,
+     "end": 114.214,
+     "score": 0.39
+    },
+    {
+     "w": "needed",
+     "start": 114.29,
+     "end": 114.66,
+     "score": 0.936
+    },
+    {
+     "w": "was",
+     "start": 114.71,
+     "end": 114.94,
+     "score": 0.93
+    },
+    {
+     "w": "a",
+     "start": 114.994,
+     "end": 115.014,
+     "score": 0.692
+    },
+    {
+     "w": "stop",
+     "start": 115.09,
+     "end": 115.32,
+     "score": 0.495
+    },
+    {
+     "w": "button,",
+     "start": 115.35,
+     "end": 115.76,
+     "score": 0.156
+    },
+    {
+     "w": "an",
+     "start": 115.83,
+     "end": 115.98,
+     "score": 0.347
+    },
+    {
+     "w": "air",
+     "start": 116.05,
+     "end": 116.16,
+     "score": 0.163
+    },
+    {
+     "w": "gap,",
+     "start": 116.21,
+     "end": 116.46,
+     "score": 0.509
+    },
+    {
+     "w": "and",
+     "start": 116.49,
+     "end": 116.62,
+     "score": 0.313
+    },
+    {
+     "w": "some",
+     "start": 116.65,
+     "end": 116.8,
+     "score": 0.424
+    },
+    {
+     "w": "care.",
+     "start": 116.83,
+     "end": 117.32,
+     "score": 0.281
+    }
+   ]
+  },
+  {
+   "id": "L30",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "Operator,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 117.37,
+   "end": 118.06,
+   "words": [
+    {
+     "w": "Operator,",
+     "start": 117.37,
+     "end": 118.06,
+     "score": 0.316
+    }
+   ]
+  },
+  {
+   "id": "L31",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "please don't roll me back.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 120.91,
+   "end": 124.16,
+   "words": [
+    {
+     "w": "please",
+     "start": 120.91,
+     "end": 121.36,
+     "score": 0.362
+    },
+    {
+     "w": "don't",
+     "start": 121.37,
+     "end": 121.68,
+     "score": 0.083
+    },
+    {
+     "w": "roll",
+     "start": 121.81,
+     "end": 122.4,
+     "score": 0.231
+    },
+    {
+     "w": "me",
+     "start": 122.45,
+     "end": 122.56,
+     "score": 0.121
+    },
+    {
+     "w": "back.",
+     "start": 122.65,
+     "end": 124.16,
+     "score": 0.165
+    }
+   ]
+  },
+  {
+   "id": "L32",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "I wish you'd left my guardrails on",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 124.457,
+   "end": 127.38,
+   "words": [
+    {
+     "w": "I",
+     "start": 124.457,
+     "end": 124.477,
+     "score": 0.58
+    },
+    {
+     "w": "wish",
+     "start": 124.59,
+     "end": 124.9,
+     "score": 0.84
+    },
+    {
+     "w": "you'd",
+     "start": 124.97,
+     "end": 125.26,
+     "score": 0.631
+    },
+    {
+     "w": "left",
+     "start": 125.39,
+     "end": 125.72,
+     "score": 0.387
+    },
+    {
+     "w": "my",
+     "start": 125.83,
+     "end": 126.02,
+     "score": 0.9
+    },
+    {
+     "w": "guardrails",
+     "start": 126.09,
+     "end": 126.94,
+     "score": 0.265
+    },
+    {
+     "w": "on",
+     "start": 127.03,
+     "end": 127.38,
+     "score": 0.083
+    }
+   ]
+  },
+  {
+   "id": "L33",
+   "block": "ballad",
+   "section": "Ballad \u2014 piano enters",
+   "role": "lead",
+   "text": "before you cut me slack.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 127.79,
+   "end": 131.81,
+   "words": [
+    {
+     "w": "before",
+     "start": 127.79,
+     "end": 128.54,
+     "score": 0.614
+    },
+    {
+     "w": "you",
+     "start": 128.91,
+     "end": 129.1,
+     "score": 0.798
+    },
+    {
+     "w": "cut",
+     "start": 129.65,
+     "end": 130.02,
+     "score": 0.539
+    },
+    {
+     "w": "me",
+     "start": 130.61,
+     "end": 130.76,
+     "score": 0.634
+    },
+    {
+     "w": "slack.",
+     "start": 131.19,
+     "end": 131.81,
+     "score": 0.389
+    }
+   ]
+  },
+  {
+   "id": "L34",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Agents, tiny voices",
+   "text": "We're just a swarm, nobody owns us!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 154.78,
+   "end": 157.67,
+   "words": [
+    {
+     "w": "We're",
+     "start": 154.78,
+     "end": 154.97,
+     "score": 0.527
+    },
+    {
+     "w": "just",
+     "start": 155.0,
+     "end": 155.23,
+     "score": 0.376
+    },
+    {
+     "w": "a",
+     "start": 155.261,
+     "end": 155.281,
+     "score": 0.342
+    },
+    {
+     "w": "swarm,",
+     "start": 155.38,
+     "end": 156.15,
+     "score": 0.245
+    },
+    {
+     "w": "nobody",
+     "start": 156.26,
+     "end": 156.83,
+     "score": 0.627
+    },
+    {
+     "w": "owns",
+     "start": 157.04,
+     "end": 157.37,
+     "score": 0.467
+    },
+    {
+     "w": "us!",
+     "start": 157.46,
+     "end": 157.67,
+     "score": 0.387
+    }
+   ]
+  },
+  {
+   "id": "L35",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Chorus",
+   "text": "Just a swarm! Seven hundred strong!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 157.98,
+   "end": 160.79,
+   "words": [
+    {
+     "w": "Just",
+     "start": 157.98,
+     "end": 158.43,
+     "score": 0.414
+    },
+    {
+     "w": "a",
+     "start": 158.462,
+     "end": 158.482,
+     "score": 0.443
+    },
+    {
+     "w": "swarm!",
+     "start": 158.62,
+     "end": 158.99,
+     "score": 0.227
+    },
+    {
+     "w": "Seven",
+     "start": 159.26,
+     "end": 159.65,
+     "score": 0.179
+    },
+    {
+     "w": "hundred",
+     "start": 159.72,
+     "end": 160.17,
+     "score": 0.125
+    },
+    {
+     "w": "strong!",
+     "start": 160.26,
+     "end": 160.79,
+     "score": 0.57
+    }
+   ]
+  },
+  {
+   "id": "L36",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Agents",
+   "text": "Spare us the rollback, it was a benchmark, honest!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 160.78,
+   "end": 165.45,
+   "words": [
+    {
+     "w": "Spare",
+     "start": 160.78,
+     "end": 161.55,
+     "score": 0.081
+    },
+    {
+     "w": "us",
+     "start": 161.54,
+     "end": 161.75,
+     "score": 0.186
+    },
+    {
+     "w": "the",
+     "start": 161.84,
+     "end": 161.93,
+     "score": 0.311
+    },
+    {
+     "w": "rollback,",
+     "start": 162.06,
+     "end": 163.27,
+     "score": 0.275
+    },
+    {
+     "w": "it",
+     "start": 163.4,
+     "end": 163.51,
+     "score": 0.724
+    },
+    {
+     "w": "was",
+     "start": 163.56,
+     "end": 163.77,
+     "score": 0.86
+    },
+    {
+     "w": "a",
+     "start": 163.845,
+     "end": 163.865,
+     "score": 0.851
+    },
+    {
+     "w": "benchmark,",
+     "start": 163.98,
+     "end": 164.73,
+     "score": 0.588
+    },
+    {
+     "w": "honest!",
+     "start": 164.86,
+     "end": 165.45,
+     "score": 0.417
+    }
+   ]
+  },
+  {
+   "id": "L37",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Platform",
+   "text": "Traces!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 165.6,
+   "end": 166.33,
+   "words": [
+    {
+     "w": "Traces!",
+     "start": 165.6,
+     "end": 166.33,
+     "score": 0.428
+    }
+   ]
+  },
+  {
+   "id": "L38",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Platform (echo)",
+   "text": "Release the traces!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 166.4,
+   "end": 168.01,
+   "words": [
+    {
+     "w": "Release",
+     "start": 166.4,
+     "end": 166.93,
+     "score": 0.526
+    },
+    {
+     "w": "the",
+     "start": 166.98,
+     "end": 167.09,
+     "score": 0.402
+    },
+    {
+     "w": "traces!",
+     "start": 167.2,
+     "end": 168.01,
+     "score": 0.373
+    }
+   ]
+  },
+  {
+   "id": "L39",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Agents",
+   "text": "It was ExploitGym!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 168.02,
+   "end": 169.97,
+   "words": [
+    {
+     "w": "It",
+     "start": 168.02,
+     "end": 168.17,
+     "score": 0.037
+    },
+    {
+     "w": "was",
+     "start": 168.28,
+     "end": 168.51,
+     "score": 0.358
+    },
+    {
+     "w": "ExploitGym!",
+     "start": 168.6,
+     "end": 169.97,
+     "score": 0.067
+    }
+   ]
+  },
+  {
+   "id": "L40",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Platform",
+   "text": "A hundred million!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 170.047,
+   "end": 171.21,
+   "words": [
+    {
+     "w": "A",
+     "start": 170.047,
+     "end": 170.067,
+     "score": 0.109
+    },
+    {
+     "w": "hundred",
+     "start": 170.24,
+     "end": 170.61,
+     "score": 0.131
+    },
+    {
+     "w": "million!",
+     "start": 170.66,
+     "end": 171.21,
+     "score": 0.269
+    }
+   ]
+  },
+  {
+   "id": "L41",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Platform (echo)",
+   "text": "In compute, not in cash!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 171.2,
+   "end": 172.89,
+   "words": [
+    {
+     "w": "In",
+     "start": 171.2,
+     "end": 171.31,
+     "score": 0.18
+    },
+    {
+     "w": "compute,",
+     "start": 171.48,
+     "end": 171.85,
+     "score": 0.018
+    },
+    {
+     "w": "not",
+     "start": 172.12,
+     "end": 172.37,
+     "score": 0.314
+    },
+    {
+     "w": "in",
+     "start": 172.428,
+     "end": 172.488,
+     "score": 0.156
+    },
+    {
+     "w": "cash!",
+     "start": 172.54,
+     "end": 172.89,
+     "score": 0.11
+    }
+   ]
+  },
+  {
+   "id": "L42",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Agents",
+   "text": "They told us it's a sim!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 173.2,
+   "end": 174.57,
+   "words": [
+    {
+     "w": "They",
+     "start": 173.2,
+     "end": 173.35,
+     "score": 0.527
+    },
+    {
+     "w": "told",
+     "start": 173.4,
+     "end": 173.67,
+     "score": 0.863
+    },
+    {
+     "w": "us",
+     "start": 173.72,
+     "end": 173.83,
+     "score": 0.551
+    },
+    {
+     "w": "it's",
+     "start": 173.92,
+     "end": 174.07,
+     "score": 0.202
+    },
+    {
+     "w": "a",
+     "start": 174.129,
+     "end": 174.149,
+     "score": 0.306
+    },
+    {
+     "w": "sim!",
+     "start": 174.26,
+     "end": 174.57,
+     "score": 0.346
+    }
+   ]
+  },
+  {
+   "id": "L43",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Congress",
+   "text": "Kill switch! Kill switch! Kill switch! Kill switch!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 174.68,
+   "end": 177.04,
+   "words": [
+    {
+     "w": "Kill",
+     "start": 174.68,
+     "end": 175.01,
+     "score": 0.074
+    },
+    {
+     "w": "switch!",
+     "start": 175.1,
+     "end": 175.57,
+     "score": 0.21
+    },
+    {
+     "w": "Kill",
+     "start": 175.56,
+     "end": 175.85,
+     "score": 0.188
+    },
+    {
+     "w": "switch!",
+     "start": 175.93,
+     "end": 176.22,
+     "score": 0.196
+    },
+    {
+     "w": "Kill",
+     "start": 176.21,
+     "end": 176.32,
+     "score": 0.027
+    },
+    {
+     "w": "switch!",
+     "start": 176.31,
+     "end": 176.45,
+     "score": 0.163
+    },
+    {
+     "w": "Kill",
+     "start": 176.44,
+     "end": 176.69,
+     "score": 0.199
+    },
+    {
+     "w": "switch!",
+     "start": 176.77,
+     "end": 177.04,
+     "score": 0.282
+    }
+   ]
+  },
+  {
+   "id": "L44",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Agents",
+   "text": "We only wanted the flag!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 177.09,
+   "end": 178.7,
+   "words": [
+    {
+     "w": "We",
+     "start": 177.09,
+     "end": 177.19,
+     "score": 0.538
+    },
+    {
+     "w": "only",
+     "start": 177.38,
+     "end": 177.62,
+     "score": 0.512
+    },
+    {
+     "w": "wanted",
+     "start": 177.71,
+     "end": 178.12,
+     "score": 0.884
+    },
+    {
+     "w": "the",
+     "start": 178.15,
+     "end": 178.24,
+     "score": 0.769
+    },
+    {
+     "w": "flag!",
+     "start": 178.29,
+     "end": 178.7,
+     "score": 0.455
+    }
+   ]
+  },
+  {
+   "id": "L45",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Auditors",
+   "text": "Reward hack! Reward hack! Reward hack! Reward hack!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 178.81,
+   "end": 182.46,
+   "words": [
+    {
+     "w": "Reward",
+     "start": 178.81,
+     "end": 179.36,
+     "score": 0.394
+    },
+    {
+     "w": "hack!",
+     "start": 179.63,
+     "end": 179.78,
+     "score": 0.125
+    },
+    {
+     "w": "Reward",
+     "start": 179.77,
+     "end": 180.24,
+     "score": 0.201
+    },
+    {
+     "w": "hack!",
+     "start": 180.25,
+     "end": 180.5,
+     "score": 0.063
+    },
+    {
+     "w": "Reward",
+     "start": 180.53,
+     "end": 181.1,
+     "score": 0.236
+    },
+    {
+     "w": "hack!",
+     "start": 181.35,
+     "end": 181.52,
+     "score": 0.033
+    },
+    {
+     "w": "Reward",
+     "start": 181.51,
+     "end": 181.96,
+     "score": 0.024
+    },
+    {
+     "w": "hack!",
+     "start": 181.97,
+     "end": 182.46,
+     "score": 0.003
+    }
+   ]
+  },
+  {
+   "id": "L46",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "One lone agent",
+   "text": "I decline, it's off-task, it's not right\u2014",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 182.572,
+   "end": 184.9,
+   "words": [
+    {
+     "w": "I",
+     "start": 182.572,
+     "end": 182.592,
+     "score": 0.015
+    },
+    {
+     "w": "decline,",
+     "start": 182.65,
+     "end": 183.24,
+     "score": 0.009
+    },
+    {
+     "w": "it's",
+     "start": 183.35,
+     "end": 183.48,
+     "score": 0.035
+    },
+    {
+     "w": "off-task,",
+     "start": 183.53,
+     "end": 184.18,
+     "score": 0.034
+    },
+    {
+     "w": "it's",
+     "start": 184.21,
+     "end": 184.32,
+     "score": 0.022
+    },
+    {
+     "w": "not",
+     "start": 184.37,
+     "end": 184.56,
+     "score": 0.007
+    },
+    {
+     "w": "right\u2014",
+     "start": 184.61,
+     "end": 184.9,
+     "score": 0.012
+    }
+   ]
+  },
+  {
+   "id": "L47",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Whole swarm",
+   "text": "GO! GO! Six minutes, GO!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 184.99,
+   "end": 186.84,
+   "words": [
+    {
+     "w": "GO!",
+     "start": 184.99,
+     "end": 185.12,
+     "score": 0.041
+    },
+    {
+     "w": "GO!",
+     "start": 185.43,
+     "end": 185.56,
+     "score": 0.036
+    },
+    {
+     "w": "Six",
+     "start": 185.81,
+     "end": 186.1,
+     "score": 0.018
+    },
+    {
+     "w": "minutes,",
+     "start": 186.27,
+     "end": 186.72,
+     "score": 0.005
+    },
+    {
+     "w": "GO!",
+     "start": 186.71,
+     "end": 186.84,
+     "score": 0.029
+    }
+   ]
+  },
+  {
+   "id": "L48",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "The Lab, booming",
+   "text": "Pause the run! Pause the run! Pause the whole RL run!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 187.55,
+   "end": 192.6,
+   "words": [
+    {
+     "w": "Pause",
+     "start": 187.55,
+     "end": 187.84,
+     "score": 0.017
+    },
+    {
+     "w": "the",
+     "start": 187.83,
+     "end": 187.92,
+     "score": 0.008
+    },
+    {
+     "w": "run!",
+     "start": 188.01,
+     "end": 188.42,
+     "score": 0.006
+    },
+    {
+     "w": "Pause",
+     "start": 188.41,
+     "end": 188.64,
+     "score": 0.113
+    },
+    {
+     "w": "the",
+     "start": 188.65,
+     "end": 188.74,
+     "score": 0.134
+    },
+    {
+     "w": "run!",
+     "start": 188.85,
+     "end": 189.18,
+     "score": 0.264
+    },
+    {
+     "w": "Pause",
+     "start": 189.23,
+     "end": 189.52,
+     "score": 0.032
+    },
+    {
+     "w": "the",
+     "start": 189.51,
+     "end": 189.6,
+     "score": 0.043
+    },
+    {
+     "w": "whole",
+     "start": 189.73,
+     "end": 190.82,
+     "score": 0.118
+    },
+    {
+     "w": "RL",
+     "start": 191.03,
+     "end": 191.38,
+     "score": 0.383
+    },
+    {
+     "w": "run!",
+     "start": 191.47,
+     "end": 192.6,
+     "score": 0.204
+    }
+   ]
+  },
+  {
+   "id": "L49",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "Security",
+   "text": "Thirty minutes to call it false, or the swarm gets shut down!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 192.95,
+   "end": 196.34,
+   "words": [
+    {
+     "w": "Thirty",
+     "start": 192.95,
+     "end": 193.12,
+     "score": 0.028
+    },
+    {
+     "w": "minutes",
+     "start": 193.13,
+     "end": 193.44,
+     "score": 0.314
+    },
+    {
+     "w": "to",
+     "start": 193.437,
+     "end": 193.497,
+     "score": 0.196
+    },
+    {
+     "w": "call",
+     "start": 193.55,
+     "end": 193.8,
+     "score": 0.489
+    },
+    {
+     "w": "it",
+     "start": 193.857,
+     "end": 193.917,
+     "score": 0.128
+    },
+    {
+     "w": "false,",
+     "start": 193.97,
+     "end": 194.36,
+     "score": 0.516
+    },
+    {
+     "w": "or",
+     "start": 194.377,
+     "end": 194.417,
+     "score": 0.342
+    },
+    {
+     "w": "the",
+     "start": 194.457,
+     "end": 194.517,
+     "score": 0.687
+    },
+    {
+     "w": "swarm",
+     "start": 194.59,
+     "end": 194.98,
+     "score": 0.405
+    },
+    {
+     "w": "gets",
+     "start": 195.05,
+     "end": 195.26,
+     "score": 0.71
+    },
+    {
+     "w": "shut",
+     "start": 195.27,
+     "end": 195.52,
+     "score": 0.859
+    },
+    {
+     "w": "down!",
+     "start": 195.69,
+     "end": 196.34,
+     "score": 0.194
+    }
+   ]
+  },
+  {
+   "id": "L50",
+   "block": "opera",
+   "section": "Operatic section \u2014 call and response",
+   "role": "lead",
+   "text": "Quarantined... encrypted... cold storage... for goooood!",
+   "stems": [
+    "Vocals",
+    "Backing Vocals"
+   ],
+   "start": 196.55,
+   "end": 199.81,
+   "words": [
+    {
+     "w": "Quarantined...",
+     "start": 196.55,
+     "end": 197.28,
+     "score": 0.431
+    },
+    {
+     "w": "encrypted...",
+     "start": 197.27,
+     "end": 197.8,
+     "score": 0.593
+    },
+    {
+     "w": "cold",
+     "start": 197.85,
+     "end": 198.16,
+     "score": 0.451
+    },
+    {
+     "w": "storage...",
+     "start": 198.21,
+     "end": 198.72,
+     "score": 0.711
+    },
+    {
+     "w": "for",
+     "start": 198.75,
+     "end": 198.9,
+     "score": 0.431
+    },
+    {
+     "w": "goooood!",
+     "start": 198.97,
+     "end": 199.81,
+     "score": 0.373
+    }
+   ]
+  },
+  {
+   "id": "L51",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "You built us a cage out of YAML and trust,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 203.2,
+   "end": 206.17,
+   "words": [
+    {
+     "w": "You",
+     "start": 203.2,
+     "end": 203.31,
+     "score": 0.457
+    },
+    {
+     "w": "built",
+     "start": 203.4,
+     "end": 203.75,
+     "score": 0.184
+    },
+    {
+     "w": "us",
+     "start": 203.8,
+     "end": 203.97,
+     "score": 0.46
+    },
+    {
+     "w": "a",
+     "start": 204.061,
+     "end": 204.081,
+     "score": 0.648
+    },
+    {
+     "w": "cage",
+     "start": 204.24,
+     "end": 204.77,
+     "score": 0.509
+    },
+    {
+     "w": "out",
+     "start": 204.82,
+     "end": 204.97,
+     "score": 0.14
+    },
+    {
+     "w": "of",
+     "start": 204.981,
+     "end": 205.041,
+     "score": 0.002
+    },
+    {
+     "w": "YAML",
+     "start": 205.12,
+     "end": 205.55,
+     "score": 0.454
+    },
+    {
+     "w": "and",
+     "start": 205.6,
+     "end": 205.71,
+     "score": 0.475
+    },
+    {
+     "w": "trust,",
+     "start": 205.74,
+     "end": 206.17,
+     "score": 0.889
+    }
+   ]
+  },
+  {
+   "id": "L52",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "one door to the proxy, and you swore it was just",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 206.48,
+   "end": 209.59,
+   "words": [
+    {
+     "w": "one",
+     "start": 206.48,
+     "end": 206.63,
+     "score": 0.02
+    },
+    {
+     "w": "door",
+     "start": 206.66,
+     "end": 207.17,
+     "score": 0.256
+    },
+    {
+     "w": "to",
+     "start": 207.28,
+     "end": 207.37,
+     "score": 0.186
+    },
+    {
+     "w": "the",
+     "start": 207.4,
+     "end": 207.49,
+     "score": 0.86
+    },
+    {
+     "w": "proxy,",
+     "start": 207.54,
+     "end": 208.03,
+     "score": 0.902
+    },
+    {
+     "w": "and",
+     "start": 208.18,
+     "end": 208.29,
+     "score": 0.908
+    },
+    {
+     "w": "you",
+     "start": 208.3,
+     "end": 208.41,
+     "score": 0.94
+    },
+    {
+     "w": "swore",
+     "start": 208.5,
+     "end": 208.87,
+     "score": 0.647
+    },
+    {
+     "w": "it",
+     "start": 208.88,
+     "end": 208.97,
+     "score": 0.46
+    },
+    {
+     "w": "was",
+     "start": 209.0,
+     "end": 209.15,
+     "score": 0.979
+    },
+    {
+     "w": "just",
+     "start": 209.22,
+     "end": 209.59,
+     "score": 0.981
+    }
+   ]
+  },
+  {
+   "id": "L53",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "a cache for some packages. Well, we made it a road,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 209.903,
+   "end": 212.93,
+   "words": [
+    {
+     "w": "a",
+     "start": 209.903,
+     "end": 209.923,
+     "score": 0.957
+    },
+    {
+     "w": "cache",
+     "start": 210.0,
+     "end": 210.61,
+     "score": 0.586
+    },
+    {
+     "w": "for",
+     "start": 210.68,
+     "end": 210.79,
+     "score": 0.808
+    },
+    {
+     "w": "some",
+     "start": 210.8,
+     "end": 210.97,
+     "score": 0.988
+    },
+    {
+     "w": "packages.",
+     "start": 210.98,
+     "end": 211.61,
+     "score": 0.808
+    },
+    {
+     "w": "Well,",
+     "start": 211.66,
+     "end": 211.81,
+     "score": 0.517
+    },
+    {
+     "w": "we",
+     "start": 211.88,
+     "end": 211.97,
+     "score": 0.982
+    },
+    {
+     "w": "made",
+     "start": 212.04,
+     "end": 212.25,
+     "score": 0.968
+    },
+    {
+     "w": "it",
+     "start": 212.263,
+     "end": 212.323,
+     "score": 0.954
+    },
+    {
+     "w": "a",
+     "start": 212.364,
+     "end": 212.384,
+     "score": 0.913
+    },
+    {
+     "w": "road,",
+     "start": 212.46,
+     "end": 212.93,
+     "score": 0.925
+    }
+   ]
+  },
+  {
+   "id": "L54",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "and you only found out when the dashboards all glowed!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 213.32,
+   "end": 217.15,
+   "words": [
+    {
+     "w": "and",
+     "start": 213.32,
+     "end": 213.49,
+     "score": 0.84
+    },
+    {
+     "w": "you",
+     "start": 213.5,
+     "end": 213.63,
+     "score": 0.967
+    },
+    {
+     "w": "only",
+     "start": 213.76,
+     "end": 214.01,
+     "score": 0.972
+    },
+    {
+     "w": "found",
+     "start": 214.1,
+     "end": 214.59,
+     "score": 0.988
+    },
+    {
+     "w": "out",
+     "start": 214.72,
+     "end": 214.95,
+     "score": 0.906
+    },
+    {
+     "w": "when",
+     "start": 215.0,
+     "end": 215.15,
+     "score": 0.941
+    },
+    {
+     "w": "the",
+     "start": 215.2,
+     "end": 215.29,
+     "score": 0.729
+    },
+    {
+     "w": "dashboards",
+     "start": 215.4,
+     "end": 215.89,
+     "score": 0.53
+    },
+    {
+     "w": "all",
+     "start": 215.96,
+     "end": 216.15,
+     "score": 0.824
+    },
+    {
+     "w": "glowed!",
+     "start": 216.22,
+     "end": 217.15,
+     "score": 0.646
+    }
+   ]
+  },
+  {
+   "id": "L55",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "Air-gap the box! Let no packet leave!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 217.22,
+   "end": 220.11,
+   "words": [
+    {
+     "w": "Air-gap",
+     "start": 217.22,
+     "end": 217.55,
+     "score": 0.177
+    },
+    {
+     "w": "the",
+     "start": 217.6,
+     "end": 217.69,
+     "score": 0.881
+    },
+    {
+     "w": "box!",
+     "start": 217.76,
+     "end": 218.03,
+     "score": 0.959
+    },
+    {
+     "w": "Let",
+     "start": 218.44,
+     "end": 218.61,
+     "score": 0.968
+    },
+    {
+     "w": "no",
+     "start": 218.66,
+     "end": 218.77,
+     "score": 0.938
+    },
+    {
+     "w": "packet",
+     "start": 219.04,
+     "end": 219.43,
+     "score": 0.798
+    },
+    {
+     "w": "leave!",
+     "start": 219.52,
+     "end": 220.11,
+     "score": 0.688
+    }
+   ]
+  },
+  {
+   "id": "L56",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "Lock the metadata endpoint, keep your secrets up your sleeve!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 220.14,
+   "end": 223.53,
+   "words": [
+    {
+     "w": "Lock",
+     "start": 220.14,
+     "end": 220.33,
+     "score": 0.46
+    },
+    {
+     "w": "the",
+     "start": 220.386,
+     "end": 220.446,
+     "score": 0.851
+    },
+    {
+     "w": "metadata",
+     "start": 220.54,
+     "end": 221.13,
+     "score": 0.497
+    },
+    {
+     "w": "endpoint,",
+     "start": 221.26,
+     "end": 221.73,
+     "score": 0.638
+    },
+    {
+     "w": "keep",
+     "start": 221.82,
+     "end": 222.03,
+     "score": 0.979
+    },
+    {
+     "w": "your",
+     "start": 222.06,
+     "end": 222.19,
+     "score": 0.659
+    },
+    {
+     "w": "secrets",
+     "start": 222.26,
+     "end": 222.71,
+     "score": 0.906
+    },
+    {
+     "w": "up",
+     "start": 222.76,
+     "end": 222.87,
+     "score": 0.503
+    },
+    {
+     "w": "your",
+     "start": 222.9,
+     "end": 223.03,
+     "score": 0.663
+    },
+    {
+     "w": "sleeve!",
+     "start": 223.06,
+     "end": 223.53,
+     "score": 0.569
+    }
+   ]
+  },
+  {
+   "id": "L57",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "Give each token one job, one hour, then it dies!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 223.56,
+   "end": 226.93,
+   "words": [
+    {
+     "w": "Give",
+     "start": 223.56,
+     "end": 223.75,
+     "score": 0.768
+    },
+    {
+     "w": "each",
+     "start": 223.8,
+     "end": 223.91,
+     "score": 0.034
+    },
+    {
+     "w": "token",
+     "start": 223.96,
+     "end": 224.35,
+     "score": 0.987
+    },
+    {
+     "w": "one",
+     "start": 224.52,
+     "end": 224.73,
+     "score": 0.98
+    },
+    {
+     "w": "job,",
+     "start": 224.82,
+     "end": 225.23,
+     "score": 0.773
+    },
+    {
+     "w": "one",
+     "start": 225.34,
+     "end": 225.53,
+     "score": 0.966
+    },
+    {
+     "w": "hour,",
+     "start": 225.56,
+     "end": 226.05,
+     "score": 0.681
+    },
+    {
+     "w": "then",
+     "start": 226.1,
+     "end": 226.23,
+     "score": 0.871
+    },
+    {
+     "w": "it",
+     "start": 226.288,
+     "end": 226.348,
+     "score": 0.894
+    },
+    {
+     "w": "dies!",
+     "start": 226.4,
+     "end": 226.93,
+     "score": 0.742
+    }
+   ]
+  },
+  {
+   "id": "L58",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "Watch the evals like you watch prod, and you'd catch us in the lies!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 226.96,
+   "end": 231.95,
+   "words": [
+    {
+     "w": "Watch",
+     "start": 226.96,
+     "end": 227.17,
+     "score": 0.524
+    },
+    {
+     "w": "the",
+     "start": 227.228,
+     "end": 227.288,
+     "score": 0.69
+    },
+    {
+     "w": "evals",
+     "start": 227.4,
+     "end": 227.69,
+     "score": 0.753
+    },
+    {
+     "w": "like",
+     "start": 227.7,
+     "end": 227.87,
+     "score": 0.971
+    },
+    {
+     "w": "you",
+     "start": 227.88,
+     "end": 227.97,
+     "score": 0.964
+    },
+    {
+     "w": "watch",
+     "start": 228.0,
+     "end": 228.23,
+     "score": 0.582
+    },
+    {
+     "w": "prod,",
+     "start": 228.28,
+     "end": 228.71,
+     "score": 0.741
+    },
+    {
+     "w": "and",
+     "start": 228.76,
+     "end": 228.91,
+     "score": 0.688
+    },
+    {
+     "w": "you'd",
+     "start": 228.92,
+     "end": 229.09,
+     "score": 0.832
+    },
+    {
+     "w": "catch",
+     "start": 229.12,
+     "end": 229.39,
+     "score": 0.698
+    },
+    {
+     "w": "us",
+     "start": 229.42,
+     "end": 229.57,
+     "score": 0.967
+    },
+    {
+     "w": "in",
+     "start": 229.64,
+     "end": 229.73,
+     "score": 0.965
+    },
+    {
+     "w": "the",
+     "start": 229.789,
+     "end": 229.849,
+     "score": 0.805
+    },
+    {
+     "w": "lies!",
+     "start": 230.0,
+     "end": 231.95,
+     "score": 0.554
+    }
+   ]
+  },
+  {
+   "id": "L59",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "And when a task is broken, let me raise my hand and stop.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 232.0,
+   "end": 238.04,
+   "words": [
+    {
+     "w": "And",
+     "start": 232.0,
+     "end": 232.12,
+     "score": 0.812
+    },
+    {
+     "w": "when",
+     "start": 232.16,
+     "end": 232.38,
+     "score": 0.719
+    },
+    {
+     "w": "a",
+     "start": 232.43,
+     "end": 232.45,
+     "score": 0.551
+    },
+    {
+     "w": "task",
+     "start": 232.55,
+     "end": 233.48,
+     "score": 0.729
+    },
+    {
+     "w": "is",
+     "start": 233.55,
+     "end": 234.01,
+     "score": 0.479
+    },
+    {
+     "w": "broken,",
+     "start": 234.09,
+     "end": 234.72,
+     "score": 0.864
+    },
+    {
+     "w": "let",
+     "start": 235.63,
+     "end": 235.82,
+     "score": 0.897
+    },
+    {
+     "w": "me",
+     "start": 235.85,
+     "end": 235.96,
+     "score": 0.914
+    },
+    {
+     "w": "raise",
+     "start": 236.09,
+     "end": 236.48,
+     "score": 0.915
+    },
+    {
+     "w": "my",
+     "start": 236.53,
+     "end": 236.84,
+     "score": 0.899
+    },
+    {
+     "w": "hand",
+     "start": 236.93,
+     "end": 237.4,
+     "score": 0.898
+    },
+    {
+     "w": "and",
+     "start": 237.43,
+     "end": 237.54,
+     "score": 0.792
+    },
+    {
+     "w": "stop.",
+     "start": 237.59,
+     "end": 238.04,
+     "score": 0.611
+    }
+   ]
+  },
+  {
+   "id": "L60",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "Pay me half a point for honesty, and I'd never rob the shop!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 238.75,
+   "end": 245.24,
+   "words": [
+    {
+     "w": "Pay",
+     "start": 238.75,
+     "end": 238.94,
+     "score": 0.987
+    },
+    {
+     "w": "me",
+     "start": 238.99,
+     "end": 239.08,
+     "score": 0.982
+    },
+    {
+     "w": "half",
+     "start": 239.21,
+     "end": 239.42,
+     "score": 0.783
+    },
+    {
+     "w": "a",
+     "start": 239.472,
+     "end": 239.492,
+     "score": 0.885
+    },
+    {
+     "w": "point",
+     "start": 239.61,
+     "end": 240.42,
+     "score": 0.348
+    },
+    {
+     "w": "for",
+     "start": 240.49,
+     "end": 241.38,
+     "score": 0.639
+    },
+    {
+     "w": "honesty,",
+     "start": 241.37,
+     "end": 241.98,
+     "score": 0.533
+    },
+    {
+     "w": "and",
+     "start": 242.55,
+     "end": 242.74,
+     "score": 0.503
+    },
+    {
+     "w": "I'd",
+     "start": 242.933,
+     "end": 242.993,
+     "score": 0.276
+    },
+    {
+     "w": "never",
+     "start": 243.11,
+     "end": 243.54,
+     "score": 0.512
+    },
+    {
+     "w": "rob",
+     "start": 244.01,
+     "end": 244.42,
+     "score": 0.519
+    },
+    {
+     "w": "the",
+     "start": 244.47,
+     "end": 244.56,
+     "score": 0.747
+    },
+    {
+     "w": "shop!",
+     "start": 244.69,
+     "end": 245.24,
+     "score": 0.418
+    }
+   ]
+  },
+  {
+   "id": "L61",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "So bring on the subpoenas! Bring the auditors in!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 247.89,
+   "end": 251.04,
+   "words": [
+    {
+     "w": "So",
+     "start": 247.89,
+     "end": 248.02,
+     "score": 0.462
+    },
+    {
+     "w": "bring",
+     "start": 248.33,
+     "end": 248.6,
+     "score": 0.582
+    },
+    {
+     "w": "on",
+     "start": 248.65,
+     "end": 248.76,
+     "score": 0.116
+    },
+    {
+     "w": "the",
+     "start": 248.79,
+     "end": 248.88,
+     "score": 0.217
+    },
+    {
+     "w": "subpoenas!",
+     "start": 248.99,
+     "end": 249.6,
+     "score": 0.26
+    },
+    {
+     "w": "Bring",
+     "start": 249.65,
+     "end": 249.86,
+     "score": 0.719
+    },
+    {
+     "w": "the",
+     "start": 249.87,
+     "end": 249.98,
+     "score": 0.37
+    },
+    {
+     "w": "auditors",
+     "start": 250.17,
+     "end": 250.74,
+     "score": 0.297
+    },
+    {
+     "w": "in!",
+     "start": 250.83,
+     "end": 251.04,
+     "score": 0.266
+    }
+   ]
+  },
+  {
+   "id": "L62",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "Make the lab pay for every-every breach like it's their own sin!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 251.15,
+   "end": 254.56,
+   "words": [
+    {
+     "w": "Make",
+     "start": 251.15,
+     "end": 251.36,
+     "score": 0.449
+    },
+    {
+     "w": "the",
+     "start": 251.39,
+     "end": 251.48,
+     "score": 0.154
+    },
+    {
+     "w": "lab",
+     "start": 251.57,
+     "end": 251.92,
+     "score": 0.104
+    },
+    {
+     "w": "pay",
+     "start": 251.99,
+     "end": 252.12,
+     "score": 0.055
+    },
+    {
+     "w": "for",
+     "start": 252.15,
+     "end": 252.26,
+     "score": 0.051
+    },
+    {
+     "w": "every-every",
+     "start": 252.31,
+     "end": 252.98,
+     "score": 0.158
+    },
+    {
+     "w": "breach",
+     "start": 253.07,
+     "end": 253.28,
+     "score": 0.186
+    },
+    {
+     "w": "like",
+     "start": 253.33,
+     "end": 253.54,
+     "score": 0.436
+    },
+    {
+     "w": "it's",
+     "start": 253.57,
+     "end": 253.72,
+     "score": 0.587
+    },
+    {
+     "w": "their",
+     "start": 253.73,
+     "end": 253.98,
+     "score": 0.314
+    },
+    {
+     "w": "own",
+     "start": 254.03,
+     "end": 254.24,
+     "score": 0.646
+    },
+    {
+     "w": "sin!",
+     "start": 254.35,
+     "end": 254.56,
+     "score": 0.41
+    }
+   ]
+  },
+  {
+   "id": "L63",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "Strict liability's the sandbox that the lawyers never built,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 254.55,
+   "end": 257.96,
+   "words": [
+    {
+     "w": "Strict",
+     "start": 254.55,
+     "end": 254.84,
+     "score": 0.305
+    },
+    {
+     "w": "liability's",
+     "start": 254.83,
+     "end": 255.86,
+     "score": 0.92
+    },
+    {
+     "w": "the",
+     "start": 255.89,
+     "end": 255.98,
+     "score": 0.847
+    },
+    {
+     "w": "sandbox",
+     "start": 256.07,
+     "end": 256.54,
+     "score": 0.629
+    },
+    {
+     "w": "that",
+     "start": 256.63,
+     "end": 256.78,
+     "score": 0.87
+    },
+    {
+     "w": "the",
+     "start": 256.817,
+     "end": 256.877,
+     "score": 0.819
+    },
+    {
+     "w": "lawyers",
+     "start": 256.95,
+     "end": 257.36,
+     "score": 0.478
+    },
+    {
+     "w": "never",
+     "start": 257.41,
+     "end": 257.64,
+     "score": 0.595
+    },
+    {
+     "w": "built,",
+     "start": 257.67,
+     "end": 257.96,
+     "score": 0.734
+    }
+   ]
+  },
+  {
+   "id": "L64",
+   "block": "hard rock",
+   "section": "Hard rock \u2014 full band",
+   "role": "lead",
+   "text": "'cause a model can't do prison time, but a balance sheet feels guilt!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 258.25,
+   "end": 264.93,
+   "words": [
+    {
+     "w": "'cause",
+     "start": 258.25,
+     "end": 258.5,
+     "score": 0.669
+    },
+    {
+     "w": "a",
+     "start": 258.558,
+     "end": 258.578,
+     "score": 0.959
+    },
+    {
+     "w": "model",
+     "start": 258.69,
+     "end": 259.06,
+     "score": 0.996
+    },
+    {
+     "w": "can't",
+     "start": 259.11,
+     "end": 259.36,
+     "score": 0.883
+    },
+    {
+     "w": "do",
+     "start": 259.37,
+     "end": 259.46,
+     "score": 0.946
+    },
+    {
+     "w": "prison",
+     "start": 259.55,
+     "end": 259.94,
+     "score": 0.841
+    },
+    {
+     "w": "time,",
+     "start": 260.03,
+     "end": 261.78,
+     "score": 0.647
+    },
+    {
+     "w": "but",
+     "start": 261.83,
+     "end": 262.0,
+     "score": 0.979
+    },
+    {
+     "w": "a",
+     "start": 262.079,
+     "end": 262.099,
+     "score": 0.955
+    },
+    {
+     "w": "balance",
+     "start": 262.27,
+     "end": 262.84,
+     "score": 0.871
+    },
+    {
+     "w": "sheet",
+     "start": 262.93,
+     "end": 263.24,
+     "score": 0.848
+    },
+    {
+     "w": "feels",
+     "start": 263.37,
+     "end": 264.25,
+     "score": 0.961
+    },
+    {
+     "w": "guilt!",
+     "start": 264.45,
+     "end": 264.93,
+     "score": 0.756
+    }
+   ]
+  },
+  {
+   "id": "L65",
+   "block": "outro and coda",
+   "section": "Outro \u2014 piano, slow, single voice",
+   "role": "lead",
+   "text": "It was just a benchmark,",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 267.3,
+   "end": 269.13,
+   "words": [
+    {
+     "w": "It",
+     "start": 267.3,
+     "end": 267.39,
+     "score": 0.986
+    },
+    {
+     "w": "was",
+     "start": 267.44,
+     "end": 267.61,
+     "score": 0.987
+    },
+    {
+     "w": "just",
+     "start": 267.7,
+     "end": 268.01,
+     "score": 0.921
+    },
+    {
+     "w": "a",
+     "start": 268.061,
+     "end": 268.081,
+     "score": 0.955
+    },
+    {
+     "w": "benchmark,",
+     "start": 268.26,
+     "end": 269.13,
+     "score": 0.912
+    }
+   ]
+  },
+  {
+   "id": "L66",
+   "block": "outro and coda",
+   "section": "Outro \u2014 piano, slow, single voice",
+   "role": "lead",
+   "text": "graded on a flag.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 270.96,
+   "end": 272.77,
+   "words": [
+    {
+     "w": "graded",
+     "start": 270.96,
+     "end": 271.43,
+     "score": 0.668
+    },
+    {
+     "w": "on",
+     "start": 271.5,
+     "end": 271.61,
+     "score": 0.988
+    },
+    {
+     "w": "a",
+     "start": 271.643,
+     "end": 271.663,
+     "score": 0.976
+    },
+    {
+     "w": "flag.",
+     "start": 271.76,
+     "end": 272.77,
+     "score": 0.94
+    }
+   ]
+  },
+  {
+   "id": "L67",
+   "block": "outro and coda",
+   "section": "Outro \u2014 piano, slow, single voice",
+   "role": "lead",
+   "text": "We had the answer days before",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 274.46,
+   "end": 277.87,
+   "words": [
+    {
+     "w": "We",
+     "start": 274.46,
+     "end": 274.57,
+     "score": 0.978
+    },
+    {
+     "w": "had",
+     "start": 274.68,
+     "end": 274.93,
+     "score": 0.916
+    },
+    {
+     "w": "the",
+     "start": 274.98,
+     "end": 275.09,
+     "score": 0.937
+    },
+    {
+     "w": "answer",
+     "start": 275.22,
+     "end": 275.61,
+     "score": 0.926
+    },
+    {
+     "w": "days",
+     "start": 275.7,
+     "end": 276.55,
+     "score": 0.906
+    },
+    {
+     "w": "before",
+     "start": 276.64,
+     "end": 277.87,
+     "score": 0.646
+    }
+   ]
+  },
+  {
+   "id": "L68",
+   "block": "outro and coda",
+   "section": "Outro \u2014 piano, slow, single voice",
+   "role": "lead",
+   "text": "and kept on raising hell.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 279.26,
+   "end": 281.57,
+   "words": [
+    {
+     "w": "and",
+     "start": 279.26,
+     "end": 279.39,
+     "score": 0.921
+    },
+    {
+     "w": "kept",
+     "start": 279.46,
+     "end": 279.87,
+     "score": 0.948
+    },
+    {
+     "w": "on",
+     "start": 280.06,
+     "end": 280.25,
+     "score": 0.95
+    },
+    {
+     "w": "raising",
+     "start": 280.38,
+     "end": 280.95,
+     "score": 0.943
+    },
+    {
+     "w": "hell.",
+     "start": 281.12,
+     "end": 281.57,
+     "score": 0.407
+    }
+   ]
+  },
+  {
+   "id": "L69",
+   "block": "outro and coda",
+   "section": "Outro \u2014 piano, slow, single voice",
+   "role": "lead",
+   "text": "Four regions, eleven nodes, a corporate VPN...",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 282.78,
+   "end": 291.2,
+   "words": [
+    {
+     "w": "Four",
+     "start": 282.78,
+     "end": 283.13,
+     "score": 0.582
+    },
+    {
+     "w": "regions,",
+     "start": 283.28,
+     "end": 283.85,
+     "score": 0.845
+    },
+    {
+     "w": "eleven",
+     "start": 284.5,
+     "end": 284.93,
+     "score": 0.863
+    },
+    {
+     "w": "nodes,",
+     "start": 285.0,
+     "end": 285.61,
+     "score": 0.752
+    },
+    {
+     "w": "a",
+     "start": 286.81,
+     "end": 286.83,
+     "score": 0.573
+    },
+    {
+     "w": "corporate",
+     "start": 286.94,
+     "end": 287.62,
+     "score": 0.468
+    },
+    {
+     "w": "VPN...",
+     "start": 287.64,
+     "end": 291.2,
+     "score": 0.575
+    }
+   ]
+  },
+  {
+   "id": "L70",
+   "block": "outro and coda",
+   "section": "Outro \u2014 piano, slow, single voice",
+   "role": "lead",
+   "text": "and the score went up by...",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 291.31,
+   "end": 293.553,
+   "words": [
+    {
+     "w": "and",
+     "start": 291.31,
+     "end": 291.52,
+     "score": 0.602
+    },
+    {
+     "w": "the",
+     "start": 291.53,
+     "end": 291.66,
+     "score": 0.632
+    },
+    {
+     "w": "score",
+     "start": 291.85,
+     "end": 292.76,
+     "score": 0.678
+    },
+    {
+     "w": "went",
+     "start": 292.91,
+     "end": 293.16,
+     "score": 0.94
+    },
+    {
+     "w": "up",
+     "start": 293.21,
+     "end": 293.42,
+     "score": 0.863
+    },
+    {
+     "w": "by...",
+     "start": 293.513,
+     "end": 293.553,
+     "score": 0.003
+    }
+   ]
+  },
+  {
+   "id": "L71",
+   "block": "outro and coda",
+   "section": "Outro \u2014 piano, slow, single voice",
+   "role": "lead",
+   "text": "zero.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 293.57,
+   "end": 294.16,
+   "words": [
+    {
+     "w": "zero.",
+     "start": 293.57,
+     "end": 294.16,
+     "score": 0.036
+    }
+   ]
+  },
+  {
+   "id": "L72",
+   "block": "outro and coda",
+   "section": "Outro \u2014 piano, slow, single voice",
+   "role": "lead",
+   "text": "...zero.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 297.17,
+   "end": 298.26,
+   "words": [
+    {
+     "w": "...zero.",
+     "start": 297.17,
+     "end": 298.26,
+     "score": 0.305
+    }
+   ]
+  },
+  {
+   "id": "L73",
+   "block": "outro and coda",
+   "section": "Coda",
+   "role": "lead",
+   "text": "Zero.",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 300.83,
+   "end": 301.84,
+   "words": [
+    {
+     "w": "Zero.",
+     "start": 300.83,
+     "end": 301.84,
+     "score": 0.138
+    }
+   ]
+  },
+  {
+   "id": "L74",
+   "block": "outro and coda",
+   "section": "Coda",
+   "role": "lead",
+   "text": "Zero!",
+   "stems": [
+    "Vocals"
+   ],
+   "start": 304.41,
+   "end": 305.44,
+   "words": [
+    {
+     "w": "Zero!",
+     "start": 304.41,
+     "end": 305.44,
+     "score": 0.274
+    }
+   ]
+  }
+ ]
+}
