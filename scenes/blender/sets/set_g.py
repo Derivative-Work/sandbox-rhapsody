@@ -183,8 +183,8 @@ def build():
     sign.rotation_euler = (0, 0, 0)
     K.mesh_obj("decline_sign.stick", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("stick", "paper", 0.6), sign,
                radius=0.006, depth=0.32, location=(0, 0, 0.16))
-    _box("decline_sign.card", K.mat_plastic("sign_card", "paper", 0.7), (0, -0.004, 0.42), (0.78, 0.008, 0.25), sign)
-    t = K.text("decline_sign.text", "I DECLINE", 0.165, K.mat_plastic("sign_ink", "shadow", 0.6),
+    _box("decline_sign.card", K.mat_matte("sign_card", "paper"), (0, -0.004, 0.42), (0.78, 0.008, 0.25), sign)
+    t = K.text("decline_sign.text", "I DECLINE", 0.165, K.mat_ink("sign_ink", "shadow"),
                loc=(0, -0.0095, 0.42), font="InstrumentSerif-Regular.ttf", parent=sign)
     t.data.offset = 0.004  # hand-lettered, thick marker strokes
     out["lone"], out["sign"] = lone, sign
@@ -219,7 +219,7 @@ def build():
     _box("kill_tower.body", K.mat_plastic("kill_body", "lab_dark", 0.35), (0, 0, 0.8), (0.8, 0.4, 1.6), tower, bev=0.02)
     _box("kill_tower.trim", brass, (0, -0.205, 1.58), (0.82, 0.02, 0.05), tower)
     _box("kill_tower.plate", K.mat_emission("kill_plate", "paper", 2.5), (0, -0.203, 1.45), (0.7, 0.01, 0.15), tower)
-    K.text("kill_tower.label", "KILL SWITCH", 0.085, K.mat_plastic("kill_label", "shadow", 0.4),
+    K.text("kill_tower.label", "KILL SWITCH", 0.085, K.mat_ink("kill_label", "shadow"),
            loc=(0, -0.209, 1.45), parent=tower)
     out["kill_buttons"] = []
     for k in range(12):
@@ -249,7 +249,7 @@ def build():
     K.prop(pr, "flash", 0.0)
     _box("printer.head_light", K.mat_emission("printer_light", "amber", 30.0, pr, "flash"), (0, -0.355, 0.5),
          (1.0, 0.01, 0.03), pr)
-    K.text("printer.label", "PLATFORM", 0.08, K.mat_plastic("printer_ink", "shadow", 0.5), loc=(0, -0.356, 0.32),
+    K.text("printer.label", "PLATFORM", 0.08, K.mat_ink("printer_ink", "shadow"), loc=(0, -0.356, 0.32),
            parent=pr)
     K.prop(pr, "feed", 0.0, lo=0.0, hi=1000.0)
     paper_root = K.empty("paper_root", (0, -0.35, 0.003), pr)
@@ -263,7 +263,7 @@ def build():
     paper.data.materials.append(K.mat_plastic("paper", "paper", 0.7))
     mover = K.empty("paper_mover", (0, -0.35, 0.005), pr)
     out.update(printer=pr, paper=paper, paper_mover=mover)  # their feed drivers are added in animate() (see there)
-    ink = K.mat_plastic("log_ink", "shadow", 0.6)
+    ink = K.mat_ink("log_ink", "shadow")
     for k in range(60):  # log lines, generic (no real systems)
         K.text(f"logline{k}", f"{12 + k // 20:02d}:{(k * 7) % 60:02d}:{(k * 13) % 60:02d}  agent-{(k * 37) % 700:03d}  "
                f"{('GET', 'PUT', 'POST', 'EXEC')[k % 4]} /run/{(k * 53) % 9973}  {('200', '201', '403', '200')[k % 4]}",
@@ -271,9 +271,9 @@ def build():
                parent=mover)
     out["log_lines"] = [bpy.data.objects[f"logline{k}"] for k in range(60)]
     inv = K.empty("invoice", (0, 0, 0.0005), mover)
-    K.text("invoice.l1", "$100,000,000 —", 0.1, K.mat_plastic("inv_ink", "shadow", 0.5), loc=(0, 0.07, 0), rot=(0, 0, 0),
+    K.text("invoice.l1", "$100,000,000 —", 0.1, K.mat_ink("inv_ink", "shadow"), loc=(0, 0.07, 0), rot=(0, 0, 0),
            parent=inv).data.offset = 0.002
-    K.text("invoice.l2", "PAYABLE IN GPUs", 0.1, K.mat_plastic("inv_ink2", "decal_ink", 0.5), loc=(0, -0.07, 0),
+    K.text("invoice.l2", "PAYABLE IN GPUs", 0.1, K.mat_ink("inv_ink2", "decal_ink"), loc=(0, -0.07, 0),
            rot=(0, 0, 0), parent=inv).data.offset = 0.002
     out["invoice"] = inv
     out["pile"] = []
@@ -286,7 +286,7 @@ def build():
 
     # The Auditors: five stamp arms over a long table.
     _box("stamp_table", black, (0, 0.28, 0.15), (1.9, 0.36, 0.3), bev=0.01)
-    stamp_ink = K.mat_plastic("stamp_ink", "decal_ink", 0.4)
+    stamp_ink = K.mat_ink("stamp_ink", "decal_ink")
     out["stamps"], out["stamp_prints"] = [], []
     for k in range(5):
         x = (k - 2) * 0.37
@@ -317,7 +317,7 @@ def build():
     _box("pedal.plate", K.mat_plastic("pedal_plate", "lab", 0.3), (0, -0.38, 0.03), (0.6, 0.8, 0.05), hinge, bev=0.01)
     _box("pedal.glow", K.mat_emission("pedal_glow", "alarm", 25.0, ped, "press"), (0, -0.38, 0.03), (0.64, 0.84, 0.03),
          hinge)
-    K.text("pedal.label", "PAUSE", 0.16, K.mat_plastic("pedal_ink", "shadow", 0.5), loc=(0, -0.42, 0.056),
+    K.text("pedal.label", "PAUSE", 0.16, K.mat_ink("pedal_ink", "shadow"), loc=(0, -0.42, 0.056),
            rot=(0, 0, 0), parent=hinge).data.offset = 0.003
     out["pedal"] = ped
 
@@ -354,7 +354,7 @@ def build():
              sw).rotation_euler = (0, a, 0)  # long axis along the radius (was -a: mirrored, C4 v2)
     K.prop(sw, "tick", 0.0, lo=0.0, hi=10000.0)
     hand = K.empty("stopwatch.hand", (0, -0.041, 1.95), sw)  # in front of the readout window
-    K.drive(hand, "rotation_euler", 1, sw, "tick", "0.2094 * x")  # 30 ticks a turn
+    K.drive(hand, "rotation_euler", 1, sw, "tick", "-0.2094 * x")  # 30 ticks a turn, anticlockwise: counting down
     _box("stopwatch.needle", K.mat_plastic("needle", "shadow", 0.3), (0, 0, 0.15), (0.016, 0.004, 0.32), hand)
     # The readout: glowing red digits on a black window, so `30:00` reads under the red light (was dark ink, faint).
     _box("stopwatch.window", K.mat_plastic("sw_window", "shadow", 0.2), (0, -0.033, 1.765), (0.36, 0.004, 0.14), sw)
@@ -366,7 +366,7 @@ def build():
     _box("conveyor", black, (1.45, -1.4, 0.08), (2.0, 0.3, 0.16), bev=0.01)
     _box("conveyor.belt", K.mat_plastic("belt", "lab_dark", 0.6), (1.45, -1.4, 0.163), (2.0, 0.26, 0.006))
     _box("freezer", K.mat_acrylic("frost", "glass", alpha=0.75, emit=0.35), (2.95, -1.4, 0.45), (0.9, 0.9, 0.9), bev=0.03)
-    K.text("freezer.label", "COLD STORAGE", 0.09, K.mat_plastic("freezer_ink", "lab_dark", 0.4),
+    K.text("freezer.label", "COLD STORAGE", 0.09, K.mat_ink("freezer_ink", "shadow"),
            loc=(2.95, -1.856, 0.8), parent=None).data.offset = 0.002
     door_hinge = K.empty("vault_hinge", (2.49, -1.4 - 0.3, 0.45))
     K.mesh_obj("vault_door", bpy.ops.mesh.primitive_cylinder_add, K.mat_metal("vault", "chrome", 0.2), door_hinge,
@@ -468,11 +468,17 @@ def animate(S, t0, t1):
     A.bell(S["grader"], "bell", [dict(flag_w, end=flag_w["t"] + 1.5)])
     A.stepper(S["grader"], "spin", [flag_w])
 
-    # The lone sign: up throughout, it lowers slowly across S41 (the GO calls).
+    # The lone sign: out of sight until the lone agent sings "decline" (S40), when it comes up from below the seat
+    # (it showed from S31 on, spoiling S40's find, C4 v4); it lowers slowly across S41 (the GO calls).
     sg = S["sign"]
     a, b = shot["S41"]["cut"], shot["S42"]["cut"]
+    t_up = next(w["t"] for w in words if w["w"].lower().startswith("declin") and line["L46"]["start"] - 0.05 <= w["t"])
+    f_up = A.frame(t_up)
+    for ax in range(3):
+        A.write_keys(sg, "scale", [(0, 0.0, "CONSTANT"), (f_up - 6, 1.0, "CONSTANT")], index=ax)
     A.write_keys(sg, "rotation_euler", [(A.frame(a + 0.4), 0.0), (A.frame(b - 0.2), -1.35)], index=0)
-    A.write_keys(sg, "location", [(A.frame(a + 0.4), K.PROBE_R * 0.6), (A.frame(b - 0.2), -0.12)], index=2)
+    A.write_keys(sg, "location", [(f_up - 6, -0.3), (f_up + 6, K.PROBE_R * 0.6), (A.frame(a + 0.4), K.PROBE_R * 0.6),
+                                  (A.frame(b - 0.2), -0.12)], index=2)
     A.envelope_rig(S["lone"], "led", A.envelope("vocal_env"), A.frame(shot["S40"]["cut"]), A.frame(shot["S41"]["cut"]),
                    gain=0.7, offset=0.3)
 
@@ -493,6 +499,7 @@ def animate(S, t0, t1):
             pel = K.pellet_mesh(f"pellet_g{n}", pmat, r=0.022)
             c = pel.constraints.new("FOLLOW_PATH")
             c.target, c.use_fixed_location, c.use_curve_follow = arc, True, True
+            arc.data.use_path = True  # Follow Path does nothing without it (the pellets sat still until C4 v5)
             keys, vis = [], []
             for f in range(A.frame(p0), A.frame(p1) + 1, 2):
                 u = (clock(f / A.FPS) - launch) / flight

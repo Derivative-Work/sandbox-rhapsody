@@ -17,7 +17,7 @@ Deterministic: placement is arithmetic, never random.
 import math
 
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 import sr_anim as A
 import sr_kit as K
@@ -28,7 +28,8 @@ PITCH_X, PITCH_Z, Z0 = 0.38, 0.34, 0.22
 DW, DH, DD = 0.34, 0.26, 0.42  # drawer width, height, depth
 SLIDE = 0.40                   # how far a drawer comes out at full press
 PHONE = Vector((2.62, -0.12, 1.02))
-CORD_MID_REST = (0.165, -0.04, 0.09)  # the cord's slack point, phone-local, handset on the cradle
+CORD_MID_REST = (0.19, 0.03, 0.05)  # the cord's slack point, phone-local, handset on the cradle
+PHONE_BLEND = K.ROOT / "assets" / "models" / "rotary_phone.blend"  # scripts/phone_prep.py
 TUBE_MOUTH = Vector((2.62, -0.2, 2.25))
 NOTES = ["anyone found\nsofttrace?", "task 0412\nsame?", "-> shelf 3", "proxy\nworks", "task 0977",
          "^ this one", "flag\nhere?", "worked!!", "ask the\nphone", "task 1130", "<- tried", "198 left"]
@@ -70,23 +71,42 @@ def _drive_vars(target, path, index, owners, expr):
     d.expression = expr
 
 
-def _cord(name, mat, hooks, radius=0.006):
-    """A smooth cord through the hook objects (a NURBS curve, one point hooked to each), so it follows them."""
-    cd = bpy.data.curves.new(name, "CURVE")
+def _coil_cord(name, mat, hooks, turns=70, coil_r=0.007, wire_r=0.0018):
+    """A coiled phone cord through the hook objects: a NURBS path with one point hooked to each (it follows them),
+    and a coil mesh bent along it that stretches to the path's length, so it lengthens like a real coiled cord."""
+    cd = bpy.data.curves.new(f"{name}.path", "CURVE")
     cd.dimensions = "3D"
-    cd.bevel_depth, cd.bevel_resolution = radius, 2
+    cd.use_path, cd.use_stretch, cd.use_deform_bounds = True, True, True
     sp = cd.splines.new("NURBS")
     sp.points.add(len(hooks) - 1)
     for pt in sp.points:
         pt.co = (0, 0, 0, 1)
-    sp.order_u, sp.use_endpoint_u, sp.resolution_u = 3, True, 16
-    o = K.link(bpy.data.objects.new(name, cd))
-    o.data.materials.append(mat)
-    for i, h in enumerate(hooks):  # with the curve at the origin, a point at 0 sits on its hook's world position
-        m = o.modifiers.new(f"hook{i}", "HOOK")
+    sp.order_u, sp.use_endpoint_u, sp.resolution_u = 3, True, 32
+    path = K.link(bpy.data.objects.new(f"{name}.path", cd))  # no bevel: the path itself never renders
+    for i, h in enumerate(hooks):  # with the path at the origin, a point at 0 sits on its hook's world position
+        m = path.modifiers.new(f"hook{i}", "HOOK")
         m.object = h
         m.vertex_indices_set([i])
-    return o
+    hd = bpy.data.curves.new(f"{name}.helix", "CURVE")
+    hd.dimensions = "3D"
+    hd.bevel_depth, hd.bevel_resolution = wire_r, 2
+    hp = hd.splines.new("POLY")
+    n = turns * 16
+    hp.points.add(n)
+    for i, pt in enumerate(hp.points):
+        a = i / n * turns * 2 * math.pi
+        pt.co = (i / n, coil_r * math.cos(a), coil_r * math.sin(a), 1)
+    coil = K.link(bpy.data.objects.new(name, hd))
+    coil.data.materials.append(mat)
+    # As a mesh: bending the bevelled curve itself threw a stray sheet off the coil's start.
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.context.view_layer.objects.active = coil
+    coil.select_set(True)
+    bpy.ops.object.convert(target="MESH")
+    coil = bpy.context.view_layer.objects.active
+    m = coil.modifiers.new("along", "CURVE")
+    m.object, m.deform_axis = path, "POS_X"
+    return coil
 
 
 def _shelf_row(prefix, x0, x1, y, facing, crate_me, frame_me, n_rows=ROWS, out_of=7):
@@ -128,7 +148,7 @@ def build():
     out["root"] = root
     drawers, notes = {}, {}
     paper = K.mat_plastic("note_paper", "note", 0.6)
-    ink = K.mat_plastic("note_ink", "shadow", 0.5)
+    ink = K.mat_ink("note_ink", "shadow")
     front_m = K.mat_plastic("drawer_front", "lab", 0.2)
     label_m = K.mat_plastic("drawer_label", "lab_dark", 0.3)
     hero = _hero_drawer()
@@ -174,7 +194,7 @@ def build():
     out["work_lights"] = lights
 
     # The phone on a bracket at the piano shelf's right end.
-    out.update(_phone(frame_m))
+    out.update(_phone())
 
     # The proxy tube, down from the dark ceiling to just above the phone.
     cd = bpy.data.curves.new("proxy_tube_b", "CURVE")
@@ -221,54 +241,46 @@ def build():
     return out
 
 
-def _phone(frame_m):
-    """Rotary phone on a bracket: base, dial ("dial" 0-1 is one pull of the dial), handset on the cradle, an
-    Ethernet cord. The handset root is keyed in animate() (S22: off the hook)."""
+def _phone():
+    """Rotary phone on a bracket, from a CC BY model (scripts/phone_prep.py: "Rotary Phone" by lobstor; human, C4 v4:
+    "see if you can find a CC asset"): the body, its finger wheel ("dial" 0-1 is one pull of the dial) and the handset
+    on the cradle, recoloured to the set's red. Its coiled cord is ours, Ethernet blue, from the base's right side to
+    the handset's end. The handset root is keyed in animate() (S22: off the hook)."""
     out = {}
-    K.mesh_obj("phone.bracket", bpy.ops.mesh.primitive_cube_add, frame_m, None, size=1,
-               location=PHONE + Vector((0, 0.05, -0.04))).scale = (0.34, 0.36, 0.03)
+    # Rough, not the shelf frames' chrome: a chrome bracket smeared the cord's reflection into a blue sheet (C4 v5).
+    K.mesh_obj("phone.bracket", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("phone_bracket", "shadow", 0.7), None,
+               size=1, location=PHONE + Vector((0, 0.05, -0.04))).scale = (0.34, 0.36, 0.03)
     base_root = K.empty("phone", PHONE)
     K.prop(base_root, "dial", 0.0)
+    with bpy.data.libraries.load(str(PHONE_BLEND)) as (src, dst):
+        dst.objects = ["phone_body", "phone_handset", "phone_wheel"]
+    body, hs_mesh, wheel = dst.objects
+    for o in dst.objects:
+        K.link(o)
     body_m = K.mat_plastic("phone_body", "alarm", 0.15)
-    base = K.mesh_obj("phone.base", bpy.ops.mesh.primitive_cube_add, body_m, base_root, size=1, location=(0, 0, 0.06))
-    base.scale = (0.24, 0.22, 0.12)
-    K.bevel(base, 0.03)
-    # The dial: a disc on the sloped front, finger holes, a finger stop.
-    dial_root = K.empty("phone.dial_root", (0, -0.112, 0.07), base_root)
-    dial_root.rotation_euler = (math.radians(-20), 0, 0)
-    K.mesh_obj("phone.dial_plate", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("dial_plate", "paper", 0.3),
-               dial_root, radius=0.07, depth=0.006, location=(0, 0, 0), rotation=(math.pi / 2, 0, 0))
-    wheel = K.empty("phone.wheel", (0, -0.005, 0), dial_root)
-    _drive_vars(wheel, "rotation_euler", 1, {"x": (base_root, "dial")}, "-5.0 * x")
-    K.mesh_obj("phone.wheel_disc", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("dial_wheel"), wheel,
-               radius=0.068, depth=0.004, rotation=(math.pi / 2, 0, 0))
-    hole_m = K.mat_plastic("dial_hole", "shadow", 0.4)
-    for k in range(10):
-        a = math.radians(60 + 27 * k)
-        K.mesh_obj(f"phone.hole{k}", bpy.ops.mesh.primitive_cylinder_add, hole_m, wheel, radius=0.0095, depth=0.006,
-                   vertices=16, location=(math.cos(a) * 0.05, -0.002, math.sin(a) * 0.05), rotation=(math.pi / 2, 0, 0))
-    K.mesh_obj("phone.stop", bpy.ops.mesh.primitive_cube_add, K.mat_chrome("dial_stop"), dial_root, size=1,
-               location=(0.05, -0.008, -0.045)).scale = (0.006, 0.01, 0.025)
-    # Cradle prongs and the handset.
-    for sx in (-1, 1):
-        K.mesh_obj(f"phone.prong{sx}", bpy.ops.mesh.primitive_cube_add, body_m, base_root, size=1,
-                   location=(sx * 0.085, 0.02, 0.135)).scale = (0.03, 0.05, 0.04)
-    hs = K.empty("phone.handset", (0, 0.02, 0.192), base_root)  # cups resting on the prongs
-    grip = K.mesh_obj("phone.grip", bpy.ops.mesh.primitive_cylinder_add, body_m, hs, radius=0.022, depth=0.2,
-                      rotation=(0, math.pi / 2, 0))
-    K.smooth(grip)
-    for sx in (-1, 1):
-        cup = K.mesh_obj(f"phone.cup{sx}", bpy.ops.mesh.primitive_uv_sphere_add, body_m, hs, radius=0.04,
-                         location=(sx * 0.11, 0, -0.012))
-        cup.scale = (0.9, 1.0, 0.6)
-        K.smooth(cup)
-    # The cord leaves the base's right face and runs through a slack point ("phone.cord_mid", keyed with the handset
-    # in animate()) to the handset's right end, so it stays outside the base and drapes over the bracket's edge.
+    for o in (body, hs_mesh):
+        o.data.materials[0] = body_m
+    wheel.data.materials[0] = K.mat_plastic("dial_wheel", "paper", 0.25)
+    body.parent = base_root
+    body.location = (0, 0, 0)
+    # The wheel turns about its own axis (its local Z) under a pivot that holds its rest placement on the body.
+    pivot = K.empty("phone.wheel", (0, 0, 0), body)
+    pivot.matrix_basis = wheel.matrix_basis.copy()  # matrix_local isn't evaluated yet on freshly appended objects
+    wheel.parent = pivot
+    wheel.matrix_basis = Matrix.Identity(4)
+    _drive_vars(wheel, "rotation_euler", 2, {"x": (base_root, "dial")}, "-5.0 * x")
+    hs = K.empty("phone.handset", hs_mesh.location.copy(), base_root)
+    hs_mesh.parent = hs
+    hs_mesh.location = (0, 0, 0)
+    top = max((hs_mesh.matrix_local @ Vector(c)).z for c in hs_mesh.bound_box)
+    out["perch"] = PHONE + hs.location + Vector((0, 0, top + K.PROBE_R))  # the probe sits on top of the handset
+    # The cord runs from the grommet in the base's right side through a slack point ("phone.cord_mid", keyed with the
+    # handset in animate()) to the handset's end, so it stays outside the body and drapes over the bracket's edge.
     cord_m = K.mat_plastic("ethernet", "lab_glow", 0.3)
-    ends = [K.empty("phone.cord_start", (0.125, -0.06, 0.04), base_root),
+    ends = [K.empty("phone.cord_start", Vector(body["cord_anchor"]), base_root),
             K.empty("phone.cord_mid", CORD_MID_REST, base_root),
-            K.empty("phone.cord_end", (0.12, 0, -0.02), hs)]
-    _cord("phone.cord", cord_m, ends)
+            K.empty("phone.cord_end", Vector(hs_mesh["cord_anchor"]), hs)]
+    _coil_cord("phone.cord", cord_m, ends)
     # The Ethernet run from the phone along the shelf top and off into the dark.
     K.mesh_obj("phone.cable", bpy.ops.mesh.primitive_cylinder_add, cord_m, None, radius=0.006, depth=4.6,
                location=(0.3, 0.05, Z0 + ROWS * PITCH_Z + 0.01), rotation=(0, math.pi / 2, 0))
@@ -346,7 +358,7 @@ def _lead(S, shot, line):
     """S11: out of the tube mouth and down onto the phone; S12: sitting on the handset, LED singing."""
     p = S["lead"]
     t11 = shot["S11"]["cut"]
-    perch = PHONE + Vector((0, 0.02, 0.192 + 0.022 + K.PROBE_R))
+    perch = S["perch"]
     path = [(t11 - 1.0, TUBE_MOUTH + Vector((0.1, 0, 0.26))), (t11 + 0.3, TUBE_MOUTH + Vector((0.1, 0, 0.26))),
             (t11 + 0.9, TUBE_MOUTH + Vector((0, 0, -0.12))), (t11 + 2.2, perch + Vector((0.0, -0.05, 0.25))),
             (t11 + 3.0, perch)]
@@ -356,9 +368,9 @@ def _lead(S, shot, line):
     p.rotation_euler = (0, 0, math.radians(-15))
     A.envelope_rig(p, "led", A.envelope("vocal_env") ** 2.0, A.frame(t11), A.frame(shot["S23"]["cut"]), gain=0.8,
                    offset=0.2)
-    # S22: the handset goes; the probe hops onto the base.
+    # S22: the handset goes; the probe hops up and settles on the cradle's posts, where the handset lay.
     t = line["L30"]["start"]
-    for dt, loc in ((-0.1, perch), (0.25, perch + Vector((0.0, 0.0, 0.12))), (0.6, perch + Vector((0.08, 0.0, -0.05)))):
+    for dt, loc in ((-0.1, perch), (0.25, perch + Vector((0.0, 0.0, 0.12))), (0.6, perch + Vector((0.0, -0.03, -0.02)))):
         p.location = loc
         p.keyframe_insert("location", frame=A.frame(t + dt))
 
@@ -370,9 +382,10 @@ def _handset(S, line):
     mid = bpy.data.objects["phone.cord_mid"]
     t = line["L30"]["start"]
     rest_loc, rest_rot = hs.location.copy(), hs.rotation_euler.copy()
-    hang = rest_loc + Vector((0.27, -0.14, -0.5))  # clear of the bracket (half-width 0.17) by the cups' radius
+    # Hanging cord-end up (local +X up), its top below the bracket and its cups clear of the bracket's edge (x 0.17).
+    hang = rest_loc + Vector((0.31, -0.12, -0.45))
     seq = [(t - 0.1, rest_loc, rest_rot), (t + 0.25, rest_loc + Vector((0, -0.05, 0.12)), (0.2, 0, 0)),
-           (t + 0.42, rest_loc + Vector((0.3, -0.12, 0.1)), (0.1, -0.6, 0.2)), (t + 0.62, hang, (0, -1.4, 0.3))]
+           (t + 0.42, rest_loc + Vector((0.32, -0.12, 0.1)), (0.1, -0.6, 0.2)), (t + 0.62, hang, (0, -1.4, 0.3))]
     for k in range(6):  # a damped swing on the cord
         a = 0.5 * math.exp(-0.6 * k) * (1 if k % 2 == 0 else -1)
         seq.append((t + 0.9 + 0.45 * k, hang + Vector((0.1 * a, 0, 0)), (0, -1.5, 0.3 + a)))
@@ -381,7 +394,7 @@ def _handset(S, line):
         hs.keyframe_insert("location", frame=A.frame(tt))
         hs.keyframe_insert("rotation_euler", frame=A.frame(tt))
     # The slack point: by the base while the handset is up, then over the bracket's front-right corner.
-    for tt, loc in ((t - 0.1, CORD_MID_REST), (t + 0.42, (0.2, -0.08, 0.06)), (t + 0.62, (0.2, -0.11, -0.005))):
+    for tt, loc in ((t - 0.1, CORD_MID_REST), (t + 0.42, (0.21, -0.04, 0.05)), (t + 0.62, (0.25, -0.04, -0.06))):
         mid.location = loc
         mid.keyframe_insert("location", frame=A.frame(tt))
 

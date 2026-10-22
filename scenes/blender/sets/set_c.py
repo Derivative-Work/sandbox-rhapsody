@@ -149,7 +149,7 @@ def build():
     plate = K.mesh_obj("rented.plate", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("rented_plate", "amber", 0.3),
                        pad, size=1, location=(0.0, -PAD_R + 0.12, 0.78))
     plate.scale = (0.8, 0.03, 0.26)
-    K.text("rented.text", "RENTED", 0.17, K.mat_plastic("rented_ink", "shadow", 0.4), loc=(0.0, -PAD_R + 0.1, 0.78),
+    K.text("rented.text", "RENTED", 0.17, K.mat_ink("rented_ink", "shadow"), loc=(0.0, -PAD_R + 0.1, 0.78),
            parent=pad).data.offset = 0.006
     out["pad"] = pad
     out["floor_ring"] = K.floor_ring("floor_ring_c", radius=PAD_R - 0.2, loc=PAD + Vector((0, 0, 0.002)))

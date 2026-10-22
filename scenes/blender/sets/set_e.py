@@ -234,6 +234,7 @@ def _hop_pellet(S, name, curve, fl, fa):
     p = K.pellet_mesh(name, S["pellet_mat"], r=0.016)
     c = p.constraints.new("FOLLOW_PATH")
     c.target, c.use_fixed_location, c.use_curve_follow = curve, True, True
+    curve.data.use_path = True  # Follow Path does nothing without it (the pellets sat still until C4 v5)
     A.write_keys(p, f'constraints["{c.name}"].offset_factor', [(fl, 0.0, "LINEAR"), (fa, 1.0, "LINEAR")],
                  interp="LINEAR")
     A.write_keys(p, "hide_render", [(0, 1, "CONSTANT"), (fl, 0, "CONSTANT"), (fa + 4, 1, "CONSTANT")],

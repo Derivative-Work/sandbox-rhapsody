@@ -622,3 +622,35 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - transcription accuracy (the human: later);
   - the vocal repaint.
 - **Why:** Human feedback, R1 (human interventions).
+
+## 2026-10-22T18:35:12-04:00 — C4 animatic v5: the v4 review's ten notes, a third-party phone, and the Follow Path fix
+
+- **Human review of v4 (R1)** (human interventions), item by item, with what changed:
+  - **S10, "the protagonist is still flying out way too fast":**
+    - **The cause:** the proxy tube had path evaluation off (`use_path`), so the Follow Path constraint did nothing. The probe never left the tube's mouth while the camera raced on down the empty tube.
+    - **Now:** the tube evaluates. The probe drifts up to the mouth (2.4 s), peels the note as it arrives, slips in on "wherever" and glides from the mouth (offset 0.088) to 0.3 by the cut, about 0.55 m/s. Its location hands over to the path linearly, so it doesn't jump. The camera trails it.
+    - **Same bug elsewhere:** set E's probe hop, and the pellets in `sr_anim.pellets` and set G's arcs, never travelled either. All now set `use_path`.
+  - **S12 and the phone, "see if you can find a CC asset":**
+    - **The model:** none of the Sketchfab/Poly Haven search results were CC0. The human chose "Rotary Phone" by lobstor (CC BY 4.0) and downloaded it (R4) to `assets/models/rotary_phone_src/`. This is the first third-party asset in the video, at the human's direction; credited in `docs/credits.md`, to appear on the end card.
+    - **Prep:** `scripts/phone_prep.py` splits its 122 loose parts by position into body, handset and finger wheel, and drops the cord. It mirrors the phone so the cord side faces the open end of the shelf, scales it to 0.24 m and records the cord anchors. Output: `assets/models/rotary_phone.blend`, regenerable.
+    - **Set B:** the model is recoloured to the set's red, and the finger wheel turns on its own axis for the dial gag. The cord is new: a coiled Ethernet-blue mesh bent along a hooked NURBS path that stretches with the handset.
+    - **The finger wheel** first loaded lying flat under the body, because an appended object's `matrix_local` isn't evaluated yet. The human spotted the missing dial in the check stills (R1). Its pivot now takes the stored transform; the wheel sits on the dial face and turns one full pull (−4.8 rad) on each "Operator".
+    - **The off-the-hook path** is retimed to the new handset's size. The probe settles on the cradle posts.
+    - **The phone's bracket** is rough dark plastic. As chrome, it smeared the cord's reflection into a blue sheet.
+  - **S19, the pager falls through the floor:**
+    - **The cause:** the flip was keyed on the pager's root, while its walk across the desk is an offset on a child, so the flip swung it in a 1 m circle down through the floor.
+    - **Now:** the flip turns the slide, so the pager turns about itself. Its lowest point is ≥ 2.2 cm above the floor in every frame of S19.
+  - **All rendered text for contrast:** every ink was the kit's glossy coated plastic, which picks up the room's highlights and washes out to grey. Changes:
+    - `sr_kit.mat_ink` (matte, no coat, no specular, lettering set a little heavier) for all printed and painted text;
+    - `sr_kit.mat_matte` for sign boards, paper cards and the SIMULATION decal film;
+    - LIABILITY larger, and the dashboard labels sized to their cards.
+  - **S31, "I DECLINE" from the start:** not intended. It spoiled S40's find. The sign is now out of sight until the lone agent sings "decline", then comes up from below the seat.
+  - **S45, monospace YAML:** a code editor on each wall: JetBrains Mono (OFL, already in `assets/fonts`), dim line numbers, blue keys, amber values, on a dark pane.
+  - **S59 on, "score: 0":** the scoreboard is blank until "and the score went up by…", then clacks to 0 on "zero".
+  - **S29, stamps clipping the boxes:** the stations' stroke now ends on the crates' tops (0.116 m, was 0.32).
+  - **S43, the clock ticking the wrong way:** the hand turns anticlockwise, counting down.
+  - **S59 on, sticks clipping the covers:** each frost shell is sized to the union of its machine's bounds over every frame it plays under it, plus 5 cm.
+- **Closed by the human:** transcription accuracy (no more work) and the vocal repaint (failed in Suno Studio; "every-every breach" stays as sung).
+- **Re-rendered:** every set. Invalid drivers after rebind: 0 in all sets.
+- **Outputs:** `renders/animatic/animatic_v5.mp4`. Superseded: `archive/renders/animatic_v4_superseded_c4-review-4.mp4`.
+- **Why:** Human feedback, R1; the phone model, R4 (human interventions).

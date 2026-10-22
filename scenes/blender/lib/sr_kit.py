@@ -49,6 +49,23 @@ def mat_plastic(name, role, rough=None):
     return m
 
 
+def mat_matte(name, role):
+    """Matte, no coat, no specular: signs, cards and lettering that must never pick up the room's highlights and
+    wash out (glossy ones did, in the lit sets; human, C4 v4: "all rendered text for contrast")."""
+    m, b = _principled(name)
+    b.inputs["Base Color"].default_value = col(role)
+    b.inputs["Roughness"].default_value = 0.95
+    b.inputs["Specular IOR Level"].default_value = 0.0
+    return m
+
+
+def mat_ink(name, role="shadow"):
+    """Printed or painted lettering: matte, and text() sets it a little heavier."""
+    m = mat_matte(name, role)
+    m["ink"] = True
+    return m
+
+
 def mat_chrome(name, role="chrome"):
     m, b = _principled(name)
     b.inputs["Base Color"].default_value = col(role)
@@ -650,6 +667,8 @@ def text(name, body, size, mat, loc=(0, 0, 0), rot=(math.pi / 2, 0, 0), font="In
     o = link(bpy.data.objects.new(name, cu))
     o.location, o.rotation_euler = loc, rot
     o.data.materials.append(mat)
+    if mat.get("ink"):
+        cu.offset = size * 0.04  # heavier than the font's regular weight, so strokes hold up against glare
     if parent:
         o.parent = parent
     return o
@@ -824,8 +843,8 @@ def decal(name, body, loc, rot, size, peel=0.0, parent=None):
     film.parent = root
     # Opaque film and heavy letters: it has to read in a wide shot (a translucent film with regular-weight red
     # letters didn't; human, C1 v2).
-    film.data.materials.append(mat_plastic(f"{name}.film", "decal_film", 0.55))  # off-white, so it doesn't bloom
-    t = text(f"{name}.text", body, h * 0.7, mat_plastic(f"{name}.ink", "decal_ink", 0.4), loc=(0, 0, 0.0008), rot=(0, 0, 0),
+    film.data.materials.append(mat_matte(f"{name}.film", "decal_film"))  # off-white and matte, so it doesn't bloom or glare
+    t = text(f"{name}.text", body, h * 0.7, mat_ink(f"{name}.ink", "decal_ink"), loc=(0, 0, 0.0008), rot=(0, 0, 0),
              font="Inter[opsz,wght].ttf", parent=root)
     t.data.space_character = 1.05
     t.data.offset = h * 0.008  # embolden a little (Inter loads at its default weight); more fills the A's crossbar

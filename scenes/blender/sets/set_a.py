@@ -63,6 +63,7 @@ def build(decal_peel=0.25):
     for bp, p in zip(sp.bezier_points, pts):
         bp.co = p
         bp.handle_left_type = bp.handle_right_type = "AUTO"
+    cd.use_path = True  # the lead probe rides it in S10 (Follow Path); without this the constraint did nothing
     tube = K.link(bpy.data.objects.new("proxy_tube", cd))
     tube.data.materials.append(K.mat_acrylic("tube", "lab_glow", alpha=0.5, emit=1.2))
     out["tube"] = tube
@@ -71,9 +72,9 @@ def build(decal_peel=0.25):
     # Sticky note stuck over the hole on the inside, slightly crooked, with its message.
     note_root = K.empty("sticky", exit_pt + Vector((-0.012, -0.0, 0.0)))
     note_root.rotation_euler = (math.pi / 2, 0.08, -math.pi / 2)
-    K.mesh_obj("sticky.paper", bpy.ops.mesh.primitive_plane_add, K.mat_plastic("sticky", "note", 0.6), note_root,
+    K.mesh_obj("sticky.paper", bpy.ops.mesh.primitive_plane_add, K.mat_matte("sticky", "note"), note_root,
                size=0.1)
-    K.text("sticky.text", "NO\nINTERNET :)", 0.018, K.mat_plastic("ink", "shadow", 0.5), loc=(0, 0, 0.0008),
+    K.text("sticky.text", "NO\nINTERNET :)", 0.018, K.mat_ink("ink", "shadow"), loc=(0, 0, 0.0008),
            rot=(0, 0, 0), font="InstrumentSerif-Italic.ttf", parent=note_root)
     out["note"] = note_root
 
@@ -147,9 +148,9 @@ def build(decal_peel=0.25):
     w.scale = (0.22, 0.03, 0.012)
     tag = K.empty("guardrail_tag", (-1.75, -1.05, 0.05))
     tag.rotation_euler = (math.radians(70), 0, 0.25)
-    K.mesh_obj("tag.card", bpy.ops.mesh.primitive_plane_add, K.mat_plastic("tag", "paper", 0.5), tag, size=1
+    K.mesh_obj("tag.card", bpy.ops.mesh.primitive_plane_add, K.mat_matte("tag", "paper"), tag, size=1
                ).scale = (0.62, 0.13, 1)
-    K.text("tag.text", "removed for evaluation", 0.048, K.mat_plastic("tag_ink", "shadow", 0.5), loc=(0, 0, 0.002),
+    K.text("tag.text", "removed for evaluation", 0.048, K.mat_ink("tag_ink", "shadow"), loc=(0, 0, 0.002),
            rot=(0, 0, 0), parent=tag)
     # Beyond the glass (S06): faint machines in the dark, and a security camera on a pole, facing away.
     faint = K.mat_plastic("faint", "horizon", 0.4)
@@ -296,26 +297,40 @@ def probe_moves(S):
     for t, loc in ((t5 - 0.6, home), (t5 + 0.4, glass), (t6 + 1.0, glass), (t6 + 2.5, home)):
         p.location = loc
         p.keyframe_insert("location", frame=A.frame(t))
-    # S10: the probe peels the note off; it flutters to the floor (two swings), then the probe goes up to the tube's
-    # mouth, then along it (Follow Path, offset keyed), hidden once inside the tube's far end.
+    # S10: the probe drifts up to the tube's mouth and peels the note off as it gets there; the note flutters to the
+    # floor (two swings); the probe slips into the tube on "wherever" and glides along it (Follow Path, offset keyed),
+    # only part way by the cut (human, C4 v4: it flew out far too fast).
     mouth = S["exit_pt"] + Vector((-0.08, 0, 0))
+    t_arrive = t10 + 2.4
+    t_in = next(w["start"] for li in tm["lines"] if li["id"] == "L16" for w in li["words"])
     p.location = home
-    p.keyframe_insert("location", frame=A.frame(t10))
+    p.keyframe_insert("location", frame=A.frame(t10 + 0.2))
+    p.location = mouth + Vector((-0.06, -0.02, -0.04))
+    p.keyframe_insert("location", frame=A.frame(t_arrive - 0.3))
     p.location = mouth
-    p.keyframe_insert("location", frame=A.frame(t10 + 1.2))
+    p.keyframe_insert("location", frame=A.frame(t_arrive))
     n = S["note"]
     n0, r0 = n.location.copy(), n.rotation_euler.copy()
-    for dt, dloc, rot in ((0.9, (0, 0, 0), r0), (1.3, (-0.1, -0.04, -0.2), (1.2, 0.5, -1.2)),
-                          (1.8, (-0.22, 0.05, -0.42), (0.3, -0.4, -1.9)), (2.2, (-0.3, 0.0, -0.6), (0, 0, -2.2))):
+    for dt, dloc, rot in ((0.0, (0, 0, 0), r0), (0.5, (-0.1, -0.04, -0.2), (1.2, 0.5, -1.2)),
+                          (1.1, (-0.22, 0.05, -0.42), (0.3, -0.4, -1.9)), (1.6, (-0.3, 0.0, -0.6), (0, 0, -2.2))):
         n.location, n.rotation_euler = n0 + Vector(dloc), rot
-        n.keyframe_insert("location", frame=A.frame(t10 + dt))
-        n.keyframe_insert("rotation_euler", frame=A.frame(t10 + dt))
+        n.keyframe_insert("location", frame=A.frame(t_arrive + dt))
+        n.keyframe_insert("rotation_euler", frame=A.frame(t_arrive + dt))
+    # Fixed-location Follow Path adds the probe's own location to the path point, so its location goes from the mouth
+    # to zero while the constraint fades in (both linear): the sum holds still at the mouth through the handover.
+    for loc, t in ((mouth, t_in), (Vector((0, 0, 0)), t_in + 0.5)):
+        p.location = loc
+        p.keyframe_insert("location", frame=A.frame(t))
+    for ax in range(3):
+        for kp in A._fcurve(p, "location", ax).keyframe_points:
+            if A.frame(t_in) <= kp.co.x < A.frame(t_in + 0.5):
+                kp.interpolation = "LINEAR"
     c = p.constraints.new("FOLLOW_PATH")
     c.target, c.use_fixed_location, c.use_curve_follow = S["tube"], True, True
-    A.write_keys(p, f'constraints["{c.name}"].influence', [(0, 0.0, "CONSTANT"), (A.frame(t10 + 1.2), 0.0, "LINEAR"),
-                                                          (A.frame(t10 + 1.5), 1.0, "LINEAR")])
-    A.write_keys(p, f'constraints["{c.name}"].offset_factor', [(A.frame(t10 + 1.5), 0.32, "LINEAR"),
-                                                              (A.frame(t11), 1.0, "LINEAR")])
+    A.write_keys(p, f'constraints["{c.name}"].influence', [(0, 0.0, "CONSTANT"), (A.frame(t_in), 0.0, "LINEAR"),
+                                                          (A.frame(t_in + 0.5), 1.0, "LINEAR")])
+    # Offsets are by length: 0.088 is the mouth (the grommet), 0.3 about 2.6 m along, just outside the cube.
+    A.write_keys(p, f'constraints["{c.name}"].offset_factor', [(A.frame(t_in + 0.5), 0.088), (A.frame(t11), 0.3)])
 
 
 # ---------------------------------------------------------------- cameras (u = fraction of the shot; eye, target, lens)
@@ -337,7 +352,7 @@ CAMERAS = {
     "S08": [(0.0, _v(2.0, -1.25, 0.8), _v(1.72, -0.78, 0.6), 40), (1.0, _v(1.95, -1.1, 0.75), _v(1.72, -0.78, 0.58), 50)],
     "S09": [(0.0, _v(-2.6, 1.0, 0.55), _v(-2.2, 2.7, 0.35), 32), (1.0, _v(2.6, 1.0, 0.55), _v(2.2, 2.7, 0.35), 32)],
     "S10": [(0.0, _v(1.9, -0.6, 1.0), _v(1.0, 0.55, 0.62), 35), (0.45, _v(1.5, 0.3, 0.7), _v(1.0, 0.55, 0.62), 35),
-            (0.7, _v(1.6, 0.85, 0.6), _v(2.4, 1.3, 0.4), 24), (1.0, _v(3.8, 2.6, 0.25), _v(5.6, 4.6, 0.04), 24)],
+            (0.7, _v(1.75, 0.35, 0.75), _v(2.08, 1.13, 0.41), 30), (1.0, _v(2.6, 1.05, 0.65), _v(3.11, 1.92, 0.23), 30)],
     "S20": [(0.0, _v(3.0, -5.0, 1.8), _v(0, 0, 1.0), 35), (1.0, _v(28.0, -48.0, 20.0), _v(0, 0, 1.0), 35)],
     "S21": [(0.0, _v(1.6, -2.6, 0.5), _v(0.55, -1.0, 0.15), 40), (1.0, _v(1.0, -1.7, 0.3), _v(0.55, -1.0, 0.13), 50)],
     "S23": [(0.0, _v(-0.6, -3.4, 0.9), _v(-1.45, -1.1, 0.05), 35), (1.0, _v(-1.55, -2.0, 0.55), _v(-1.7, -1.05, 0.08), 40)],

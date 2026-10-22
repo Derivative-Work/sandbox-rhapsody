@@ -352,21 +352,6 @@ def animate(S, t0, t1):
     # S60: the lead opens its arm on "before": it was holding the flag all along.
     t_open = next(w["start"] for li in tm["lines"] if li["id"] == "L67" for w in li["words"] if w["w"].startswith("bef"))
     A.write_keys(lead, '["arm_r"]', [(0, 0.0), (A.frame(t_open) - 4, 0.0), (A.frame(t_open) + 26, 1.0)])
-    # The coda machines play from the band's return (bar 173, in S64) under their frost; the shells rattle on the kit's
-    # hits there, and burst off on S64b's cut, its first setup being the wide (C4 v3: the shake-off fell in S64, so
-    # S64b opened awake).
-    t_burst = shots["S64b"]["cut"]
-    rattle = [A.frame(e["t"]) for e in A.between(A.strikes(A.events("kit"), 0.08), coda0, t_burst - 0.1)]
-    for k, sh in enumerate(S["shells"]):
-        x0 = sh.location.x
-        keys = [(0, x0)]
-        for n, f in enumerate(rattle):
-            keys += [(f, x0 + (0.012 if (n + k) % 2 else -0.012)), (f + 4, x0)]
-        A.write_keys(sh, "location", keys, index=0)
-        fw = A.frame(t_burst) + 2 * k
-        for ax in range(3):
-            A.write_keys(sh, "scale", [(fw - 1, sh.scale[ax]), (fw + 3, sh.scale[ax] * 1.12), (fw + 13, 0.0)],
-                         index=ax)
     M = S["machines"]
     kitc = A.between(A.events("kit"), coda0, final + 0.5)
     kicks, snares = A.strikes(A.pieces(kitc, "kick")), A.strikes(A.pieces(kitc, "snare"))
@@ -395,6 +380,25 @@ def animate(S, t0, t1):
                                     (A.frame(final + 1.5 + 0.4 * k) + 8, 0.0, "LINEAR")], interp="LINEAR")
     bass = A.between(A.strikes(A.events("bass"), 0.05), coda0, final + 0.5)
     A.led_pulse(S["floor_ring"], "pulse", bass)
+    # Each frost shell is sized to its machine's whole swing while it plays under it (arms and sticks poked through
+    # the fixed-size shells, C4 v4): the union of the machine's bounds over every frame from the band's return to the
+    # burst, plus a margin, from the floor up.
+    _fit_shells(S, A.frame(coda0) - 12, A.frame(shots["S64b"]["cut"]) + 1)
+    # The coda machines play from the band's return (bar 173, in S64) under their frost; the shells rattle on the kit's
+    # hits there, and burst off on S64b's cut, its first setup being the wide (C4 v3: the shake-off fell in S64, so
+    # S64b opened awake).
+    t_burst = shots["S64b"]["cut"]
+    rattle = [A.frame(e["t"]) for e in A.between(A.strikes(A.events("kit"), 0.08), coda0, t_burst - 0.1)]
+    for k, sh in enumerate(S["shells"]):
+        x0 = sh.location.x
+        keys = [(0, x0)]
+        for n, f in enumerate(rattle):
+            keys += [(f, x0 + (0.012 if (n + k) % 2 else -0.012)), (f + 4, x0)]
+        A.write_keys(sh, "location", keys, index=0)
+        fw = A.frame(t_burst) + 2 * k
+        for ax in range(3):
+            A.write_keys(sh, "scale", [(fw - 1, sh.scale[ax]), (fw + 3, sh.scale[ax] * 1.12), (fw + 13, 0.0)],
+                         index=ax)
     # S61: the frost map traces word by word, then melts in the shot's last quarter.
     fm = S["frost_map"]
     words = {w["w"].lower().strip(".,"): w["start"] for li in tm["lines"] if li["id"] == "L69" for w in li["words"]}
@@ -423,10 +427,11 @@ def animate(S, t0, t1):
     A.write_keys(fm["root"], '["glow"]', [(A.frame(melt0), 1.0, "LINEAR"), (A.frame(s62 - 0.1), 0.0, "LINEAR")],
                  interp="LINEAR")
     A.write_keys(fm["root"], "location", [(A.frame(melt0), MAP.z), (A.frame(s62), MAP.z - 0.12)], index=2)
-    # The scoreboard: shows 0; clacks through digits on the piano notes of "and the score went up by..." and lands on
-    # 0 on "zero"; again on "...zero"; and it jolts back to 0 on each "Zero" of the coda.
+    # The scoreboard: blank until "and the score went up by..." (it showed 0 from S59, spoiling the line; human,
+    # C4 v4); clacks through digits on that line's piano notes and lands on 0 on "zero"; again on "...zero"; and it
+    # jolts back to 0 on each "Zero" of the coda.
     zeros = [w["start"] for li in tm["lines"] if li["id"] in ("L71", "L72", "L73", "L74") for w in li["words"]]
-    changes = [(0, 0)]
+    changes = [(0, None)]
     clack_from = [shots["S62"]["cut"], shots["S64"]["cut"]]
     n = 0
     for z in zeros:
@@ -439,6 +444,32 @@ def animate(S, t0, t1):
             changes.append((A.frame(e["t"]), (n * 389 + 127) % 1000))
         changes.append((A.frame(z), 0))
     _board_keys(S, sorted(changes))
+
+
+def _fit_shells(S, fa, fb, margin=0.05):
+    M = S["machines"]
+    covered = [[M["kick"]], [M["snare"]], [M["grader"]], M["blades"], [M["toms"][0]], [M["toms"][1]], [M["hats"]],
+               [M["crash"]]]
+    K.rebind_drivers()  # the machines' drivers must evaluate while sampling
+    K.refresh()
+    scene = bpy.context.scene
+    meshes = [[o for r in roots for o in [r] + list(r.children_recursive) if o.type == "MESH"] for roots in covered]
+    lo = [[1e9] * 3 for _ in covered]
+    hi = [[-1e9] * 3 for _ in covered]
+    for f in [fa - 60] + list(range(fa, fb + 1)):
+        scene.frame_set(f)
+        dg = bpy.context.evaluated_depsgraph_get()
+        for i, objs in enumerate(meshes):
+            for o in objs:
+                mw = o.evaluated_get(dg).matrix_world
+                for c in o.bound_box:
+                    w = mw @ Vector(c)
+                    for ax in range(3):
+                        lo[i][ax], hi[i][ax] = min(lo[i][ax], w[ax]), max(hi[i][ax], w[ax])
+    for sh, a, b in zip(S["shells"], lo, hi):
+        a, b = Vector(a) - Vector((margin, margin, 0)), Vector(b) + Vector((margin,) * 3)
+        a.z = 0.0
+        sh.location, sh.scale = (a + b) / 2, b - a
 
 
 def _grow(curve_data, fa, fb):

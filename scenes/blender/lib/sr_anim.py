@@ -298,6 +298,7 @@ def pellets(curve_obj, evs, speed, make_pellet, path_len=None, keep_after=6):
         p = make_pellet(i)
         c = p.constraints.new("FOLLOW_PATH")
         c.target = curve_obj
+        curve_obj.data.use_path = True  # Follow Path does nothing without it (the pellets sat still until C4 v5)
         c.use_fixed_location = True
         c.use_curve_follow = True
         write_keys(p, f'constraints["{c.name}"].offset_factor', [(fl, 0.0, "LINEAR"), (fa, 1.0, "LINEAR")],

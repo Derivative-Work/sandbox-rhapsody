@@ -73,9 +73,10 @@ def _sign(name, body, size, w, h, parent, loc, rot=(math.pi / 2, 0, 0), board="p
     """A legible sign: opaque board, heavy dark ink (style spec, legibility rule)."""
     root = K.empty(name, loc, parent)
     root.rotation_euler = rot
-    K.mesh_obj(f"{name}.board", bpy.ops.mesh.primitive_plane_add, K.mat_plastic(f"{name}.board", board, 0.5), root,
+    # Matte board: a glossy one caught the lamps and its glare spread over the letters (C4 v4).
+    K.mesh_obj(f"{name}.board", bpy.ops.mesh.primitive_plane_add, K.mat_matte(f"{name}.board", board), root,
                size=1).scale = (w, h, 1)
-    K.text(f"{name}.text", body, size, K.mat_plastic(f"{name}.ink", ink, 0.5), loc=(0, 0, 0.003), rot=(0, 0, 0),
+    K.text(f"{name}.text", body, size, K.mat_ink(f"{name}.ink", ink), loc=(0, 0, 0.003), rot=(0, 0, 0),
            parent=root)
     return root
 
@@ -121,18 +122,33 @@ def build():
     out["cube"] = K.glass_cube("sandbox_new", 2.0)  # no decal: it's finally gone
     out["floor_ring"] = K.floor_ring("floor_ring", radius=1.6)
 
-    # S45: the old cube's walls are config text, scrolling up behind each pane.
-    ink = K.mat_emission("yaml_ink", "lab_glow", 6.0)
+    # S45: the old cube's walls are config files in a code editor, scrolling up: a dark editor pane per wall, line
+    # numbers, keys and values in their own colours, in a monospace font (human, C4 v4: "like YAML in a code editor").
+    mono = "JetBrainsMono[wght].ttf"
+    size, adv = 0.1, 0.06  # JetBrains Mono advances 0.6 em per character
+    ink_key = K.mat_emission("yaml_key", "lab_glow", 6.0)
+    ink_val = K.mat_emission("yaml_val", "amber", 5.0)
+    ink_num = K.mat_emission("yaml_num", "lab", 1.2)
+    pane_m = K.mat_plastic("yaml_pane", "shadow", 0.35)
     panels = []
     # Front and right only: the back and left panels would read mirrored through the glass.
     for side, (loc, rz) in {"front": ((0, -0.97, 0), 0.0), "right": ((0.97, 0, 0), math.pi / 2)}.items():
         root = K.empty(f"yaml_{side}", loc)
         root.rotation_euler = (0, 0, rz)
+        pane = _box(f"yaml_{side}.pane", pane_m, root, (0, 0.012, 1.0), (1.9, 0.004, 1.9))
         lines = []
         for k, body in enumerate(YAML):
-            t = K.text(f"yaml_{side}_{k}", body, 0.1, ink, loc=(-0.85, 0, 0.15 + 0.15 * k), align="LEFT", parent=root)
-            lines.append(t)
-        panels.append((root, lines))
+            ln = K.empty(f"yaml_{side}_{k}", (0, 0, 0.15 + 0.15 * k), root)
+            K.text(f"yaml_{side}_{k}.num", f"{k + 1:>2}", size * 0.85, ink_num, loc=(-0.88, 0, 0), align="LEFT",
+                   font=mono, parent=ln)
+            key, _, val = body.partition(":")
+            K.text(f"yaml_{side}_{k}.key", key + ":", size, ink_key, loc=(-0.68, 0, 0), align="LEFT", font=mono,
+                   parent=ln)
+            if val:
+                K.text(f"yaml_{side}_{k}.val", val, size, ink_val, loc=(-0.68 + adv * (len(key) + 1), 0, 0),
+                       align="LEFT", font=mono, parent=ln)
+            lines.append(ln)
+        panels.append((root, lines, pane))
     out["yaml"] = panels
 
     # S46: the proxy tube from the cube to the ground, then the road it becomes (inner and outer segments; the
@@ -172,7 +188,7 @@ def build():
     wall = K.empty("dash_wall", (0, 5.0, 0))
     _box("dash_wall.back", K.mat_plastic("dashwall", "lab_dark", 0.3), wall, (0, 0.12, 1.55), (6.4, 0.1, 3.1))
     teal, red = K.mat_emission("dash_ok", "lab_glow", 0.9), K.mat_emission("dash_red", "alarm", 2.5)  # dim: ink reads
-    trace = K.mat_plastic("dash_trace", "shadow", 0.5)
+    trace = K.mat_ink("dash_trace", "shadow")
     cards = []
     for r in range(3):
         for c in range(4):
@@ -183,8 +199,9 @@ def build():
                        location=(0, 0.012, 0), rotation=(-math.pi / 2, 0, 0)).scale = (1.36, 0.86, 1)
             label, value = DASH_FACTS[(2 - r) * 4 + c]  # top row first, read left to right
             vs = min(0.26, 1.15 / (0.62 * len(value)))
+            ls = min(0.16, 1.22 / (0.66 * len(label)))  # labels as large as the card allows (were 0.12, hard to read)
             for side, y, rz in (("f", -0.02, 0.0), ("b", 0.02, math.pi)):  # back face reads after the flip
-                K.text(f"dash_{r}{c}.{side}.label", label, 0.12, trace, loc=(0, y, 0.25), rot=(math.pi / 2, 0, rz),
+                K.text(f"dash_{r}{c}.{side}.label", label, ls, trace, loc=(0, y, 0.25), rot=(math.pi / 2, 0, rz),
                        parent=piv)
                 K.text(f"dash_{r}{c}.{side}.value", value, vs, trace, loc=(0, y, -0.08), rot=(math.pi / 2, 0, rz),
                        parent=piv)
@@ -299,7 +316,7 @@ def build():
     note.rotation_euler = (math.pi / 2, 0.15, 0)
     K.mesh_obj("vault.note.paper", bpy.ops.mesh.primitive_plane_add, K.mat_plastic("sticky_h", "note", 0.6), note,
                size=0.22)
-    K.text("vault.note.text", "NO\nINTERNET :)", 0.04, K.mat_plastic("ink_h", "shadow", 0.5), loc=(0, 0, 0.002),
+    K.text("vault.note.text", "NO\nINTERNET :)", 0.04, K.mat_ink("ink_h", "shadow"), loc=(0, 0, 0.002),
            rot=(0, 0, 0), font="InstrumentSerif-Italic.ttf", parent=note)
     out.update(vault=vault, vault_dial=dial, vault_bolts=bolts, vault_note=note, vault_pointer=ptr)
 
@@ -389,7 +406,7 @@ def build():
     for s in (-1, 1):
         _box(f"ribbon.tail{s}", K.mat_plastic("rosette_tail", "amber", 0.4), rib, (s * 0.035, 0, -0.12),
              (0.04, 0.008, 0.14), (0, s * 0.25, 0))
-    K.text("ribbon.text", "+0.5", 0.07, K.mat_plastic("ribbon_ink", "shadow", 0.4), loc=(0, -0.009, 0),
+    K.text("ribbon.text", "+0.5", 0.07, K.mat_ink("ribbon_ink", "shadow"), loc=(0, -0.009, 0),
            parent=rib)
     rib["size"] = rib_s
     out.update(honest=hp, flag=flag, dispenser=disp, ribbon=rib)
@@ -428,7 +445,7 @@ def build():
     feed = K.empty("printer.feed", (0, 0, 0), sheet)
     K.mesh_obj("printer.sheet.paper", bpy.ops.mesh.primitive_plane_add, K.mat_plastic("bill", "paper", 0.6), feed,
                size=1, location=(0, -0.6, 0)).scale = (1.3, 1.2, 1)
-    K.text("printer.sheet.text", "BILL TO:\nTHE LAB", 0.2, K.mat_plastic("bill_ink", "shadow", 0.4),
+    K.text("printer.sheet.text", "BILL TO:\nTHE LAB", 0.2, K.mat_ink("bill_ink", "shadow"),
            loc=(0, -0.62, 0.003), rot=(0, 0, 0), parent=feed)
     out.update(printer=pr, printer_feed=feed)
 
@@ -484,7 +501,7 @@ def build():
         _box(f"sheet.railb{z}", rail_m, ss, (0, YB, z), (2 * X + 0.06, 0.06, 0.06))
         for sx in (-1, 1):
             _box(f"sheet.rails{sx}{z}", rail_m, ss, (sx * X, (YF + YB) / 2, z), (0.06, YB - YF + 0.06, 0.06))
-    _sign("sheet.title", "LIABILITY", 0.11, 1.0, 0.2, ss, (0, YF - 0.06, Z1 + 0.22))
+    _sign("sheet.title", "LIABILITY", 0.15, 1.0, 0.22, ss, (0, YF - 0.06, Z1 + 0.22))
     out.update(sheet=ss, cells=cells)
     return out
 
@@ -510,7 +527,8 @@ def animate(S, t0, t1):
 
     # S45: config text scrolls up the old walls, then the walls are glass (text gone at S46's cut).
     fa, fb = A.frame(cut("S45")) - 2, A.frame(cut("S46")) + 2
-    for root, lines in S["yaml"]:
+    for root, lines, pane in S["yaml"]:
+        A.write_keys(pane, "hide_render", [(0, 0, "CONSTANT"), (A.frame(cut("S46")) + 1, 1, "CONSTANT")])
         n = len(lines)
         for k, t in enumerate(lines):
             keys = []
@@ -518,7 +536,8 @@ def animate(S, t0, t1):
                 u = (k + (f - fa) / A.FPS * 3.0) % n
                 keys.append((f, 0.15 + 0.15 * u, "LINEAR"))
             A.write_keys(t, "location", keys, index=2)
-            A.write_keys(t, "hide_render", [(0, 0, "CONSTANT"), (A.frame(cut("S46")) + 1, 1, "CONSTANT")])
+            for ch in t.children:
+                A.write_keys(ch, "hide_render", [(0, 0, "CONSTANT"), (A.frame(cut("S46")) + 1, 1, "CONSTANT")])
 
     # S46: the road widens out of the tube; lane dashes run out along it.
     a, b = cut("S46"), cut("S47")

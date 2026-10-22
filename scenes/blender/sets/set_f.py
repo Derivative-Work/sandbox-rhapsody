@@ -136,7 +136,10 @@ def build():
         _box(f"station{k}.beam", dark, st, (0, 0, 1.3), (0.2, 1.1, 0.14), 0.01)
         _box(f"station{k}.lamp", teal, st, (0, -0.56, 1.3), (0.16, 0.01, 0.06))
         hd = K.empty(f"station{k}.head_root", (0, 0, 0), st)
-        K.drive(hd, "location", 2, st, "strike", "-0.32 * max(x, 0) - 0.12 * min(x, 0)")
+        # The stroke ends on the crates' tops (head bottom 0.80, crate top BELT_Z + 0.32 = 0.68), so a stamp lands
+        # on a crate and never goes into it (it went 0.2 m in, C4 v4).
+        stroke = 0.80 - (BELT_Z + 0.32) - 0.004
+        K.drive(hd, "location", 2, st, "strike", f"-{stroke:.3f} * max(x, 0) - 0.12 * min(x, 0)")
         _box(f"station{k}.rod", chrome, hd, (0, 0, 1.05), (0.04, 0.04, 0.4))
         _box(f"station{k}.head", K.mat_plastic(f"station{k}.head", "platform", 0.2), hd, (0, 0, 0.84), (0.34, 0.34, 0.08),
              0.01)

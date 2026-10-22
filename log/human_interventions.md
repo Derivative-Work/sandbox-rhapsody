@@ -160,3 +160,35 @@ Every human action: timestamp, what, why, and which production rule allows it. R
   - the phone's handset and cord clip through the box.
 
   Addressed with the known rough spots in v4 (production log).
+
+## 2026-10-22T17:22:01-04:00 — C4 review of animatic v4 (R1), and two open items closed
+
+- **Rule:** R1.
+- **What:** Seven notes on v4:
+  - S10: the protagonist still flies out far too fast;
+  - S12 and every phone shot: the phone still looks wrong; the human asks the agent to find a Creative Commons asset to replace it;
+  - S19: the pager falls through the floor;
+  - every piece of rendered text to be checked for contrast, "SIMULATION" and "LIABILITY" in particular;
+  - S31: "I DECLINE" shows from the start of the shot; is that intended?;
+  - S45: the YAML in a monospace font, like a code editor;
+  - S59 on: no "score: 0" before it is sung.
+
+  Three more, sent while the agent worked:
+  - S29: the stamps clip through the boxes ("not really sure how to resolve this one");
+  - S43: the clock ticks the wrong way for a countdown;
+  - S59 on: the drumsticks and similar clip through the covers.
+
+  Addressed in v5 (production log).
+- **Closed by the human:**
+  - Transcription accuracy needs no more work: "it's not a good score for reproducing the music as heard, but it makes a good video".
+  - The vocal repaint failed (Suno Studio couldn't reproduce the same voice), so the vocal stays as it is. "every-every breach" remains as sung.
+
+## 2026-10-22T18:12:52-04:00 — The phone model: chosen and downloaded (R1, R4)
+
+- **Rule:** R1 (choosing between the agent's two candidates) and R4 (Sketchfab downloads need an account the agent doesn't have).
+- **What:** The human picked "Rotary Phone" by lobstor (CC BY 4.0) over the 1970 beige phone ("the other one had artifacts from 3D scanning but this one does not") and downloaded it to `~/Downloads/rotary_phone.zip`. They noted the cord would need removing and remodelling, and the handset isolating, to animate it. It is the first third-party asset in the video; credited in `docs/credits.md` for the end card.
+
+## 2026-10-22T18:27:46-04:00 — The phone's dial missing from the check stills (R1)
+
+- **Rule:** R1.
+- **What:** The human asked whether the dial had been put back; it hadn't rendered (the finger wheel was placed flat under the body). Fixed before v5 (production log).

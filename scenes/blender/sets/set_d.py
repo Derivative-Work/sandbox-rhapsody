@@ -220,14 +220,16 @@ def animate(S, t0, t1):
     A.hit_flash(S["pager"], "buzz", kicks + after, length=24)
     edge = DESK_W / 2 - PAGER0.x + 0.02  # walk from the start to the desk's edge over all the kicks
     K.drive(S["pager_slide"], "location", 0, S["pager"], "walk", f"{edge / max(1, len(kicks)):.5f} * x")
-    pg = S["pager"]
+    # The fall moves the root; the flip turns the slide, which carries the walked-off distance, so the pager turns
+    # about itself (turning the root swung it in a 1 m circle through the floor, C4 v4).
+    pg, sl = S["pager"], S["pager_slide"]
     p0 = pg.location.copy()
-    for dt, d, rot in ((0.0, (0, 0, 0), (0, 0, 0)), (0.25, (0.08, -0.04, -0.25), (0, 1.6, 0.2)),
-                       (0.5, (0.14, -0.08, -0.74), (0.2, 5.6, 0.5)), (0.6, (0.15, -0.09, -0.70), (0.1, 6.1, 0.5)),
+    for dt, d, rot in ((0.0, (0, 0, 0), (0, 0, 0)), (0.25, (0.08, -0.04, -0.2), (0, 1.6, 0.2)),
+                       (0.5, (0.14, -0.08, -0.62), (0.2, 4.7, 0.5)), (0.6, (0.15, -0.09, -0.70), (0.1, 6.0, 0.5)),
                        (0.7, (0.15, -0.09, -0.74), (0.0, 6.283, 0.5))):  # one full flip, landing face up
-        pg.location, pg.rotation_euler = p0 + Vector(d), rot
+        pg.location, sl.rotation_euler = p0 + Vector(d), rot
         pg.keyframe_insert("location", frame=A.frame(t_fall + dt))
-        pg.keyframe_insert("rotation_euler", frame=A.frame(t_fall + dt))
+        sl.keyframe_insert("rotation_euler", frame=A.frame(t_fall + dt))
 
 
 def lights(S):
