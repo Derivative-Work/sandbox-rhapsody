@@ -1,0 +1,17 @@
+{
+ "id": "c85b4241-5787-430c-b71e-b84c79282a06",
+ "title": "It Was Just a Benchmark",
+ "tags": "Operatic rock ballad, opening piano solo into multitracked stacked choir harmonies, wide-range vocals with clipped rhythmic staccato phrasing climbing to high notes, measured ballad pulse building into a driving heavy-rock breakdown with full-band impact.",
+ "display_tags": "operatic rock, ballad, heavy rock",
+ "model_name": "chirp-hawk",
+ "major_model_version": "v6",
+ "duration": 323,
+ "created_at": "2026-10-15T05:47:26.268Z",
+ "type": "gen",
+ "make_instrumental": false,
+ "is_remix": false,
+ "control_sliders": {
+  "aug_creativity": 1
+ },
+ "handle": "mzheng8mztk"
+}

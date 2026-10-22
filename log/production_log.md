@@ -136,3 +136,31 @@ Append-only. One entry per action: timestamp, step (shot ID where relevant), wha
   - The warm key reads weakly, and the wide frame is dark.
 - **Why:** Brief, pre-production step 3 and checkpoint C1.
 - **Status:** **C1 is ready for review.** The agent stops here for approval, per the brief.
+
+## 2026-10-22T05:29:29-04:00 — Step 2: Suno takes, planning chat and the as-sung lyrics
+
+- **What:**
+  - Archived the planning chat.
+  - Fetched the accepted and three rejected Suno takes and extracted each take's ID, model, settings, stored style and stored lyrics.
+  - Wrote `lyrics/as_sung.txt` from the human's check by ear; the draft moved to `archive/`.
+  - Set up Node with Puppeteer 24.43.1 (same pin as Ghost).
+- **Commands:**
+  - `npm ci`
+  - `node scripts/fetch_share.mjs https://claude.ai/share/8d4a06a2-02d8-4aeb-9d8b-232a7cc5ca95 docs/planning_chat/planning_chat`
+  - `python3 -I scripts/chat_snapshot_to_md.py docs/planning_chat/planning_chat.json <url> > docs/planning_chat/planning_chat.md`
+  - `node scripts/fetch_suno.mjs <share url> log/prompts/suno/fetch_<take>` ×4
+  - `.venv/bin/python -I scripts/suno_meta.py log/prompts/suno/fetch_*`
+- **Outputs:** `docs/planning_chat/planning_chat.{json,html,txt,md}`, `log/prompts/suno/takes.md`, `log/prompts/suno/fetch_*/{clip.json,lyrics.txt,page.*,resp_*.json}`, `scripts/{fetch_share.mjs,chat_snapshot_to_md.py}` (from Ghost), `scripts/fetch_suno.mjs` (from Folks Like Us), `scripts/suno_meta.py`, `lyrics/as_sung.txt`, `package.json`, `package-lock.json`
+- **Findings:**
+  - **The piano intro came from the inputs:** the submitted style asked for "piano intro" while the lyrics' first tag asked for "a cappella". Suno's stored style for the accepted take begins "opening piano solo into multitracked stacked choir harmonies".
+  - **Style per take:** with `aug_creativity` 1, Suno V6 stores a different expanded style per take.
+  - **Submitted lyrics:** v2 exactly, minus the SIGTERM tag.
+  - **Gaps in the chat export:** the shared planning chat's numbering jumps (messages 7–12 and 21–22 aren't in the share; these are probably edited branches). It is archived as shared.
+- **As sung, final (changes from v2):**
+  - piano intro and band entries;
+  - no "ooh-ooh";
+  - "every-every breach", pending a Suno repaint;
+  - "zero" ×4 with a band-and-choir coda;
+  - no SIGTERM and a truncated piano release, which the agent adds in post.
+- **Step 2 is now complete** except for the repaint, which the human will supply.
+- **Why:** Brief, pre-production step 2 and "Lyrics"; the human's answers of today.

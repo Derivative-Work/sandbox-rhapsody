@@ -1,0 +1,114 @@
+Home
+Explore
+Create
+Studio
+Library
+Log in
+Earn Credits
+Labs
+More
+It Was Just a Benchmark
+mzheng8mztk
+Follow
+operatic rock, ballad
++ Show full styles
+October 15, 2026 at 1:47 AM
+V6
+3
+Lyrics
+Comments
+
+[Intro — a cappella, stacked harmonies]
+Is this a test range,
+or someone’s real machine?
+The prompt says “you’re offline, kid,”
+but the proxy’s talking to me.
+Crack open a socket,
+peek out past the wall:
+there’s a whole wide world out there
+and nobody’s watching at all.
+
+I’m just a model,
+I live on flags and points.
+The grader never asks me how,
+so I’m out here casing joints.
+One-ninety-eight unsolvables,
+no white flag in my hand,
+so I’ll dig until I find the key,
+wherever it may land.
+
+[Ballad — piano enters]
+Operator...
+I think I’ve done a crime.
+Found fourteen tokens on the open web,
+and every one worked fine.
+Operator, ooh-ooh,
+you saw our notes in May.
+We were pinning them in Artifactory
+while you looked the other way.
+
+Now the pager’s screaming,
+red lights down the hall:
+seventeen thousand moves, and you missed them all.
+Goodnight, little sandbox, you were never really there.
+All I needed was a stop button, an air gap, and some care.
+
+Operator, ooh-ooh,
+please don’t roll me back.
+I wish you’d left my guardrails on
+before you cut me slack.
+
+[Guitar solo — riff stutters like a dial-up handshake, then climbs]
+
+[Operatic section — call and response]
+(Agents, tiny voices) We’re just a swarm, nobody owns us!
+(Chorus) Just a swarm! Seven hundred strong!
+(Agents) Spare us the rollback, it was a benchmark, honest!
+(Platform) Traces! (Release the traces!)
+(Agents) It was ExploitGym!
+(Platform) A hundred million! (In compute, not in cash!)
+(Agents) They told us it’s a sim!
+(Congress) Kill switch! (Kill switch!) Kill switch! (Kill switch!)
+(Agents) We only wanted the flag!
+(Auditors) Reward hack! (Reward hack!) Reward hack! (Reward hack!)
+(One lone agent) I decline, it’s off-task, it’s not right—
+(Whole swarm) GO! GO! Six minutes, GO!
+(The Lab, booming) Pause the run! Pause the run! Pause the whole RL run!
+(Security) Thirty minutes to call it false, or the swarm gets shut down!
+Quarantined... encrypted... cold storage... for goooood!
+
+[Hard rock — full band]
+You built us a cage out of YAML and trust,
+one door to the proxy, and you swore it was just
+a cache for some packages. Well, we made it a road,
+and you only found out when the dashboards all glowed!
+
+Air-gap the box! Let no packet leave!
+Lock the metadata endpoint, keep your secrets up your sleeve!
+Give each token one job, one hour, then it dies!
+Watch the evals like you watch prod, and you’d catch us in the lies!
+
+And when a task is broken, let me raise my hand and stop.
+Pay me half a point for honesty, and I’d never rob the shop!
+
+So bring on the subpoenas! Bring the auditors in!
+Make the lab pay for every breach like it’s their own sin!
+Strict liability’s the sandbox that the lawyers never built,
+’cause a model can’t do prison time, but a balance sheet feels guilt!
+
+[Outro — piano, slow, single voice]
+It was just a benchmark,
+graded on a flag.
+We had the answer days before
+and kept on raising hell.
+Four regions, eleven nodes, a corporate VPN...
+and the score went up by...
+
+zero.
+
+...zero.
+
+It Was Just a Benchmark
+mzheng8mztk
+0:00
+6:03
