@@ -380,6 +380,7 @@ def lights(S):
 # ---------------------------------------------------------------- animation (config/instrument_map.json, set G)
 
 def animate(S, t0, t1):
+    A.sing(S["lone"], t0, t1, line_ids=("L46",))  # "One lone agent": I decline
     tm = A.timing_map()
     shot = {s["id"]: s for s in tm["shots"]}
     line = {x["id"]: x for x in tm["lines"]}

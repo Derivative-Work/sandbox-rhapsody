@@ -285,6 +285,7 @@ def _slot(pitch):
 # ---------------------------------------------------------------- animation (config/instrument_map.json, set B)
 
 def animate(S, t0, t1):
+    A.sing(S["lead"], t0, t1)  # the protagonist sings ("Operator...")
     W = lambda evs: A.between(evs, t0 - 1, t1 + 1)  # noqa: E731
     tm = A.timing_map()
     shot = {s["id"]: s for s in tm["shots"]}
@@ -409,8 +410,9 @@ CAMERAS = {
             (0.45, TUBE_MOUTH + _v(0.55, -0.95, -0.4), _v(2.62, -0.1, 1.75), 38),
             (1.0, PHONE + _v(0.55, -0.95, 0.4), PHONE + _v(0, 0, 0.2), 40)],
     # Close on the probe on the phone's cradle.
-    "S12": [(0.0, PHONE + _v(0.35, -0.8, 0.3), PHONE + _v(0, 0, 0.15), 45),
-            (1.0, PHONE + _v(0.2, -0.6, 0.27), PHONE + _v(0, 0, 0.17), 50)],
+    # Close on the singer on the cradle, the phone below it (human, C4: the singing must read).
+    "S12": [(0.0, PHONE + _v(0.25, -0.62, 0.36), PHONE + _v(0, 0, 0.24), 50),
+            (1.0, PHONE + _v(0.14, -0.45, 0.33), PHONE + _v(0, 0, 0.26), 58)],
     # Drawers slide out as piano keys; the camera drifts toward the hero drawer's note.
     "S15": [(0.0, _v(1.2, -2.6, 2.4), _v(0, -0.3, 1.2), 30), (1.0, None, None, 42)],
     # Wide: every drawer open, notes everywhere, probes pinning.

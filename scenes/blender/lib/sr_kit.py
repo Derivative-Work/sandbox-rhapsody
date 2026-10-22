@@ -152,8 +152,9 @@ def mat_acrylic(name, role, alpha=0.35, emit=0.0):
     return m
 
 
-def mat_emission(name, role, strength, prop_owner=None, prop=None):
-    """Emitter whose strength can be driven by a custom property on `prop_owner` (0–1 scales `strength`)."""
+def mat_emission(name, role, strength, prop_owner=None, prop=None, floor=0.04):
+    """Emitter whose strength can be driven by a custom property on `prop_owner` (0–1 scales `strength`, above an
+    idle `floor`)."""
     m = bpy.data.materials.new(name)
     m.use_nodes = True
     nt = m.node_tree
@@ -172,7 +173,7 @@ def mat_emission(name, role, strength, prop_owner=None, prop=None):
         v.targets[0].id_type = "OBJECT"
         v.targets[0].id = prop_owner
         v.targets[0].data_path = f'["{prop}"]'
-        d.expression = f"{strength} * (0.04 + 0.96 * x)"
+        d.expression = f"{strength} * ({floor} + {1 - floor} * x)"
     return m
 
 
@@ -253,6 +254,12 @@ def refresh():
     for m in bpy.data.materials:  # emission strengths driven by the same properties
         if m.node_tree and m.node_tree.animation_data:
             m.node_tree.update_tag()
+    # A driver flagged invalid (e.g. evaluated once before its target existed) is skipped until cleared; clear every
+    # flag so each is retried (sub-agent report, set G: drivers made in build() silently never evaluated).
+    for idb in list(bpy.data.objects) + list(bpy.data.lights) + [m.node_tree for m in bpy.data.materials if m.node_tree]:
+        ad = idb.animation_data
+        for fc in (ad.drivers if ad else []):
+            fc.driver.is_valid = True
     bpy.context.view_layer.update()
 
 
@@ -449,13 +456,19 @@ PROBE_R = 0.034  # tennis-ball size (brief, "The agents")
 
 
 def probe(name="probe", loc=(0, 0, 0), led_role="amber", led=1.0, scale=1.0):
-    """Polished sphere, one lens, one status LED, two thin manipulator arms. Faces -Y (lens forward)."""
+    """Polished sphere, one lens, one status LED, two thin manipulator arms. Faces -Y (lens forward).
+    "sing" (0-1, sr_anim.sing) is its voice: the body lifts and tilts its lens up, the iris opens and a halo round the
+    lens lights (human, C4: the protagonist's singing, an LED alone, was "too subtle")."""
     r = PROBE_R
-    root = empty(name, loc)
-    root.scale = (scale,) * 3
-    prop(root, "led", led)
-    prop(root, "arm_l", 0.2)
-    prop(root, "arm_r", 0.2)
+    top = empty(name, loc)
+    top.scale = (scale,) * 3
+    prop(top, "led", led)
+    prop(top, "arm_l", 0.2)
+    prop(top, "arm_r", 0.2)
+    prop(top, "sing", 0.0)
+    root = empty(f"{name}.body", (0, 0, 0), top)  # every part hangs here, so singing moves the whole probe
+    drive(root, "location", 2, top, "sing", f"{r * 0.45} * x")
+    drive(root, "rotation_euler", 0, top, "sing", "-0.38 * x")  # lens (-Y) tips up
 
     shell = mesh_obj(f"{name}.shell", bpy.ops.mesh.primitive_uv_sphere_add, mat_chrome(f"{name}.chrome", "probe"),
                      root, radius=r, segments=48, ring_count=24, location=(0, 0, 0))
@@ -469,12 +482,18 @@ def probe(name="probe", loc=(0, 0, 0), led_role="amber", led=1.0, scale=1.0):
                     root, radius=r * 0.4, segments=32, ring_count=16, location=(0, -r * 0.78, r * 0.05))
     lens.scale = (1, 0.55, 1)
     smooth(lens)
-    iris = mesh_obj(f"{name}.iris", bpy.ops.mesh.primitive_circle_add, mat_emission(f"{name}.iris", led_role, 6.0, root, "led"),
+    iris = mesh_obj(f"{name}.iris", bpy.ops.mesh.primitive_circle_add, mat_emission(f"{name}.iris", led_role, 6.0, top, "led"),
                     root, radius=r * 0.16, vertices=32, fill_type="NGON", location=(0, -r * 1.0, r * 0.05),
                     rotation=(math.pi / 2, 0, 0))
+    for i in (0, 1):
+        drive(iris, "scale", i, top, "sing", "1 + 1.3 * x")
+    halo = mesh_obj(f"{name}.halo", bpy.ops.mesh.primitive_torus_add,
+                    mat_emission(f"{name}.halo", led_role, 30.0, top, "sing"), root, major_radius=r * 0.52,
+                    minor_radius=r * 0.035, location=(0, -r * 0.86, r * 0.05), rotation=(math.pi / 2, 0, 0))
+    smooth(halo)
     # Status LED on top, in a small acrylic dome.
     ledo = mesh_obj(f"{name}.led", bpy.ops.mesh.primitive_uv_sphere_add,
-                    mat_emission(f"{name}.led", led_role, 40.0, root, "led"), root, radius=r * 0.13, segments=16,
+                    mat_emission(f"{name}.led", led_role, 40.0, top, "led"), root, radius=r * 0.13, segments=16,
                     ring_count=8, location=(0, -r * 0.1, r * 0.97))
     smooth(ledo)
     # Arms: two-segment thin chrome rods from the equator, with a tiny pincer.
@@ -492,10 +511,10 @@ def probe(name="probe", loc=(0, 0, 0), led_role="amber", led=1.0, scale=1.0):
                          elbow, size=1, location=(k * r * 0.05, 0, -r * 0.95))
             f.scale = (r * 0.025, r * 0.05, r * 0.16)
         # Reach 0 = arm folded along the body, 1 = stretched forward.
-        drive(shoulder, "rotation_euler", 0, root, f"arm_{side}", "-0.25 - 1.25 * x")
-        drive(shoulder, "rotation_euler", 1, root, f"arm_{side}", f"{sx} * (0.35 - 0.2 * x)")
-        drive(elbow, "rotation_euler", 0, root, f"arm_{side}", "-1.1 + 0.95 * x")
-    return root
+        drive(shoulder, "rotation_euler", 0, top, f"arm_{side}", "-0.25 - 1.25 * x")
+        drive(shoulder, "rotation_euler", 1, top, f"arm_{side}", f"{sx} * (0.35 - 0.2 * x)")
+        drive(elbow, "rotation_euler", 0, top, f"arm_{side}", "-1.1 + 0.95 * x")
+    return top
 
 
 # ---------------------------------------------------------------- server blade
@@ -651,10 +670,28 @@ def music_box(name="musicbox", loc=(0, 0, 0), scale=1.0, rot_z=0.0, parent=None)
         mesh_obj(f"{name}.pin{i}", bpy.ops.mesh.primitive_cylinder_add, pin_mat, axle, radius=0.0012, depth=0.006,
                  vertices=6, location=(x, math.sin(a) * 0.022, math.cos(a) * 0.022),
                  rotation=(-a, 0, 0))  # points radially out of the drum
+    # Teeth, low (left) to high: each hinges at the comb base; "tooth<k>" (0-1, sr_anim.comb) lifts its tip and
+    # lights it, so every plucked note shows (human, C4: the piano at the end couldn't be seen).
+    comb_m = mat_chrome(f"{name}.comb")
     for k in range(18):
-        t = mesh_obj(f"{name}.tooth{k}", bpy.ops.mesh.primitive_cube_add, mat_chrome(f"{name}.comb"), root, size=1,
-                     location=(-0.051 + k * 0.006, -0.026, 0.084))
-        t.scale = (0.0042, 0.05 - k * 0.0012, 0.0015)
+        L = 0.05 - k * 0.0012
+        prop(root, f"tooth{k}", 0.0)
+        hinge = empty(f"{name}.hinge{k}", (-0.051 + k * 0.006, -0.051, 0.084), root)
+        drive(hinge, "rotation_euler", 0, root, f"tooth{k}", "0.3 * x")
+        t = mesh_obj(f"{name}.tooth{k}", bpy.ops.mesh.primitive_cube_add, comb_m, hinge, size=1,
+                     location=(0, L / 2, 0))
+        t.scale = (0.0042, L, 0.0015)
+        tip = mesh_obj(f"{name}.tip{k}", bpy.ops.mesh.primitive_cube_add,
+                       mat_emission(f"{name}.tip{k}", "amber", 60.0, root, f"tooth{k}", floor=0.0), hinge, size=1,
+                       location=(0, L * 0.8, 0.0012))
+        tip.scale = (0.0044, L * 0.4, 0.001)
+    # A warm pool of light over the comb, following the loudest ringing tooth ("glow", keyed by sr_anim.comb).
+    prop(root, "glow", 0.0)
+    ld = bpy.data.lights.new(f"{name}.glow", "POINT")
+    ld.color, ld.shadow_soft_size, ld.energy = col("amber")[:3], 0.02, 0.0
+    lo = link(bpy.data.objects.new(f"{name}.glow", ld))
+    lo.parent, lo.location = root, (0, -0.02, 0.13)
+    drive(ld, "energy", None, root, "glow", f"{6.0 * scale * scale:.3f} * x")
     comb_base = mesh_obj(f"{name}.combbase", bpy.ops.mesh.primitive_cube_add, mat_chrome(f"{name}.comb"), root, size=1,
                          location=(0, -0.055, 0.082))
     comb_base.scale = (0.115, 0.018, 0.008)

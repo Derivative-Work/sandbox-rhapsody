@@ -316,3 +316,62 @@ def curve_length(curve_obj):
     pts = [curve_obj.matrix_world @ v.co for v in me.vertices]
     curve_obj.evaluated_get(dg).to_mesh_clear()
     return sum((pts[i + 1] - pts[i]).length for i in range(len(pts) - 1)) if len(pts) > 1 else 1.0
+
+
+def sing_curve(t0, t1, roles=("lead",), line_ids=None, attack=3, release=6, accent=0.3, accent_len=8):
+    """Per-frame 0-1 "voice" from the sung words (timing map) shaped by the vocal envelope. Inside a word it sits at
+    0.55-1.0 with the stem's level; a fresh word adds an accent that decays over accent_len frames, so repeated words
+    read one by one; it opens over `attack` frames and closes over `release`. The stem's own level is compressed
+    (0.5-0.93 while singing), so on its own it barely moves a machine (human, C4: "too subtle")."""
+    env = envelope("vocal_env")
+    n = frame(timing_map()["duration_s"]) + 1
+    target = np.zeros(n)
+    acc = np.zeros(n)
+    for li in timing_map()["lines"]:
+        if (line_ids is None and li["role"] not in roles) or (line_ids is not None and li["id"] not in line_ids):
+            continue
+        for w in li["words"]:
+            if not (t0 - 1 <= w["start"] < t1 + 1):
+                continue
+            a, b = frame(w["start"]), max(frame(w["end"]), frame(w["start"]) + 6)
+            lv = np.clip((env[np.minimum(np.arange(a, b), len(env) - 1)] - 0.4) / 0.55, 0, 1)
+            target[a:b] = np.maximum(target[a:b], 0.55 + 0.45 * lv)
+            k = np.arange(accent_len)
+            acc[a:a + accent_len] = np.maximum(acc[a:a + accent_len], accent * (1 - k / accent_len)[:n - a])
+    out = np.zeros(n)
+    v = 0.0
+    for f in range(n):
+        tgt = target[f]
+        v += (tgt - v) / (attack if tgt > v else release)
+        out[f] = v
+    return np.clip(out + acc, 0, 1)
+
+
+def sing(owner, t0, t1, prop="sing", **kw):
+    """Key a probe's "sing" (sr_kit.probe) from sing_curve over [t0, t1] s."""
+    return envelope_rig(owner, prop, sing_curve(t0, t1, **kw), frame(t0 - 1), frame(t1 + 1), step=1)
+
+
+def comb(box, evs, lo=36, hi=96, cut_at=None, step=1):
+    """A music box (sr_kit.music_box) plays notes: pitch picks one of its 18 teeth (lo..hi spread across the comb,
+    low on the left); a tooth snaps up and lights on its note's onset frame, rings down like a struck string while the
+    note is held (fast transient, then about 6 dB/s, matching the ending's release) and lets go over 12 frames at the
+    note's end. Overlapping notes on a tooth take the louder. cut_at (s) stops everything dead (the SIGTERM)."""
+    n = frame(timing_map()["duration_s"]) + 1
+    vals = np.zeros((18, n))
+    stop = frame(cut_at) if cut_at is not None else n
+    for e in evs:
+        k = int(np.clip(round((e["pitch"] - lo) / (hi - lo) * 17), 0, 17))
+        a = frame(e["t"])
+        b = min(max(frame(e["end"]), a + 8), stop)
+        f = np.arange(a, min(b + 12, stop, n))
+        dt = (f - a) / FPS
+        v = 0.3 * 10 ** (-6 * dt / 20) + 0.7 * np.exp(-dt * FPS / 20)
+        v = np.where(f < b, v, v * np.clip(1 - (f - b) / 12, 0, 1))
+        vals[k, f] = np.maximum(vals[k, f], v)
+    lo_f = max(0, min((frame(e["t"]) for e in evs), default=0) - 2)
+    hi_f = min(n, max((frame(e["end"]) for e in evs), default=0) + 14, stop + 1)
+    for k in range(18):
+        if vals[k].any():
+            envelope_rig(box, f"tooth{k}", vals[k], lo_f, hi_f, step=step)
+    envelope_rig(box, "glow", vals.max(axis=0), lo_f, hi_f, step=step)

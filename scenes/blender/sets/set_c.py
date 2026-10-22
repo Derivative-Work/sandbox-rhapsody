@@ -190,6 +190,7 @@ def door_events():
 
 
 def animate(S, t0, t1):
+    A.sing(S["lead"], t0, t1)  # the protagonist sings
     W = lambda evs: A.between(evs, t0 - 1, t1 + 1)  # noqa: E731
     tm = A.timing_map()
     shot = {s["id"]: s for s in tm["shots"]}

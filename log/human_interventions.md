@@ -122,3 +122,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **What:** On `renders/step7/anim_test_44-54_v3.mp4` the human said: "movements are legible, but it also makes issues in the transcribed score more obvious too. keep going for now and we'll come back to it later".
 - **Rule:** R1. Transcription accuracy (the notes the machines play) stays open, to be revisited (handoff).
+
+## 2026-10-22T12:45:55-04:00 — C4 review of animatic v1 (R1)
+
+- **Rule:** R1 (approve or reject).
+- **What:** The human said the piano at the end couldn't be seen and the protagonist's singing was too subtle. The agent made both legible in v2 (production log).

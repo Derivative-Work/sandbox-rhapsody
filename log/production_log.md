@@ -509,3 +509,28 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - Plates in `renders/animatic/plates/` (regenerable, not archived).
   - Render times at 640×360: 0.07–0.24 s per frame; set builds 3 s (D) to about 2 min (A, with the 198 boxes).
 - **Why:** Brief, checkpoint C4. Transcription accuracy stays open per the human ("keep going for now and we'll come back to it later").
+
+## 2026-10-22T12:45:55-04:00 — C4 animatic v2: a visible piano and a singing protagonist
+
+- **Human feedback on v1 (R1):** "Is there something at the end that's supposed to represent the piano? I can't see it if so. Similarly, the protagonist's singing is too subtle."
+- **Diagnosis:**
+  - **Piano:** the music box (the outro's piano) only stepped its drum a twelfth of a turn per top-line note, and its comb never moved. The final chord (321.61 s) and the agent-made release had nothing on screen.
+  - **Singing:** it was only the lead probe's LED on the vocal envelope. The stem is compressed (0.51–0.93 for 10th–90th percentile while singing), so the LED barely changed.
+- **Fix, shared kit:**
+  - **`sr_kit.music_box`:** the 18 comb teeth now hinge at the comb base. "tooth<k>" lifts a tooth's tip and lights an amber strip on it, dark at rest. A "glow" point light over the comb follows the loudest ringing tooth.
+  - **`sr_anim.comb`:** pitch (36–96) picks the tooth. A tooth snaps up on its note's onset frame, rings down while the note is held (a fast transient, then 6 dB/s, the ending's release rate) and lets go over 12 frames; `cut_at` stops everything dead.
+  - **`sr_kit.probe`:** the parts hang from a new body pivot. "sing" lifts the probe 0.45 r and tips the lens up 0.38 rad, opens the iris to 2.3×, and lights a halo ring round the lens. Names and the other props are unchanged.
+  - **`sr_anim.sing`:** the voice comes from the sung words in the timing map (lead lines, or given line ids), shaped by the vocal envelope. Each fresh word adds an accent so repeated words read one by one; it opens over 3 frames and closes over 6, and is dark between phrases.
+  - **`sr_kit.mat_emission`:** gains an idle `floor`.
+  - **`sr_kit.refresh`:** clears every driver's invalid flag. Material drivers were flagged invalid when created and skipped until cleared. This is the cause of the set G sub-agent's "drivers made in build() silently never evaluated" report.
+- **Fix, sets:**
+  - The protagonist sings in A, B, C and I. In H, the honest probe sings S53–S54. In G, the lone agent sings L46 only.
+  - The music box plays every piano note in A and I. In I, the last chord rings until the SIGTERM cuts it.
+  - Set I's box is bigger (scale 1.8 → 2.4). S59 ends, and S64b holds from 85%, on a high view down onto the comb with the singer beside it.
+  - S12 is now framed close on the singer on the phone's cradle.
+- **Checked:**
+  - In S64b, the final chord lights teeth 0, 3, 7, 8 and 10 and they fade through the release.
+  - In S05 and S12, the halo, lift and tilt follow the words and go dark between phrases.
+  - Tooth values at frames 19297/19330/19400 are 1.0/0.34/0.10 on the chord's teeth (debug run).
+- **Outputs:** `renders/animatic/animatic_v2.mp4`, with all sets re-rendered. Superseded: `archive/renders/animatic_v1_superseded_piano-and-singing-too-subtle.mp4`.
+- **Why:** Human feedback, R1 (human interventions).

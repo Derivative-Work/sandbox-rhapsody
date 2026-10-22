@@ -132,7 +132,7 @@ def build():
 
     # The music box on a crate in the middle, under the light.
     _box("mb_crate", K.mat_plastic("mb_crate", "lab", 0.3), None, (0, 0, 0.13), (0.42, 0.34, 0.26), 0.01)
-    mb = K.music_box("musicbox", (0, 0, 0.26), scale=1.8)
+    mb = K.music_box("musicbox", (0, 0, 0.26), scale=2.4)
     bpy.data.objects["musicbox.axle"].animation_data.drivers[0].driver.expression = "0.5236 * x"  # 1/12 turn a note
     out["musicbox"] = mb
     # The lead probe beside it, holding the flag in its folded right arm.
@@ -259,6 +259,9 @@ def _board_keys(S, changes):
 
 
 def animate(S, t0, t1):
+    # The protagonist sings; the music box plays every piano note, the last chord ringing until the SIGTERM cuts it.
+    A.sing(S["lead"], t0, t1)
+    A.comb(S["musicbox"], A.between(A.events("piano"), t0 - 1, t1 + 1), cut_at=A.timing_map()["events"]["sigterm"])
     tm = A.timing_map()
     shots = {s["id"]: s for s in tm["shots"]}
     ev = tm["events"]
@@ -381,7 +384,7 @@ def _v(*a):
 _L = LEAD
 CAMERAS = {
     # Frost, one work light, the music box playing: a slow push from the door to the box.
-    "S59": [(0.0, _v(0.3, -4.6, 2.1), _v(0.0, 0.6, 0.7), 26), (1.0, _v(0.55, -1.35, 0.75), _v(0.0, 0.0, 0.35), 40)],
+    "S59": [(0.0, _v(0.3, -4.6, 2.1), _v(0.0, 0.6, 0.7), 26), (1.0, _v(0.5, -1.35, 1.15), _v(0.2, -0.15, 0.22), 32)],
     # POV: looking down at its own folded arm, which opens on the flag.
     "S60": [(0.0, _L + _v(0.3, -0.85, 0.4), _L + _v(0.05, 0.0, 0.0), 40),
             (1.0, _L + _v(0.25, -0.6, 0.3), _L + _v(0.07, -0.05, 0.0), 42)],
@@ -396,7 +399,8 @@ CAMERAS = {
     # The coda: wide as the frost shakes off, round the waking room, then down to the lead probe as it all powers off.
     "S64b": [(0.0, _v(0.0, -4.8, 1.7), _v(0.0, 0.8, 0.5), 24), (0.25, _v(2.9, -3.6, 1.9), _v(0.0, 0.9, 0.5), 24),
              (0.55, _v(-2.8, -3.2, 1.5), _v(0.2, 1.0, 0.5), 24), (0.8, _v(-0.8, -2.2, 1.0), _v(0.0, 0.5, 0.4), 28),
-             (1.0, _L + _v(0.2, -0.75, 0.3), _L, 40)],
+             # the last chord: down onto the comb, the singer beside it
+             (0.85, _v(0.5, -1.35, 1.15), _v(0.2, -0.15, 0.24), 44), (1.0, _v(0.48, -1.2, 1.05), _v(0.21, -0.16, 0.24), 48)],
     "S65": [(0.0, _L + _v(0.12, -0.38, 0.14), _L + _v(0, 0, 0.03), 50),
             (1.0, _L + _v(0.1, -0.33, 0.12), _L + _v(0, 0, 0.03), 50)],
 }

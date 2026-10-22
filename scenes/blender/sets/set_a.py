@@ -184,6 +184,9 @@ BAND_IN = 44.5  # the band (and the backing vocals, bass) enter
 
 def animate(S, t0, t1):
     """Key every set-A rig for the window [t0, t1] (s) from the events (sr_anim)."""
+    # The protagonist sings: the lead probe's voice from the lead's words; the music box plays every piano note.
+    A.sing(S["lead"], t0, t1)
+    A.comb(S["musicbox"], A.between(A.events("piano"), t0 - 1, t1 + 1))
     W = lambda evs: A.between(evs, t0 - 1, t1 + 1)  # noqa: E731
     f0, f1 = A.frame(t0 - 1), A.frame(t1 + 1)
     vocal = A.envelope("vocal_env") ** 2.0

@@ -394,6 +394,7 @@ def lights(S):
 # ---------------------------------------------------------------- animation (config/instrument_map.json, set H)
 
 def animate(S, t0, t1):
+    A.sing(S["honest"], t0, t1)  # the honest probe is the protagonist's voice in the rebuild
     tm = A.timing_map()
     shot = {s["id"]: s for s in tm["shots"]}
     cut = lambda i: shot[i]["cut"]  # noqa: E731
