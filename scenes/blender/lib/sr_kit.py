@@ -840,3 +840,25 @@ def pellet_mesh(name, mat, r=0.015, stretch=2.6):
     o.scale = (stretch, 1, 1)
     o.data.materials.append(mat)
     return o
+
+
+def camera_move(name, keys, fps=None):
+    """A camera flying through `keys` = [(time s, eye xyz, target xyz, lens mm), ...], tracking a target empty,
+    eased in and out (Bezier keys, auto-clamped handles): Animusic's long smooth moves (style spec, camera).
+    Returns the camera object; it becomes the scene camera."""
+    import bpy
+    fps = fps or LOOK["fps"]
+    tgt = empty(f"{name}.target")
+    cd = bpy.data.cameras.new(name)
+    cd.clip_start, cd.clip_end = 0.01, 800
+    cam = link(bpy.data.objects.new(name, cd))
+    c = cam.constraints.new("TRACK_TO")
+    c.target, c.track_axis, c.up_axis = tgt, "TRACK_NEGATIVE_Z", "UP_Y"
+    for t, eye, target, lens in keys:
+        f = round(t * fps)
+        cam.location, tgt.location, cd.lens = eye, target, lens
+        cam.keyframe_insert("location", frame=f)
+        tgt.keyframe_insert("location", frame=f)
+        cd.keyframe_insert("lens", frame=f)
+    bpy.context.scene.camera = cam
+    return cam

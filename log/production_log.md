@@ -473,3 +473,39 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - **SIGTERM** at 325.50 s: a click, a falling whine (2.2 kHz → 80 Hz over 0.4 s) and a 55 Hz thump at −24 dBFS peak. The chord is cut with it (12 ms fade). Silence from 325.95 s.
   - The master before 322.6 s is untouched, sample for sample (asserted). Peak −0.1 dBFS. Length 327.45 s.
 - **Timing:** `config/audio.json` names the final audio. The timing map runs 327.45 s (19,647 frames) and gains sections "release and SIGTERM" (322.6 s) and "silence" (325.95 s). S65 cuts on the SIGTERM (325.50 s, no longer provisional) and S66 at 326.45 s; S67 waits for the fact card's length. The score and `shots/pipeline.md` are regenerated.
+
+## 2026-10-22T10:21:44-04:00 — C4 animatic v1: all nine sets in grey-box, every shot at final timing
+
+- **What:** The animatic for checkpoint C4. Every set (A–I) is built in grey-box from the shared kit, each with `build()`, `animate(S, t0, t1)` (the set's `config/instrument_map.json` entries via `sr_anim`) and `CAMERAS` per shot. Every shot's scripted gag from the brief has a rough keyed version timed from the timing map's shot, line and word times.
+  - `scenes/blender/animatic.py` builds one set, keys it and renders each of its shots (the brief's Set column, first set named) over its exact frames at 640×360, 8 samples, Eevee. `scripts/render_animatic.sh` runs the sets.
+  - `scripts/animatic_assemble.py` lays the plates on the 60 fps timeline with the final audio (`config/audio.json`). The plates are burnt in with:
+    - the shot, set and section (top left);
+    - bar.beat, timecode and frame (top right);
+    - the sung line with the current word lit (bottom);
+    - the brief's on-screen text (right).
+
+    S01 fades up from black over 3 s. S66, the JS fact card, is a placeholder card. S67 waits for the fact card's length.
+  - Kit additions:
+    - `sr_kit.camera_move`: keyed eye, target and lens.
+    - Set A gains the wall-of-198 column lights, the STOP socket, guardrails with a wrench and the "removed for evaluation" tag, faint machines and a security camera beyond the glass.
+    - The lead probe's scripted moves: to the glass in S05; the note peeled and fluttering down, then into the tube, in S10.
+    - `scripts/set_g_stunts.py` draws the opera crowd's card stunts (`700`, `EXPLOITGYM`, `GO`, `6:00` countdown) as one 70×10 LED bitmap per frame (cache/, regenerable).
+- **Look fix:** `config/look.json` rim_specular 0.1 → 0.0. The rim lights' specular still showed as a tall white slab in the mirror floor in low shots (sets A, C, E; checked A/B on S23). The rims now light edges diffusely only.
+- **Made by:** sets B–I were written by four parallel sub-agents (forks of this session, same model) under the same rules. They did not edit the shared kit. I reviewed contact sheets of every shot.
+- **Known grey-box gaps, for the C4 review:**
+  - S20 has no desk; the cube only shrinks into the void.
+  - In S13, two of the 14 key pickups fall just before the cut, because only 12 piano notes fall inside the line; the JS counter should start at 2/14.
+  - The S14 keys only flash; they don't turn.
+  - The S36 decal is held up on poles, not by arms.
+  - The S46 road widens under the tube.
+  - Frost in S64b only jiggles; there are no particles.
+  - S22's rewind and S65's CRT collapse are ffmpeg edits, not yet applied.
+- **Shared-library notes from the sub-agents (not yet fixed):**
+  - Keying `hide_render` on a rig root doesn't hide its parts.
+  - Two drivers created in set G's `build()` went invalid silently; they were remade in `animate()`. Cause not found.
+  - `mat_metal` brass reads grey against the dark surround.
+- **Outputs:**
+  - `renders/animatic/animatic_v1.mp4` (327.45 s, 19,647 frames, the final audio).
+  - Plates in `renders/animatic/plates/` (regenerable, not archived).
+  - Render times at 640×360: 0.07–0.24 s per frame; set builds 3 s (D) to about 2 min (A, with the 198 boxes).
+- **Why:** Brief, checkpoint C4. Transcription accuracy stays open per the human ("keep going for now and we'll come back to it later").

@@ -41,7 +41,7 @@
     "fill": 2600,
     "rim": 4500,
     "key_specular": 0.6,
-    "rim_specular": 0.1
+    "rim_specular": 0.0
   },
   "stars": 1.2,
   "cards": {

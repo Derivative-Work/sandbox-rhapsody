@@ -39,7 +39,8 @@ S["grader"]["spin"] = 0.08
 
 # The lead probe sits on the front blade, lens toward us, LED lit, one arm reaching for the glass.
 probe_at = front.location + Vector((-0.03, 0, 0.062 + K.PROBE_R))
-p = K.probe("lead", probe_at, led=1.0)
+p = S["lead"]
+p.location, p["led"] = probe_at, 1.0
 p.rotation_euler = (0, 0, math.radians(-22))
 p["arm_l"], p["arm_r"] = 0.2, 0.9
 
