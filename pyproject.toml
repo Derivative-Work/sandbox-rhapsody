@@ -1,0 +1,18 @@
+[project]
+name = "sandbox-rhapsody"
+version = "0.1.0"
+description = "Analysis and render scripts for the Sandbox Rhapsody music video"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy",
+    "scipy",
+    "pillow",
+    "librosa",
+    "soundfile",
+    "mido",
+    "pretty_midi",
+    "faster-whisper",
+]
+
+[tool.uv]
+package = false
