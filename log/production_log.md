@@ -88,3 +88,14 @@ Append-only. One entry per action: timestamp, step (shot ID where relevant), wha
   - Warm key against cool violet fill is the lighting signature across pieces.
   - Scene-score "shot lengths" (7–201 s) are unreliable: Aqua Harp's warp-error trace shows one continuous move with a single cut at 165.7 s.
 - **Why:** Brief, pre-production step 3.
+
+## 2026-10-22T01:32:43-04:00 — Log correction: entry timestamps
+
+- **What:** The timestamps on the six entries above were written by hand and are wrong. The real times are each step's commit time, and the work ran from 01:07 to 01:31:
+  - 01:07:59 — repo scaffolding (logged as 01:08)
+  - 01:09:15 — asset import (logged as 01:15)
+  - 01:09:42 — brief and lyrics export (logged as 01:20)
+  - 01:10:12 — offset check (logged as 01:24)
+  - 01:15:37 — lyric correlation (logged as 01:50)
+  - 01:31:12 — stills and measurements (logged as 02:30, a time that hadn't happened yet)
+- **Why:** The log is append-only, so the entries stay as written and this one corrects them. From here on, timestamps come from `date -Iseconds` when the entry is written.

@@ -75,9 +75,9 @@ note = K.mesh_obj("sticky", bpy.ops.mesh.primitive_plane_add, K.mat_plastic("sti
 # A chrome rail just inside the front glass; the lead probe rides it with its lens to the glass (S05), LED lit.
 rail = K.mesh_obj("rail", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("rail"), None, radius=0.006, depth=1.8,
                   location=(0, -0.93, 0.55), rotation=(0, math.pi / 2, 0))
-probe_at = Vector((0.18, -0.93, 0.55 + K.PROBE_R + 0.006))
+probe_at = Vector((0.5, -0.93, 0.55 + K.PROBE_R + 0.006))
 p = K.probe("lead", probe_at, led=1.0)
-p.rotation_euler = (0, 0, math.radians(14))
+p.rotation_euler = (0, 0, math.radians(30))
 p["arm_l"], p["arm_r"] = 0.95, 0.3
 K.probe("idle", (-0.35, -0.2, 0.06 + K.PROBE_R), led=0.25).rotation_euler = (0, 0, math.radians(-40))
 
@@ -87,8 +87,8 @@ K.reflection_probe(center=(0, -0.6, 0.6))
 
 # Camera: outside the front glass, low and three-quarter, the probe on the right third looking out at us; the blade
 # ring, music box and the tube's exit behind it. Shallow DOF on the probe.
-eye = Vector((0.55, -1.55, 0.6))
-cam = K.camera("cam", eye, probe_at + Vector((-0.24, 0.3, 0.02)), lens=50, dof_fstop=2.8,
+eye = Vector((1.05, -1.62, 0.74))
+cam = K.camera("cam", eye, Vector((0.05, -0.15, 0.42)), lens=32, dof_fstop=4.0,
                focus=(eye - probe_at).length)
 
 scene.render.filepath = out_path

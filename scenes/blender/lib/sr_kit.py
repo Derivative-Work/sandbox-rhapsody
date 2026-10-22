@@ -439,28 +439,33 @@ def blade(name="blade", loc=(0, 0, 0), rot_z=0.0, width=0.48, height=0.09, depth
                     size=1, location=(0, 0, height / 2))
     body.scale = (width, depth, height)
     bevel(body, 0.006)
-    # Recessed dark grille well, then the louvres in front of it.
+    # Chrome face plate, a recessed dark grille well in it, the glow behind, the louvres in front.
+    face = mesh_obj(f"{name}.face", bpy.ops.mesh.primitive_cube_add, mat_chrome(f"{name}.face", "chrome"), root,
+                    size=1, location=(0, -depth / 2 - 0.002, height / 2))
+    face.scale = (width * 0.98, 0.004, height * 0.94)
+    bevel(face, 0.002, 2)
+    gw, gh = width * 0.74, height * 0.8
     well = mesh_obj(f"{name}.well", bpy.ops.mesh.primitive_cube_add, mat_plastic(f"{name}.well", "shadow", 0.4), root,
-                    size=1, location=(-width * 0.08, -depth / 2 - 0.0005, height / 2))
-    well.scale = (width * 0.68, 0.004, height * 0.74)
+                    size=1, location=(-width * 0.07, -depth / 2 - 0.0035, height / 2))
+    well.scale = (gw, 0.004, gh)
     glow = mesh_obj(f"{name}.glow", bpy.ops.mesh.primitive_plane_add,
-                    mat_emission(f"{name}.glow", "lab_glow", 3.0, root, "vent"), root, size=1,
-                    location=(-width * 0.08, -depth / 2 + 0.003, height / 2), rotation=(math.pi / 2, 0, 0))
-    glow.scale = (width * 0.66, height * 0.7, 1)
-    slat_h = height * 0.74 / slats
+                    mat_emission(f"{name}.glow", "lab_glow", 4.0, root, "vent"), root, size=1,
+                    location=(-width * 0.07, -depth / 2 - 0.006, height / 2), rotation=(math.pi / 2, 0, 0))
+    glow.scale = (gw * 0.97, gh * 0.9, 1)
+    slat_h = gh / slats
     for i in range(slats):
-        z = height * 0.13 + slat_h * (i + 0.5)
-        pivot = empty(f"{name}.slat_pivot{i}", (-width * 0.08, -depth / 2 - 0.004, z), root)
-        s = mesh_obj(f"{name}.slat{i}", bpy.ops.mesh.primitive_cube_add, mat_chrome(f"{name}.slat", "chrome"), pivot,
+        z = height / 2 - gh / 2 + slat_h * (i + 0.5)
+        pivot = empty(f"{name}.slat_pivot{i}", (-width * 0.07, -depth / 2 - 0.009, z), root)
+        s = mesh_obj(f"{name}.slat{i}", bpy.ops.mesh.primitive_cube_add, mat_plastic(f"{name}.slat", "lab", 0.1), pivot,
                      size=1, location=(0, 0, 0))
-        s.scale = (width * 0.66, slat_h * 0.95, 0.0025)
+        s.scale = (gw, slat_h * 0.98, 0.002)
         s.rotation_euler = (math.pi / 2, 0, 0)
         # vent 0: slats vertical (closed); 1: rotated 70° (open, the glow shows through).
         drive(pivot, "rotation_euler", 0, root, "vent", "1.22 * x")
     # Handles.
     for sx in (-1, 1):
         h = mesh_obj(f"{name}.handle{sx}", bpy.ops.mesh.primitive_torus_add, mat_chrome(f"{name}.handle", "chrome"), root,
-                     major_radius=height * 0.28, minor_radius=0.004, location=(sx * width * 0.46, -depth / 2 - 0.004,
+                     major_radius=height * 0.28, minor_radius=0.004, location=(sx * width * 0.46, -depth / 2 - 0.009,
                                                                                height / 2),
                      rotation=(0, math.pi / 2, 0))
         h.scale = (1, 0.5, 1)
@@ -469,7 +474,7 @@ def blade(name="blade", loc=(0, 0, 0), rot_z=0.0, width=0.48, height=0.09, depth
         mesh_obj(f"{name}.ledrow{i}", bpy.ops.mesh.primitive_uv_sphere_add,
                  mat_emission(f"{name}.ledrow{i}", "amber" if i == 0 else "lab_glow", 12.0, root, "led"), root,
                  radius=0.0045, segments=12, ring_count=6,
-                 location=(width * 0.33 + i * 0.016, -depth / 2 - 0.002, height * 0.5))
+                 location=(width * 0.36 + i * 0.016, -depth / 2 - 0.005, height * 0.5))
     return root
 
 

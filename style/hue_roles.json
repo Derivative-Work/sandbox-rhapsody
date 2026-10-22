@@ -1,0 +1,107 @@
+{
+ "acoustic-curves": {
+  "warm": 0.537,
+  "cool": 0.031,
+  "green": 0.0,
+  "highlight": "#e1bfa1",
+  "shadow": "#26140f"
+ },
+ "aqua-harp": {
+  "warm": 0.235,
+  "cool": 0.227,
+  "green": 0.0,
+  "highlight": "#b87c73",
+  "shadow": "#130d1c"
+ },
+ "cathedral-pictures": {
+  "warm": 0.216,
+  "cool": 0.054,
+  "green": 0.001,
+  "highlight": "#f2d4d0",
+  "shadow": "#1d1418"
+ },
+ "drum-machine": {
+  "warm": 0.224,
+  "cool": 0.194,
+  "green": 0.01,
+  "highlight": "#e7849e",
+  "shadow": "#201320"
+ },
+ "fiber-bundles": {
+  "warm": 0.039,
+  "cool": 0.077,
+  "green": 0.232,
+  "highlight": "#c6c3c6",
+  "shadow": "#040d09"
+ },
+ "future-retro": {
+  "warm": 0.109,
+  "cool": 0.113,
+  "green": 0.019,
+  "highlight": "#dfac93",
+  "shadow": "#1b1816"
+ },
+ "gyro-drums": {
+  "warm": 0.099,
+  "cool": 0.027,
+  "green": 0.023,
+  "highlight": "#be9b68",
+  "shadow": "#040304"
+ },
+ "harmonic-voltage": {
+  "warm": 0.006,
+  "cool": 0.409,
+  "green": 0.002,
+  "highlight": "#be9cf5",
+  "shadow": "#030403"
+ },
+ "heavy-light": {
+  "warm": 0.278,
+  "cool": 0.155,
+  "green": 0.0,
+  "highlight": "#c18c87",
+  "shadow": "#07040a"
+ },
+ "pipe-dream": {
+  "warm": 0.224,
+  "cool": 0.305,
+  "green": 0.01,
+  "highlight": "#e5bf7d",
+  "shadow": "#241926"
+ },
+ "pipe-dream-2": {
+  "warm": 0.231,
+  "cool": 0.094,
+  "green": 0.016,
+  "highlight": "#d4c392",
+  "shadow": "#20141a"
+ },
+ "pogo-sticks": {
+  "warm": 0.345,
+  "cool": 0.115,
+  "green": 0.002,
+  "highlight": "#ec917b",
+  "shadow": "#0d0309"
+ },
+ "resonant-chamber": {
+  "warm": 0.54,
+  "cool": 0.003,
+  "green": 0.0,
+  "highlight": "#eeaa78",
+  "shadow": "#150506"
+ },
+ "starship-groove": {
+  "warm": 0.163,
+  "cool": 0.071,
+  "green": 0.017,
+  "highlight": "#d4a6af",
+  "shadow": "#010106"
+ },
+ "stick-figures": {
+  "warm": 0.361,
+  "cool": 0.086,
+  "green": 0.001,
+  "highlight": "#dcb98a",
+  "shadow": "#14100f"
+ }
+}
