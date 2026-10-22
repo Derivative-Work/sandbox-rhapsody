@@ -95,3 +95,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **What:** The human reported invented drum hits in the revised preview.
 - **Rule:** R2. The agent made the changes (production log).
+
+## 2026-10-22T08:16:08-04:00 — C3: bars 59-60 drums — R2
+
+- **What:** The human reported, at bars 59 and 60: "we're missing eighth note kicks and snare fill into 61".
+- **Rule:** R2. The agent made the changes (production log).

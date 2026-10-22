@@ -381,3 +381,23 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - Pieces: kick 320, snare 143, toms 174, hats 299, crash 171.
   - Open: snares are fewer than Suno's 264, because LarsNet hears kick or toms at many of Suno's snare strikes. The human's ear decides.
 - **Rebuilt:** score, `renders/c3/c3_score_preview.mp4`, `renders/c3/c3_preview.mp4`. Superseded files: `archive/timing/drums__kit_larsnet_superseded_unsupported-hits.json` and `archive/renders/c3/*_superseded_invented-drum-hits.mp4`.
+
+## 2026-10-22T08:16:08-04:00 — C3 revision 4: drum strikes from the drum stem, pieces from LarsNet
+
+- **Cause:** revision 3's rule (hits Suno lacks must reach the 25th percentile of Suno-confirmed level and rise) was tuned on loud backbeats. It threw away the soft fill strokes (bar 60, beats 3–4) and the off-beat strikes (bars 59–60).
+- **New design** (`scripts/drums_strikes.py`, supersedes `drums_larsnet.py` for events; the separation itself is unchanged):
+  1. **Strikes are the Drums stem's onsets:**
+     - onset strength normalised by its local ±2 s maximum, so soft fills register;
+     - onsets within 60 ms merge (a kick's body reads as a second onset ~50 ms after its attack);
+     - each strike must reach −40 dB of the stem's loud level. Without that floor, local normalisation lifted leakage into 63 "strikes" in the drumless intro and outro (all at or below −44.6 dB; band-section strikes have a median of −2.2 dB). With it there are none, and 46 of 791 band strikes (the faintest) drop.
+     - Strike times are physical attacks.
+  2. **Pieces per strike come from the LarsNet stems, in each piece's own band:**
+     - the piece with the largest rise is always credited;
+     - others are credited when their rise is at least 60% of it and their level within 24 dB of their stem's loud level;
+     - hats and cymbals also on their own evidence (rise ≥ 8 dB, level ≥ −20 dB);
+     - a kick also where the original stem's 30–70 Hz band rises ≥ 6 dB to within 12 dB of the median on-beat kick. In bars 59–60 the off-beat strikes have 7–17 dB sub-bass attacks that LarsNet files under toms.
+- **Result:**
+  - 751 strikes (beats 435, e 31, and 241, a 44). Pieces: kick 487, snare 259, toms 332, hats 309, crash 324.
+  - Bar 59 kicks: 0, 0.53, 1, 1.53, 2, 3. Bar 60's fill into 61: snare at 2.45, 3.45, 3.79 and toms at 2.78, over kicks.
+  - The drumless intro and outro: no strikes.
+- **Rebuilt:** score, both previews, `renders/c3/score.musicxml`. Superseded files: `archive/timing/drums__kit_larsnet_superseded_strict-additions.json` and `archive/renders/c3/*_superseded_missing-kicks-fill.mp4`.

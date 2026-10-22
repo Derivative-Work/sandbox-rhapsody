@@ -148,7 +148,7 @@ def main():
                                f"model had no onset within 50 ms"}
     print(f"Piano    model {len(model['events'])} + basic-pitch fill-ins {len(add)}")
     sources["drums"] = {"events": "timing/events/drums__kit.json",
-                        "why": "LarsNet-separated kit pieces (scripts/drums_larsnet.py); Suno compared, not used"}
+                        "why": "strikes from the Drums stem onsets, pieces from LarsNet-separated stems + sub-bass kick check (scripts/drums_strikes.py)"}
     Path("config/event_sources.json").write_text(json.dumps(sources, indent=1) + "\n")
 
 
