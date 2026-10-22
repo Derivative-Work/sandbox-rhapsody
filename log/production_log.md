@@ -284,3 +284,51 @@ Append-only. One entry per action: timestamp, step (shot ID where relevant), wha
   - **S65 SIGTERM is provisional** at the end of the Suno audio. The piano release and the SIGTERM sound are still to be added in post.
 - **Why:** Brief, pre-production step 5 and checkpoint C3.
 - **Status: C3 is ready for review** (`renders/c3/c3_preview.mp4`, `timing/timing_map.md`). The brief says a human checks it by ear; corrections go in the intervention log.
+
+## 2026-10-22T07:04:31-04:00 — C3 revision: missing notes, corrected shifts, score preview
+
+The human reported missing piano notes and drum hits (off-beat "and"s), an unreadable preview, and lyrics not aligned with the notes. The changes, and what they uncovered:
+
+1. **Piano re-transcribed** with a dedicated model: ByteDance high-resolution piano transcription (Kong et al. 2021) via `piano_transcription_inference` on the GPU (`scripts/transcribe_piano.py`). It finds 3,451 notes against Suno's 2,207.
+   - Suno's MIDI holds only 39% of the model's notes, missing 57% of on-beat notes, 62% of "and"s and 73–76% of sixteenths.
+   - By section it misses 30–80%, and all 277 of the opera's piano notes.
+   - The model's notes now drive the piano (`timing/events/keyboard__piano_model.json`; verdict "model" in `timing/midi_inventory.md`).
+2. **Shifts corrected; the C2 numbers were wrong.**
+   - Where the model and Suno agree, the model's onsets were 20.6 ms *before* my shifted Suno events.
+   - Physical attack times (first rise of the stem's amplitude envelope, `scripts/attack_times.py`, isolated notes only) put raw Suno 6–14 ms early, not the 12–53 ms that onset-detector peaks gave at C2.
+   - The detector's lag on real drum and piano attacks is 13–20 ms larger than on the synthetic calibration notes. So every C2 event, and the beat grid aligned to the drums, landed about 12 ms late (piano about 20 ms, brass about 38 ms).
+   - Shifts now come from attacks:
+
+     | Track | Shift |
+     | --- | --- |
+     | drums | +7.5 ms |
+     | guitar | +9.3 ms |
+     | synth | +9.9 ms |
+     | bass | +12.9 ms |
+     | strings | +13.7 ms |
+     | piano model | +7.5 ms |
+     | tracks with too few isolated notes | +10 ms default |
+
+   - Stem events (brass, FX, percussion) move to their physical attacks.
+   - The grid shift is now −7.0 ms (was +5.4).
+   - The previous outputs are archived in `archive/timing/c2_detector_shifts/`.
+3. **Drum hits Suno missed: semi-supervised NMF** (`scripts/drums_nmf.py`, report `timing/drums_nmf.md`).
+   - **Method:** templates per kit piece come from Suno's isolated hits; KL-NMF on the GPU with fixed templates and 4 free components; candidate hits are clustered across pieces. Each hit is credited to the pieces holding at least 25% of the spectrum it adds (NNLS). A hit is kept only with a real band-limited transient (rise ≥ 2×) at least as strong as Suno's quietest 10% of that piece.
+   - **Iterations, each checked on spectrograms** (`scripts/drum_check_plot.py`):
+     - per-piece peaks credited every loud hit to every piece (1,176 hats);
+     - normalized responses credited kick+snare hits to the quiet hats;
+     - without a strength floor, the kick's decay re-triggered at sixteenths (seen in the first score);
+     - with all the gates, 189 hits are added: kick 92 (48 on beats, 36 on "and"s), snare 37, toms 31, hats 24, crash 5. They are the eighth-note kicks missing from fills, which the spectrograms show.
+   - Merged kit: `timing/events/drums__kit.json` (each hit tagged `suno` or `stem_nmf`).
+4. **Score preview.**
+   - `scripts/score_build.py` (music21) puts the corrected events on the beat grid at sixteenth resolution. Staves: vocals with lyrics, piano (two staves), bass, distortion guitar, drums with NMF additions in amber. It uses the song's real bars: a 1/4 pickup numbered 0, so score bars match the timing map, plus the 2/4 and 5/4 bars.
+   - **Key signatures** per section (Krumhansl via music21): G major, G minor, C minor, B♭ major from the ballad to the outro, E♭ major in the coda. Spelling is key-aware and accidentals are recomputed per measure.
+   - **Vocal staff rebuilt from the aligned words:** one note per word at its aligned start, its pitch from the vocal MIDI sounding then, with melisma notes for pitch changes inside a word. It replaces nearest-note attachment, which piled words onto one note.
+   - `scripts/score_render.py` (Verovio 6.3) patches Verovio's MEI so score-wide key changes don't land on the drum staff.
+   - `scripts/c3_score_preview.py` renders 1920×1080 at 60 fps with an amber cursor, notes lit while they sound (held notes and note-offs show), the header, and karaoke lyrics with opera roles.
+5. **Rebuilt:** the timing map (grid, cuts), drum stats, the score, the score preview, and the lane preview (now using the piano model and merged kit). Superseded previews are in `archive/renders/c3/`.
+
+- **Commands:** `uv add piano-transcription-inference audioread music21 verovio cairosvg`; `.venv/bin/python -I scripts/{transcribe_piano,midi_inventory,drums_nmf,timing_map,score_build,c3_preview,c3_score_preview}.py`
+- **Outputs:** `timing/piano_notes.json`, `timing/piano_transcription.mid`, `timing/events/*.json` (regenerated), `timing/stem_events/*.json`, `timing/midi_inventory.md`, `timing/drums_nmf.md`, `timing/timing_map.{json,md}`, `renders/c3/c3_score_preview.mp4`, `renders/c3/c3_preview.mp4`, `renders/c3/score.musicxml`
+- **Why:** Human feedback at C3 (log, human interventions); brief, steps 4–5.
+- **Status:** C3 re-review: `renders/c3/c3_score_preview.mp4` (score), with `renders/c3/c3_preview.mp4` (lanes) as a second view.

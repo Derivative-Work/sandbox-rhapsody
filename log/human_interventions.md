@@ -72,3 +72,11 @@ Every human action: timestamp, what, why, and which production rule allows it. R
   - the master offset check (0 samples);
   - `timing/midi_inventory.md`, with per-track shifts and the brass, FX and percussion stem substitutions.
 - **Rule:** R1.
+
+## 2026-10-22T07:04:31-04:00 — C3 first look: missing notes, preview readability — R2 (sync / timing data) and R1
+
+- **What:** The human watched the C3 preview and reported:
+  - "it's missing piano notes and drums in faster runs -- mostly the off-beat 'and's";
+  - the preview is hard to read: they asked for held notes, note-offs and pitch ("a piano roll would work but an actual score would be even easier"), then for "a key signature in there so the accidentals aren't in the way";
+  - "the lyrics don't appear aligned with the notes".
+- **Rule:** R2 (timing-map and A/V-sync correctness) and R1 (rejecting the preview as a review tool). The human named the problems in words; the agent made every change.
