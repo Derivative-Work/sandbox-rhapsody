@@ -263,3 +263,11 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** "wait the 'cold storage' gasket looks low-poly (at least in the render you sent)".
+
+## 2026-10-23T13:17:41-04:00 — C5 notes on sets A–F: amp cone, set F flicker, haze
+
+- **Rule:** R1.
+- **What:**
+  - "in set E, is the thing next to the guitar supposed to be a stand-in for an amp? if so, it looks like the cone is inverted".
+  - "in set F, there is flickering on the box with the keys".
+  - "in many of these, particularly noticeable in A's closeups, throughout B and C, and F's boxes, there appears to be too much light spilling into air, like there's too much smoke relative to the light or similar. it's reducing the contrast and making things hard to see".

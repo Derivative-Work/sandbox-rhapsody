@@ -887,3 +887,14 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Spot check** (frames from the packs): S07 voice rings leave the singer's lens; S08 POV rings fill the frame; S10 probe faces its way, smooth grommet; S21 E-stop socket with the red head beside it, rotate arrows legible.
 - **Queue:** set B done 10:12 (64 min), set C rendering.
 - **Next:** the human reviews set A (C5, R1).
+
+## 2026-10-23T13:22:40-04:00 — C5: less bloom (the haze), a dished amp cone, set F's crate rim; every set re-renders
+
+- **Haze** (human, R1: "too much light spilling into air ... reducing the contrast"): no volumetrics in any set; it was the compositor bloom (threshold 0.9 in scene-linear, size 0.5, strength 0.6), which caught every lit surface, not only emitters. Tested three settings on the same stills (S07, S08, S12, S16, S13, S24, S27, S28; 1920×1080, 64 samples):
+  - 5th-percentile luma (the veil over the darks), current → threshold 2/size 0.4/strength 0.5 → threshold 4/size 0.3/strength 0.5: S12 46 → 12 → 7; S08 18 → 5 → 3; S16 17 → 4 → 2. Median S24 56 → 19 → 8.
+  - Chosen: threshold 4.0, size 0.3, strength 0.5 (`config/look.json`). Emitters (8–40×) still bloom: the voice rings, LEDs, vents and tubes keep their glow.
+- **Set E amp** (human, R1: "the cone is inverted"): it was a frustum with its narrow end out and the dust cap on its tip. Now a lathed cone dished into the baffle, with a rolled surround and a domed dust cap; the whole moving part pumps out from the baffle on the guitar, inside a fixed chrome basket ring. Checked in the prop audit.
+- **Set F flicker** (human, R1: "flickering on the box with the keys", S27): the false-bottom crate's walls, corner posts and lip all ended at z 0.62, coplanar in two materials. Now 0.62 / 0.622 / 0.624, and the side walls fit between the front and back. The belt crates had the same coincidence (body, posts and lip at h/2); their lip and posts now stand 1–2 mm proud.
+- **Superseded:** the A–F reels and contact sheets and G's contact sheet (archived, `_superseded_bloom`); the A–G frame packs and anchors are set aside in `renders/c5/set_*/frames_superseded_bloom/` and `anchors_superseded_bloom/` for the human to delete. G was 1.5 h into its render and was stopped.
+- **Renders:** every set re-renders (`renders/c5/queue5.log`), with the follower building reels and packs.
+- **Why:** human feedback, R1 (human interventions).

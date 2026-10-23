@@ -209,14 +209,19 @@ def _amp():
                        location=(-0.1 + 0.04 * c, -0.131, z)).scale = (0.022, 0.004, 0.012)
     _bx("amp.speaker", dark, amp, (0, -0.005, 0.19), (0.27, 0.24, 0.29), bev=0.006)
     _bx("amp.baffle", slot, amp, (0, -0.126, 0.19), (0.25, 0.003, 0.26), bev=0.004)
-    cone = K.empty("amp.cone_root", (0, -0.131, 0.18), amp)
-    K.drive(cone, "scale", 1, amp, "pump", "1 + 3 * x")
-    K.mesh_obj("amp.cone", bpy.ops.mesh.primitive_cone_add, K.mat_plastic("cone", "shadow", 0.5), cone, radius1=0.1,
-               radius2=0.03, depth=0.03, location=(0, -0.012, 0), rotation=(math.pi / 2, 0, 0))
-    K.mesh_obj("amp.dustcap", bpy.ops.mesh.primitive_uv_sphere_add, chrome, cone, radius=0.03,
-               location=(0, -0.026, 0)).scale = (1, 0.4, 1)
-    K.mesh_obj("amp.surround", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("surround"), amp, major_radius=0.105,
-               minor_radius=0.008, location=(0, -0.132, 0.18), rotation=(math.pi / 2, 0, 0))
+    # The cone dishes in, as a real driver's does (human, C5: it read inverted, a frustum's narrow end out): lathed
+    # about local Z, which faces out of the baffle; its rim rolls into a rubber surround, a domed dust cap at its
+    # throat. The whole moving part pumps out from the baffle on the guitar; the chrome basket ring stays put.
+    cone = K.empty("amp.cone_root", (0, -0.1275, 0.18), amp)
+    cone.rotation_euler = (math.pi / 2, 0, 0)
+    K.drive(cone, "scale", 2, amp, "pump", "1 + 1.5 * x")
+    P.lathe("amp.cone", K.mat_plastic("cone", "shadow", 0.6), cone, (0, 0, 0),
+            [(0.026, 0.0), (0.045, 0.004), (0.07, 0.01), (0.088, 0.016), (0.095, 0.018), (0.098, 0.021),
+             (0.102, 0.0225), (0.106, 0.021), (0.108, 0.018), (0.108, 0.0)], steps=96)
+    P.lathe("amp.dustcap", chrome, cone, (0, 0, 0),
+            [(0.0, 0.013), (0.014, 0.0115), (0.024, 0.006), (0.029, 0.0)], steps=64)
+    K.mesh_obj("amp.surround", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("surround"), amp, major_radius=0.113,
+               minor_radius=0.005, location=(0, -0.128, 0.18), rotation=(math.pi / 2, 0, 0))
     return amp
 
 

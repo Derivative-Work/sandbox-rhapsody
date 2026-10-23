@@ -114,10 +114,11 @@ def _crate_mesh(crate_m, trim_m, dark_m, size=(0.42, 0.42, 0.32), lip=True):
     b.box((0, 0, 0), (w - 0.02, d - 0.02, h), bev=0.012, seg=3)
     for sx in (-1, 1):
         for sy in (-1, 1):
-            b.box((sx * (w / 2 - 0.018), sy * (d / 2 - 0.018), 0), (0.036, 0.036, h), bev=0.008, m=1)
+            b.box((sx * (w / 2 - 0.018), sy * (d / 2 - 0.018), 0), (0.036, 0.036, h + 0.002), bev=0.008, m=1)
         b.box((sx * (w / 2 - 0.009), 0, h * 0.3), (0.004, d * 0.36, h * 0.12), bev=0.0015, m=2)  # grip slot
     if lip:
-        b.frame((0, 0, h / 2 - 0.015), (w, d), (w - 0.04, d - 0.04), 0.03, m=1, bev=0.006)
+        # proud of the body and posts by 1-2 mm: coplanar tops in two materials flicker
+        b.frame((0, 0, h / 2 - 0.013), (w, d), (w - 0.04, d - 0.04), 0.03, m=1, bev=0.006)
     b.frame((0, 0, -h / 2 + 0.01), (w, d), (w - 0.04, d - 0.04), 0.02, m=1, bev=0.004)
     return b.mesh("crate_tote")
 
@@ -300,14 +301,16 @@ def build():
                    minor_radius=0.007, location=(kx - 0.04, ky, 0.075))
         _box(f"fb.key{k}.shaft", key_m, tr, (kx + 0.02, ky, 0.075), (0.08, 0.012, 0.01))
     # The crate walls (no bottom, no lid) on short legs above the hatch; a file icon on its front.
+    # The side walls fit between the front and back, and the walls, posts and lip end at three heights (0.62, 0.622,
+    # 0.624): their tops were coplanar in two materials and the rim flickered (human, C5 set F).
     for nm, loc, sc in (("f", (0, -0.24, 0.42), (0.5, 0.02, 0.4)), ("b", (0, 0.24, 0.42), (0.5, 0.02, 0.4)),
-                        ("l", (-0.24, 0, 0.42), (0.02, 0.5, 0.4)), ("r", (0.24, 0, 0.42), (0.02, 0.5, 0.4))):
+                        ("l", (-0.24, 0, 0.42), (0.02, 0.46, 0.4)), ("r", (0.24, 0, 0.42), (0.02, 0.46, 0.4))):
         _box(f"fb.wall_{nm}", crate_m, fb, loc, sc, 0.004)
     trim = P.Builder([trim_m])  # the same moulded trim as the belt's crates: corner posts, a lip, a skid
     for sx in (-1, 1):
         for sy in (-1, 1):
-            trim.box((sx * 0.242, sy * 0.242, 0.42), (0.036, 0.036, 0.4), bev=0.008)
-    trim.frame((0, 0, 0.605), (0.52, 0.52), (0.46, 0.46), 0.03, bev=0.006)
+            trim.box((sx * 0.242, sy * 0.242, 0.421), (0.036, 0.036, 0.402), bev=0.008)
+    trim.frame((0, 0, 0.609), (0.52, 0.52), (0.46, 0.46), 0.03, bev=0.006)
     trim.frame((0, 0, 0.23), (0.52, 0.52), (0.46, 0.46), 0.02, bev=0.004)
     P.place("fb.trim", trim.mesh("fb_trim"), parent=fb)
     P.place("fb.band", _strap_mesh(band_m, dark, 0.508, 0.508), (0, 0, 0.31), fb)
