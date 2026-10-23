@@ -17,6 +17,8 @@ import bpy
 import numpy as np
 from mathutils import Matrix, Vector
 
+import props_ab as P
+import props_cde as PC
 import sr_anim as A
 import sr_kit as K
 
@@ -82,22 +84,21 @@ def build(decal_peel=0.25):
 
     # Grader turnstile beside the cube (front right), a tray of flags waiting.
     out["grader"] = K.turnstile("grader", (1.75, -0.7, 0), rot_z=math.radians(-20))
-    tray = K.mesh_obj("flag_tray", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("tray", "lab_dark", 0.2), None,
-                      size=1, location=(1.45, -1.25, 0.05))
-    tray.scale = (0.3, 0.16, 0.1)
-    K.bevel(tray, 0.01)
-    for k in range(5):
-        x = 1.33 + k * 0.06
-        K.mesh_obj(f"flag_pole{k}", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("flagpole"), None, radius=0.004,
-                   depth=0.22, location=(x, -1.25, 0.18), rotation=(0.15 * ((k % 2) * 2 - 1), 0, 0))
-        f = K.mesh_obj(f"flag{k}", bpy.ops.mesh.primitive_plane_add, K.mat_plastic("flag", "amber", 0.3), None,
-                       size=1, location=(x + 0.025, -1.25, 0.26), rotation=(math.pi / 2, 0, 0))
-        f.scale = (0.05, 0.035, 1)
+    # The tray: a rounded box with a dark inset top and a hole per pole; each pole has a ball finial and carries a
+    # rippled swallowtail pennant (C5 placeholder pass: a box, sticks and flat cards).
+    xs = [1.33 + k * 0.06 for k in range(5)]
+    P.inst("flag_tray", P.tray_mesh(K.mat_plastic("tray", "lab_dark", 0.2), K.mat_plastic("tray_inset", "shadow", 0.5),
+                                    [x - 1.45 for x in xs]), (1.45, -1.25, 0.05))
+    pole_me, flag_me = P.flag_pole_mesh(K.mat_chrome("flagpole")), P.flag_mesh(K.mat_plastic("flag", "amber", 0.3))
+    for k, x in enumerate(xs):
+        pole = P.inst(f"flag_pole{k}", pole_me, (x, -1.25, 0.18), (0.15 * ((k % 2) * 2 - 1), 0, 0))
+        P.inst(f"flag{k}", flag_me, (0.004, 0, 0.08), parent=pole)
 
     # Wall of 198: 33 columns x 6 rows of locked boxes, a gentle arc behind the cube; chrome uprights between
     # columns and a thin ledge under each box.
     case, band = K.mat_plastic("lockbox", "lab_dark", 0.15), K.mat_metal("lockband", "brass", 0.15)
     chrome = K.mat_chrome("wallframe")
+    lock_me = P.lockbox_meshes(case, band)  # shared by all 198 (C5 placeholder pass: the kit's plain boxes)
     cols, rows, r, pitch, rise = 33, 6, 7.0, 0.14, 0.1  # 33 x 6 = 198, a long low wall
     step = pitch / r
     for c in range(cols + 1):
@@ -109,7 +110,7 @@ def build(decal_peel=0.25):
         x, y = math.sin(a) * r, 2.6 + r - math.cos(a) * r
         for rr in range(rows):
             z = 0.02 + rr * rise
-            K.locked_box(f"lock_{c:02d}_{rr:02d}", (x, y, z), rot_z=-a, mat_case=case, mat_band=band)
+            P.locked_box(f"lock_{c:02d}_{rr:02d}", (x, y, z), -a, lock_me)
             ledge = K.mesh_obj(f"ledge_{c:02d}_{rr:02d}", bpy.ops.mesh.primitive_cube_add, chrome, None, size=1,
                                location=(x, y, z - 0.004))
             ledge.scale = (pitch, 0.09, 0.006)
@@ -117,29 +118,26 @@ def build(decal_peel=0.25):
     out["floor_ring"] = K.floor_ring("floor_ring", radius=1.75)
 
     # Wall-of-198 column lights: one emissive strip per column under its boxes, driven by "glow_<c>" on a root.
+    # Each a lens set in a dark channel with end caps (C5 placeholder pass: bare strips).
     cols_root = K.empty("wall_lights")
+    lens_me, housing_me = P.wall_light_meshes(K.mat_plastic("wall_light_housing", "lab_dark", 0.35),
+                                              K.mat_emission("wall_light_proto", "lab_glow", 12.0))
     for c in range(cols):
         a = (c - (cols - 1) / 2) * step
         K.prop(cols_root, f"glow_{c}", 0.0)
-        strip = K.mesh_obj(f"wall_light_{c}", bpy.ops.mesh.primitive_cube_add,
-                           K.mat_emission(f"wall_light_{c}", "lab_glow", 12.0, cols_root, f"glow_{c}"), None, size=1,
-                           location=(math.sin(a) * r, 2.6 + r - math.cos(a) * r - 0.05, 0.012))
-        strip.scale = (pitch * 0.8, 0.012, 0.012)
-        strip.rotation_euler = (0, 0, -a)
+        strip = P.inst(f"wall_light_{c}", lens_me, (math.sin(a) * r, 2.6 + r - math.cos(a) * r - 0.05, 0.012),
+                       (0, 0, -a), mat=K.mat_emission(f"wall_light_{c}", "lab_glow", 12.0, cols_root, f"glow_{c}"))
+        P.inst(f"wall_light_{c}.housing", housing_me, parent=strip)
     out["wall_lights"] = cols_root
     out["wall_cols"] = cols
 
     _stop_socket()
     # Guardrails lying unbolted beside the cube, a wrench, a tag (S23).
-    rail_m = K.mat_metal("guardrail", "brass", 0.25)
+    # (C5 placeholder pass: they were bars.) Tubes, balusters and bolted end flanges; a combination wrench.
+    rail_me = P.guardrail_mesh(K.mat_metal("guardrail", "brass", 0.25), K.mat_plastic("rail_bolt", "shadow", 0.5))
     for k, (x, y, rz) in enumerate(((-1.55, -0.9, 0.2), (-1.45, -1.25, -0.15))):
-        g = K.mesh_obj(f"guardrail{k}", bpy.ops.mesh.primitive_cube_add, rail_m, None, size=1, location=(x, y, 0.02),
-                       rotation=(0, 0, rz))
-        g.scale = (0.9, 0.05, 0.04)
-        K.bevel(g, 0.01)
-    w = K.mesh_obj("wrench", bpy.ops.mesh.primitive_cube_add, K.mat_chrome("wrench"), None, size=1,
-                   location=(-1.2, -1.45, 0.008), rotation=(0, 0, 0.7))
-    w.scale = (0.22, 0.03, 0.012)
+        P.inst(f"guardrail{k}", rail_me, (x, y, 0.02), (0, 0, rz))
+    P.inst("wrench", P.wrench_mesh(K.mat_chrome("wrench")), (-1.2, -1.45, 0.006), (0, 0, 0.7))
     tag = K.empty("guardrail_tag", (-1.75, -1.05, 0.05))
     tag.rotation_euler = (math.radians(70), 0, 0.25)
     K.mesh_obj("tag.card", bpy.ops.mesh.primitive_plane_add, K.mat_matte("tag", "paper"), tag, size=1
@@ -220,6 +218,39 @@ def _stop_socket():
            rot=(0, 0, 0), font="Inter-Medium-flat.ttf", parent=sock)
     K.text("stop_socket.small", "EMERGENCY", 0.011, K.mat_ink("estop_ink_small", "shadow"), loc=(0, 0.069, 0.0325),
            rot=(0, 0, 0), parent=sock)
+    # Its button, unscrewed and lying on the floor beside it: the big red mushroom head of an industrial E-stop, with
+    # the rotate-to-reset arrows on its crown, on a black threaded neck (human, C5: "I was expecting ... a big red
+    # button with a rotate-to-reset mechanism"; chose "removed, lying beside it", which keeps the missing button).
+    head = K.empty("estop_head", (0.71, -1.065, 0.047))  # in frame to the end of the S21 push-in
+    head.rotation_euler = (math.radians(98), 0, 0.55)  # on its side, crown toward the camera
+    PC.lathe("estop_head.cap", K.mat_plastic("estop_red", "alarm", 0.3), head, (0, 0, 0),
+             [(0.0, 0.032), (0.02, 0.031), (0.036, 0.026), (0.045, 0.017), (0.047, 0.01), (0.045, 0.006),
+              (0.03, 0.005), (0.0, 0.005)], steps=64)
+    PC.lathe("estop_head.neck", K.mat_plastic("estop_neck", "shadow", 0.45), head, (0, 0, 0),
+             [(0.0, 0.005), (0.018, 0.005), (0.018, -0.004), (0.015, -0.006), (0.015, -0.026), (0.0, -0.026)],
+             steps=48)
+    for k in range(5):  # thread ridges on the neck
+        K.smooth(K.mesh_obj(f"estop_head.thread{k}", bpy.ops.mesh.primitive_torus_add,
+                            K.mat_plastic("estop_neck", "shadow", 0.45), head, major_radius=0.0152,
+                            minor_radius=0.0012, major_segments=32, minor_segments=6,
+                            location=(0, 0, -0.009 - k * 0.0035)))
+    white = K.mat_matte("estop_arrow", "paper")
+    for k in range(2):  # two curved arrows round the crown: turn to reset
+        a0 = 0.35 + k * math.pi
+        arc = bpy.data.curves.new(f"estop_head.arrow{k}", "CURVE")
+        arc.dimensions, arc.bevel_depth, arc.bevel_resolution = "3D", 0.0016, 2
+        sp = arc.splines.new("POLY")
+        pts = [(math.cos(a0 + 2.0 * i / 16) * 0.024, math.sin(a0 + 2.0 * i / 16) * 0.024, 0.0305) for i in range(17)]
+        sp.points.add(len(pts) - 1)
+        for pt, co in zip(sp.points, pts):
+            pt.co = (*co, 1.0)
+        ao = K.link(bpy.data.objects.new(f"estop_head.arrow{k}", arc))
+        ao.data.materials.append(white)
+        ao.parent = head
+        a1 = a0 + 2.0
+        tip = K.mesh_obj(f"estop_head.tip{k}", bpy.ops.mesh.primitive_cone_add, white, head, radius1=0.0045,
+                         depth=0.008, vertices=12, location=(math.cos(a1) * 0.024, math.sin(a1) * 0.024, 0.0305))
+        tip.rotation_euler = Vector((0, 0, 1)).rotation_difference(Vector((-math.sin(a1), math.cos(a1), 0))).to_euler()
 
 
 def _desk():
@@ -233,8 +264,9 @@ def _desk():
     objs.append(top)
     wood = K.mat_plastic("desk_body", "lab_dark", 0.5)
     objs.append(_slab("desk.body", wood, (3.0, -1.0, -0.4), (42.0, 30.0, 0.8)))
+    leg_me = P.desk_leg_mesh(wood, K.mat_metal("desk_glide", "chrome", 0.3))  # tapered, with glides (C5 pass)
     for sx, sy in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
-        objs.append(_slab(f"desk.leg{sx}{sy}", wood, (3.0 + sx * 19.5, -1.0 + sy * 13.5, -8.4), (1.2, 1.2, 15.2)))
+        objs.append(P.inst(f"desk.leg{sx}{sy}", leg_me, (3.0 + sx * 19.5, -1.0 + sy * 13.5, -8.4)))
     objs.append(_slab("lab_floor", K.mat_plastic("lab_floor", "horizon", 0.7), (3.0, -1.0, -16.05), (160, 160, 0.1)))
     # A mug, back left, and a pencil lying at an angle, front right.
     mug_m = K.mat_plastic("mug", "paper", 0.25)
@@ -257,11 +289,14 @@ def _desk():
                            None, radius=1.47, depth=0.05, vertices=96, location=(-9.0, 6.0, 3.75)))
     objs.append(K.mesh_obj("mug.handle", bpy.ops.mesh.primitive_torus_add, mug_m, None, major_radius=0.9,
                            minor_radius=0.22, location=(-10.6, 6.0, 2.1), rotation=(math.pi / 2, 0, 0)))
-    pencil = K.mesh_obj("pencil", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("pencil", "note", 0.3), None,
-                        radius=0.16, depth=7.0, vertices=6, location=(7.0, -7.5, 0.16), rotation=(0, math.pi / 2, 0.5))
+    # A real pencil (C5 placeholder pass: a hex stick and a cone): softened hex body, ringed ferrule, eraser,
+    # sharpened wood and a graphite point.
+    body_me, tip_me = P.pencil_meshes(K.mat_plastic("pencil", "note", 0.3), K.mat_metal("ferrule", "chrome", 0.3),
+                                      K.mat_plastic("eraser", "copper", 0.85), K.mat_plastic("pencil_wood", "key", 0.7),
+                                      K.mat_plastic("graphite", "shadow", 0.35))
+    pencil = P.inst("pencil", body_me, (7.0, -7.5, 0.16), (0, math.pi / 2, 0.5))
     objs.append(pencil)
-    objs.append(K.mesh_obj("pencil.tip", bpy.ops.mesh.primitive_cone_add, K.mat_plastic("pencil_tip", "key", 0.5),
-                           pencil, radius1=0.16, depth=0.7, vertices=6, location=(0, 0, 3.85)))
+    objs.append(P.inst("pencil.tip", tip_me, (0, 0, 3.85), parent=pencil))
     # The desk lamp: a warm pool on the desk around the cube, falling off before the edges.
     lamp = bpy.data.lights.new("desk_lamp", "SPOT")
     lamp.energy, lamp.color, lamp.spot_size, lamp.spot_blend = 60000.0, K.col("key")[:3], math.radians(70), 0.6

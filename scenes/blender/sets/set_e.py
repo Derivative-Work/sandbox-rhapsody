@@ -15,6 +15,7 @@ import math
 import bpy
 from mathutils import Euler, Vector
 
+import props_cde as P
 import sr_anim as A
 import sr_kit as K
 
@@ -220,7 +221,7 @@ def _amp():
 
 
 def build():
-    K.floor()
+    P.floor_with_hole(K.floor(), PORTAL, 0.7)  # the portal is a real hole: the dive drops through it
     K.star_dome()
     out = {}
 
@@ -283,16 +284,39 @@ def build():
     # The dive route (S26) and the portal: a teal hole in the map, Platform's data center glowing below.
     _curve("dive_route", [tuple(p) for p in DIVE], 0.006, K.mat_emission("dive", "web2", 2.0),
            poly=True)
+    # The portal: a round hole cut in the floor, a lined shaft with teal light rings, Platform's data center glowing
+    # at the bottom: six small server racks round a lit floor (C5 placeholder pass: an opaque disc over teal posts
+    # that could never be seen).
+    depth = 1.6
+    P.lathe("portal.shaft", K.mat_plastic("portal_shaft", "lab_dark", 0.6), None, PORTAL,
+            [(0.7, 0.0), (0.7, -depth)], steps=96)
+    glow = K.mat_emission("portal_glow", "platform", 4.0)
+    for j, z in enumerate((-0.35, -0.75, -1.15)):
+        K.smooth(K.mesh_obj(f"portal.band{j}", bpy.ops.mesh.primitive_torus_add, glow, None, major_radius=0.695,
+                            minor_radius=0.008, major_segments=96, minor_segments=8,
+                            location=PORTAL + Vector((0, 0, z))))
     K.mesh_obj("portal.disc", bpy.ops.mesh.primitive_circle_add, K.mat_emission("portal", "platform", 6.0), None,
-               radius=0.7, vertices=64, fill_type="NGON", location=PORTAL + Vector((0, 0, 0.004)))
-    K.mesh_obj("portal.ring", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("portal_ring"), None, major_radius=0.72,
-               minor_radius=0.03, location=PORTAL + Vector((0, 0, 0.01)))
-    for k in range(6):  # data-center racks glimpsed through the hole, below the floor
+               radius=0.7, vertices=96, fill_type="NGON", location=PORTAL + Vector((0, 0, -depth + 0.002)))
+    K.smooth(K.mesh_obj("portal.ring", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("portal_ring"), None,
+                        major_radius=0.72, minor_radius=0.03, major_segments=96, minor_segments=16,
+                        location=PORTAL + Vector((0, 0, 0.01))))
+    body = K.mat_plastic("portal_rack", "lab_dark", 0.3)
+    trim = K.mat_chrome("portal_rack_trim")
+    led = K.mat_emission("portal_led", "platform", 8.0)
+    grille = K.mat_plastic("portal_grille", "shadow", 0.5)
+    for k in range(6):  # small server racks round the shaft floor, fronts to the middle
         a = math.tau * k / 6
-        r = K.mesh_obj(f"portal.rack{k}", bpy.ops.mesh.primitive_cube_add, K.mat_emission(f"pr{k}", "platform", 2.0),
-                       None, size=1, location=PORTAL + Vector((math.cos(a) * 0.35, math.sin(a) * 0.35, -0.6)))
-        r.scale = (0.08, 0.08, 0.5)
-
+        rack = K.empty(f"portal.rack{k}", PORTAL + Vector((math.cos(a) * 0.42, math.sin(a) * 0.42, -depth)))
+        rack.rotation_euler = (0, 0, a - math.pi / 2)  # local -Y (its front) towards the centre
+        P.box(f"portal.rack{k}.body", body, rack, (0, 0, 0.38), (0.2, 0.24, 0.76), bev=0.01, share="prack_body")
+        P.box(f"portal.rack{k}.door", grille, rack, (0, -0.121, 0.38), (0.17, 0.004, 0.7), bev=0.002,
+              share="prack_door")
+        for u in range(6):  # 1U units with a teal status strip each
+            z = 0.12 + u * 0.1
+            P.box(f"portal.rack{k}.unit{u}", trim, rack, (0, -0.125, z), (0.16, 0.006, 0.06), bev=0.002,
+                  share="prack_unit")
+            P.box(f"portal.rack{k}.led{u}", led, rack, (-0.03, -0.1285, z), (0.07, 0.002, 0.008), share="prack_led")
+        P.box(f"portal.rack{k}.top", trim, rack, (0, 0, 0.765), (0.21, 0.25, 0.012), bev=0.004, share="prack_top")
     # The amp: a server rack beside the guitar, LEDs and a speaker cone pumping with the guitar stem.
     out["amp"] = _amp()
 

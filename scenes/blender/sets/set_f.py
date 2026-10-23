@@ -19,6 +19,7 @@ import bpy
 from mathutils import Vector
 
 import sr_anim as A
+import props_fg as P
 import sr_kit as K
 
 BELT_Z = 0.36
@@ -82,18 +83,52 @@ def _flag(name, parent, loc, size, mat_pole, mat_flag, rot=(math.pi / 2, 0, 0)):
     return root
 
 
+_ICON = {}
+
+
 def _file_icon(name, parent, loc, size):
-    """Generic file icon on a crate side: a paper page with a folded corner and three text lines."""
+    """Generic file icon on a crate side: a paper page with its top corner folded over and three text lines, one
+    thin moulded plate (shared per size), facing -Y."""
     root = K.empty(name, loc, parent)
-    root.rotation_euler = (math.pi / 2, 0, 0)
-    _box(f"{name}.page", K.mat_plastic(f"{name}.page", "paper", 0.5), root, (0, 0, 0), (size * 0.75, size, 0.004))
-    _box(f"{name}.fold", K.mat_plastic(f"{name}.fold", "chrome", 0.5), root, (size * 0.27, size * 0.4, 0.004),
-         (size * 0.2, size * 0.2, 0.004)).rotation_euler = (0, 0, math.pi / 4)
-    ink = K.mat_plastic(f"{name}.ink", "lab_dark", 0.5)
-    for k in range(3):
-        _box(f"{name}.line{k}", ink, root, (-size * 0.05, size * (0.12 - 0.2 * k), 0.004), (size * 0.5, size * 0.06,
-                                                                                          0.003))
+    root.rotation_euler = (math.pi / 2, 0, 0)  # local +Z (the plate's thickness) toward -Y
+    if size not in _ICON:
+        b = P.Builder([K.mat_matte("icon_page", "paper"), K.mat_matte("icon_fold", "decal_film"),
+                       K.mat_ink("icon_ink", "lab_dark")])
+        w, h, c = size * 0.75, size, size * 0.24
+        b.prism([(-w / 2, -h / 2), (w / 2, -h / 2), (w / 2, h / 2 - c), (w / 2 - c, h / 2), (-w / 2, h / 2)], 0, 0.003)
+        b.prism([(w / 2 - c, h / 2 - c), (w / 2, h / 2 - c), (w / 2 - c, h / 2)], 0.0031, 0.0045, m=1)
+        for k in range(3):
+            lw = size * (0.5 if k < 2 else 0.32)
+            b.box((-w / 2 + size * 0.12 + lw / 2, size * (0.1 - 0.2 * k), 0.0036), (lw, size * 0.06, 0.0012), m=2)
+        _ICON[size] = b.mesh(f"file_icon_{size}")
+    P.place(f"{name}.page", _ICON[size], parent=root)
     return root
+
+
+def _crate_mesh(crate_m, trim_m, dark_m, size=(0.42, 0.42, 0.32), lip=True):
+    """A data crate as a moulded tote, centred on its origin with `size` overall (the top stays where the stations'
+    stroke ends): a bevelled body, corner posts, a lip round the top, a skid round the base, a grip slot in each
+    end."""
+    w, d, h = size
+    b = P.Builder([crate_m, trim_m, dark_m])
+    b.box((0, 0, 0), (w - 0.02, d - 0.02, h), bev=0.012, seg=3)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            b.box((sx * (w / 2 - 0.018), sy * (d / 2 - 0.018), 0), (0.036, 0.036, h), bev=0.008, m=1)
+        b.box((sx * (w / 2 - 0.009), 0, h * 0.3), (0.004, d * 0.36, h * 0.12), bev=0.0015, m=2)  # grip slot
+    if lip:
+        b.frame((0, 0, h / 2 - 0.015), (w, d), (w - 0.04, d - 0.04), 0.03, m=1, bev=0.006)
+    b.frame((0, 0, -h / 2 + 0.01), (w, d), (w - 0.04, d - 0.04), 0.02, m=1, bev=0.004)
+    return b.mesh("crate_tote")
+
+
+def _strap_mesh(band_m, dark_m, w, d, h=0.026):
+    """A ratchet strap round a crate: a band of `w` x `d` outside, with a buckle on its +X side."""
+    b = P.Builder([band_m, dark_m])
+    b.frame((0, 0, 0), (w, d), (w - 0.012, d - 0.012), h, bev=0.002)
+    b.box((w / 2 + 0.004, 0, 0), (0.012, 0.07, h + 0.014), bev=0.003, m=1)
+    b.cyl((w / 2 + 0.012, 0, 0), 0.006, 0.06, axis="Y", segs=16, m=0)
+    return b.mesh("crate_strap")
 
 
 def build():
@@ -101,35 +136,87 @@ def build():
     K.star_dome()
     out = {}
     crate_m = K.mat_plastic("crate", "lab", 0.25)
+    trim_m = K.mat_plastic("crate_trim", "lab_dark", 0.4)
     band_m = K.mat_metal("crate_band", "platform", 0.3)
     dark = K.mat_plastic("dc_dark", "lab_dark", 0.2)
     chrome = K.mat_chrome("dc_chrome")
     teal = K.mat_emission("teal_strip", "platform", 6.0)
 
-    # Conveyor: a dark belt on chrome legs from x = -6 to 5.4, a doorway glowing teal at the far end.
+    # Conveyor: a dark belt on chrome stands from x = -6 to 5.4, a doorway glowing teal at the far end.
     _box("belt", dark, None, (-0.3, 0, BELT_Z - 0.03), (11.4, 0.7, 0.06), 0.01)
+    rail = P.Builder([chrome, dark])  # side frames: a channel each side, bolted
+    for sy in (-1, 1):
+        rail.box((-0.3, sy * 0.358, BELT_Z - 0.03), (11.44, 0.014, 0.076), bev=0.004)
+        rail.box((-0.3, sy * 0.36, BELT_Z + 0.012), (11.44, 0.02, 0.008), bev=0.002)
+    P.place("belt.frame", rail.mesh("belt_frame"))
+    # Stands every metre: two square legs on levelling feet, a cross brace, a bracket under the frame.
+    leg = P.Builder([chrome, dark])
+    hl = BELT_Z - 0.06
+    leg.box((0, 0, 0.0075), (0.04, 0.04, hl - 0.015), bev=0.006)
+    leg.cyl((0, 0, -hl / 2 + 0.006), 0.032, 0.012, segs=24, m=1)
+    leg.cyl((0, 0, -hl / 2 + 0.02), 0.008, 0.02, segs=12)
+    leg.box((0, 0, hl / 2 - 0.006), (0.07, 0.07, 0.012), bev=0.002)
+    leg_me = leg.mesh("conveyor_leg")
+    brace = P.Builder([chrome])
+    brace.box((0, 0, 0), (0.024, 0.56, 0.024), bev=0.004)
+    brace.box((0, 0, 0.12), (0.016, 0.56, 0.016), bev=0.003)
+    brace_me = brace.mesh("conveyor_brace")
     for k in range(12):
         x = -5.8 + k * 1.0
         for sy in (-1, 1):
-            _box(f"leg{k}{sy}", chrome, None, (x, sy * 0.3, (BELT_Z - 0.06) / 2), (0.04, 0.04, BELT_Z - 0.06))
-    for k in range(46):  # roller seams
-        _box(f"seam{k}", teal, None, (-5.95 + k * 0.25, -0.352, BELT_Z - 0.03), (0.02, 0.004, 0.05))
+            P.place(f"leg{k}{sy}", leg_me, (x, sy * 0.3, hl / 2))
+        P.place(f"leg{k}.brace", brace_me, (x, 0, 0.08))
+    # Roller ends along the front frame: a hub with a teal-lit centre (the belt's rollers, one per quarter metre).
+    cap = P.Builder([chrome, teal])
+    cap.cyl((0, 0, 0), 0.022, 0.006, axis="Y", segs=24)
+    cap.cyl((0, -0.002, 0), 0.012, 0.006, axis="Y", segs=24, m=1)
+    cap_me = cap.mesh("roller_cap")
+    for k in range(46):
+        P.place(f"seam{k}", cap_me, (-5.95 + k * 0.25, -0.368, BELT_Z - 0.03))
+    # The doorway: steel columns on base plates with a teal strip down each inner face, a bolted lintel on top.
+    post = P.Builder([dark, chrome, teal])
+    post.box((0, 0, 0), (0.15, 0.15, 1.4), bev=0.012, seg=3)
+    post.box((0, 0, -0.69), (0.23, 0.23, 0.02), bev=0.004, m=1)
+    post.box((0, 0, 0.69), (0.17, 0.17, 0.02), bev=0.004, m=1)
+    for bx in (-1, 1):
+        for by in (-1, 1):
+            post.cyl((bx * 0.095, by * 0.095, -0.675), 0.008, 0.012, segs=6, m=1)
+    post.box((0, -0.076, 0.05), (0.03, 0.004, 1.15), bev=0.0015, m=2)
+    post_me = post.mesh("door_post")
     for sy in (-1, 1):
-        _box(f"door_post{sy}", dark, None, (5.45, sy * 0.55, 0.7), (0.15, 0.15, 1.4))
-    _box("door_lintel", dark, None, (5.45, 0, 1.35), (0.15, 1.25, 0.15))
-    _box("tunnel", dark, None, (12.0, 0, 0.66), (12.8, 1.0, 1.32))  # crates past the doorway ride on out of sight
+        P.place(f"door_post{sy}", post_me, (5.45, sy * 0.55, 0.7), rot=(0, 0, 0 if sy > 0 else math.pi))
+    lin = P.Builder([dark, chrome])
+    lin.box((0, 0, 0), (0.15, 1.25, 0.15), bev=0.012, seg=3)
+    for y in (-0.45, -0.15, 0.15, 0.45):
+        lin.cyl((-0.076, y, 0), 0.009, 0.008, axis="X", segs=6, m=1)
+    lin.box((-0.0765, 0, -0.05), (0.004, 1.1, 0.012), bev=0.001, m=1)
+    P.place("door_lintel", lin.mesh("door_lintel"), (5.45, 0, 1.35))
+    # The tunnel the crates ride on into, out of sight: a dark housing ringed by ribs, a teal line along each side.
+    tun = P.Builder([dark, K.mat_metal("tunnel_rib", "lab", 0.35), teal])
+    tun.box((0, 0, 0), (12.8, 1.0, 1.32), bev=0.03, seg=3)
+    for k in range(16):
+        x = -5.9 + k * 0.8
+        for sy in (-1, 1):
+            tun.box((x, sy * 0.52, 0), (0.08, 0.05, 1.34), bev=0.008, m=1)
+        tun.box((x, 0, 0.675), (0.08, 1.09, 0.04), bev=0.008, m=1)
+    for sy in (-1, 1):
+        tun.box((0, sy * 0.502, 0.48), (12.7, 0.006, 0.02), m=2)
+    P.place("tunnel", tun.mesh("tunnel"), (12.0, 0, 0.66))  # crates past the doorway ride on out of sight
     _box("door_glow", K.mat_emission("door_glow", "platform", 3.0), None, (5.58, 0, 0.65), (0.02, 0.95, 1.25))
 
-    # Crates on the belt, parented to the belt's travel ("advance": +1 per beat, one crate pitch).
+    # Crates on the belt, parented to the belt's travel ("advance": +1 per beat, one crate pitch). A crate is a
+    # moulded tote (top at BELT_Z + 0.32, unchanged) with a ratchet strap round its lower third.
     belt = K.empty("belt_travel", (0, 0, 0))
     K.prop(belt, "advance", 0.0, lo=0.0, hi=10000.0)
     K.drive(belt, "location", 0, belt, "advance", f"{PITCH} * x")
+    crate_me = _crate_mesh(crate_m, trim_m, dark)
+    strap_me = _strap_mesh(band_m, dark, 0.428, 0.428)
     for j in range(40):
         x = 4.9 - PITCH * j
-        _box(f"crate{j}", crate_m, belt, (x, 0, BELT_Z + 0.16), (0.42, 0.42, 0.32), 0.012)
-        _box(f"crate{j}.band", band_m, belt, (x, 0, BELT_Z + 0.16), (0.44, 0.44, 0.04))
+        P.place(f"crate{j}", crate_me, (x, 0, BELT_Z + 0.16), belt)
+        P.place(f"crate{j}.band", strap_me, (x, 0, BELT_Z + 0.075), belt)
         if j % 3 == 0:
-            _file_icon(f"crate{j}.icon", belt, (x, -0.212, BELT_Z + 0.18), 0.16)
+            _file_icon(f"crate{j}.icon", belt, (x, -0.212, BELT_Z + 0.19), 0.16)
     out["belt"] = belt
 
     # Processing stations: gantries straddling the belt, a press head striking down on the snare.
@@ -216,7 +303,14 @@ def build():
     for nm, loc, sc in (("f", (0, -0.24, 0.42), (0.5, 0.02, 0.4)), ("b", (0, 0.24, 0.42), (0.5, 0.02, 0.4)),
                         ("l", (-0.24, 0, 0.42), (0.02, 0.5, 0.4)), ("r", (0.24, 0, 0.42), (0.02, 0.5, 0.4))):
         _box(f"fb.wall_{nm}", crate_m, fb, loc, sc, 0.004)
-    _box("fb.band", band_m, fb, (0, -0.252, 0.42), (0.52, 0.006, 0.05))
+    trim = P.Builder([trim_m])  # the same moulded trim as the belt's crates: corner posts, a lip, a skid
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            trim.box((sx * 0.242, sy * 0.242, 0.42), (0.036, 0.036, 0.4), bev=0.008)
+    trim.frame((0, 0, 0.605), (0.52, 0.52), (0.46, 0.46), 0.03, bev=0.006)
+    trim.frame((0, 0, 0.23), (0.52, 0.52), (0.46, 0.46), 0.02, bev=0.004)
+    P.place("fb.trim", trim.mesh("fb_trim"), parent=fb)
+    P.place("fb.band", _strap_mesh(band_m, dark, 0.508, 0.508), (0, 0, 0.31), fb)
     _file_icon("fb.icon", fb, (0, -0.256, 0.47), 0.2)
     for sx in (-1, 1):
         for sy in (-1, 1):
@@ -267,11 +361,13 @@ def build():
     # it already holds the same flag.
     flag_pole, flag_m = K.mat_chrome("flagpole"), K.mat_plastic("flag", "amber", 0.3)
     prize = []
+    prize_me = _crate_mesh(crate_m, trim_m, dark, size=(0.44, 0.44, 0.4), lip=False)  # the lid closes on its top
+    pstrap_me = _strap_mesh(band_m, dark, 0.448, 0.448)
     for k in range(5):
         p = K.empty(f"prize{k}", (3.3 + 0.55 * k, -1.25, 0))
         K.prop(p, "lid", 0.0)
-        _box(f"prize{k}.body", crate_m, p, (0, 0, 0.2), (0.44, 0.44, 0.4), 0.012)
-        _box(f"prize{k}.band", band_m, p, (0, 0, 0.2), (0.46, 0.46, 0.04))
+        P.place(f"prize{k}.body", prize_me, (0, 0, 0.2), p)
+        P.place(f"prize{k}.band", pstrap_me, (0, 0, 0.08), p)
         _flag(f"prize{k}.icon", p, (-0.05, -0.226, 0.26), 0.2, flag_pole, flag_m)
         hinge = K.empty(f"prize{k}.hinge", (0, 0.22, 0.4), p)
         K.drive(hinge, "rotation_euler", 0, p, "lid", "-1.9 * x")  # the front edge swings up and back

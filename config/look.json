@@ -28,7 +28,8 @@
     "paper": "#efe8da",
     "copper": "#b36f44",
     "decal_film": "#b8b2a8",
-    "decal_ink": "#c41e14"
+    "decal_ink": "#c41e14",
+    "lcd": "#9fd04a"
   },
   "materials": {
     "plastic_roughness": 0.12,

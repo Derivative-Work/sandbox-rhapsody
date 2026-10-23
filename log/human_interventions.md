@@ -246,3 +246,15 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** "for set D, the pager also looks very boxy. are you sure you went through all of the assets for placeholders". The pager was missed by the C5 placeholder pass, which looked at set stills, not at each prop up close.
+
+## 2026-10-23T05:07:38-04:00 — C5 notes: pager, cold storage
+
+- **Rule:** R1.
+- **What:**
+  - "the pager is not reading to me as a pager -- make it black with a green-ish monochrome display so it's more obvious".
+  - "the 'cold storage' camera isn't reading quite right either -- make it so that it has exactly one door, and turn the camera slightly more towards it. put the 'cold storage' label on or above the door. the door should be legible as both a freezer door and as a safe".
+
+## 2026-10-23T05:14:38-04:00 — C5 note: the emergency stop
+
+- **Rule:** R1.
+- **What:** "the 'emergency stop' is not reading like an emergency stop either -- I was expecting the kind that you'd see in industrial or medical equipment (i.e. as a big red button with a rotate-to-reset mechanism)". Asked how, since the brief's S21 gag is the missing button; the human chose "Removed, lying beside it".

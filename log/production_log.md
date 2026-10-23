@@ -845,3 +845,26 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - I: crates under the music box and lead, hanging lamp, shelf gussets.
   - Left simple on purpose: architecture (walls, floors, ceilings), abstract network lines and nodes (E), frost shells (I), the faint background silhouettes (A).
 - **Next:** four sub-agents model the placeholders, sets split A+B, C+D+E, F+G, H+I; each re-runs the audit on its sets.
+
+## 2026-10-23T05:14:38-04:00 — C5 placeholder pass: every listed prop modelled; pager, cold storage, E-stop, security camera
+
+- **Sub-agents** (four, in parallel; edited only their sets plus a helper module each; no commits or logs):
+  - **A:** combination wrench, guardrails with balusters and bolted flanges, a sharpened pencil with ferrule and eraser, swallowtail flags parented to ball-finial poles in a moulded tray, tapered desk legs with glides, lock boxes (198) with a lid panel, brass band, hasp and padlock, and wall lights as lens strips in channels.
+  - **B:** stacking totes (~1,300, one shared mesh), drawer totes, slotted shelving uprights with bracing, beamed shelf boards, a bolted phone bracket with struts, work-light diffusers and reflector hoods.
+  - **C:** street lamps: plinth, tapered octagonal post, arm and domed luminaire.
+  - **D:** pager, monitors (bezel, back housing, hinge, arm, foot), desk (banded top, brackets, pedestal with inset drawers), caged hall lamps, sirens (lens dome, cage, flared horn), brass bells on yokes with clappers that swing with them.
+  - **E:** a real portal shaft cut through the mirror floor, with six small server racks round it.
+  - **F:** moulded totes with ratchet straps and icon plates, braced legs, roller hubs on a bolted side channel, steel door columns and lintel, a ribbed tunnel housing.
+  - **G:** conveyor (channels, round rails, rollers in bearing blocks, braced legs), a bench with drawers for the stamps, a corbelled grader ledge, fluted pilasters, the freezer's corner guards, plinth, capping and seams.
+  - **H:** a line printer for the bill (paper roll, tear bar, sliding head, control panel), lattice bridge towers, riveted wall segments with caged beacons, an open-bay dashboard cabinet (its back moved behind the cards' flip sweep, which clipped it before).
+  - **I:** moulded crates under the music box and lead, an industrial pendant lamp, shelves on brackets and standards.
+- **Checks:** each set re-audited (`renders/audit_after/`); check stills in every affected shot; invalid drivers after rebind: 0 everywhere. All rigs, names, timings and footprints kept.
+- **Pager** (human, R1): it hovered 2 cm above the floor after the fall; it now lands with its clip 1.5 mm above it (lowest point over S18–S19: 1.5 mm). Then black, with a green monochrome LCD (new palette role `lcd` #9fd04a) dimly lit at rest and flaring on each buzz.
+- **Cold storage** (human, R1):
+  - Exactly one door: the front service hatch is gone.
+  - The round door reads as both a freezer door and a safe: a white insulated face, a rubber gasket round the frame, frost on its lower rim and a "-18°C" readout; a chrome rim, locking bolts, a brass handwheel and a new combination dial.
+  - COLD STORAGE is now above the door, and the S44 camera turns further toward it.
+- **Emergency stop** (human, R1): the human chose "removed, lying beside it". The big red mushroom head of an industrial E-stop, with rotate-to-reset arrows on its crown and a black threaded neck, lies on the floor beside the empty socket, in frame to the end of S21.
+- **Security camera** (`sr_kit.security_camera`, used in A, B and H): the housing was a stretched cube. Now a rounded box housing sized in the mesh, a rear cap, cooling grooves, a hood with skirts, a lens barrel with a chrome ring, a ceiling plate with screws, and a cable loop.
+- **Superseded:** the C5 set D and E reels and contact sheets (archived) and the D, E and F frames (set aside in `renders/c5/set_{D,E,F}/frames_superseded_placeholders/` for the human to delete). Every set re-renders.
+- **Why:** human feedback, R1 (human interventions).

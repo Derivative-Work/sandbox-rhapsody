@@ -12,7 +12,7 @@ import math
 from pathlib import Path
 
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 ROOT = Path(__file__).resolve().parents[3]
 LOOK = json.loads((ROOT / "config" / "look.json").read_text())
@@ -822,40 +822,76 @@ def locked_box(name, loc, rot_z=0.0, mat_case=None, mat_band=None, parent=None):
 
 
 def security_camera(name, loc, parent=None, body_role="lab", scale=1.0):
-    """A CCTV camera: a mount arm down from `loc` to a pan head (`{name}.yaw`, turns about Z) and a tilt joint
-    (`{name}.tilt`, turns about X), carrying a bevelled housing with a sun hood over it, a dark lens in a chrome
-    ring and a red tally light. The lens looks along the tilt joint's local -Y. Returns (root, yaw, tilt)."""
+    """A CCTV camera: a ceiling plate with screws and a mount arm down from `loc` to a pan head (`{name}.yaw`, turns
+    about Z) and a tilt joint (`{name}.tilt`, turns about X), carrying a rounded box housing with a darker rear cap,
+    a sun hood with side skirts, a lens barrel ending in a chrome ring round a dark lens, a red tally light, and a
+    cable looping from the housing's back into the arm (C5 placeholder pass: the housing was a stretched cube). The
+    lens looks along the tilt joint's local -Y. Returns (root, yaw, tilt)."""
     s = scale
+
+    def block(nm, mat, par, at, dims, bev, segs=4):
+        o = mesh_obj(f"{name}.{nm}", bpy.ops.mesh.primitive_cube_add, mat, par, size=1, location=at)
+        o.data.transform(Matrix.Diagonal((*dims, 1.0)))  # sized in the mesh, so the bevel stays round
+        bevel(o, bev, segs)
+        return smooth(o)
+
     root = empty(name, loc, parent)
-    plastic = mat_plastic(f"{name}.housing", body_role, 0.25)
+    plastic = mat_plastic(f"{name}.housing", body_role, 0.3)
+    dark = mat_plastic(f"{name}.dark", "lab_dark", 0.4)
     chrome = mat_chrome(f"{name}.chrome")
+    plate = mesh_obj(f"{name}.plate", bpy.ops.mesh.primitive_cylinder_add, dark, root, radius=0.055 * s,
+                     depth=0.012 * s, vertices=32, location=(0, 0, -0.006 * s))
+    bevel(plate, 0.003 * s, 2)
+    smooth(plate)
+    for k in range(3):
+        a = k * math.tau / 3 + 0.5
+        smooth(mesh_obj(f"{name}.screw{k}", bpy.ops.mesh.primitive_cylinder_add, chrome, root, radius=0.007 * s,
+                        depth=0.004 * s, vertices=16, location=(math.cos(a) * 0.04 * s, math.sin(a) * 0.04 * s,
+                                                                 -0.013 * s)))
     arm = mesh_obj(f"{name}.arm", bpy.ops.mesh.primitive_cylinder_add, chrome, root, radius=0.018 * s,
-                   depth=0.16 * s, vertices=16, location=(0, 0, -0.08 * s))
+                   depth=0.16 * s, vertices=24, location=(0, 0, -0.08 * s))
     smooth(arm)
     yaw = empty(f"{name}.yaw", (0, 0, -0.17 * s), root)
-    mesh_obj(f"{name}.knuckle", bpy.ops.mesh.primitive_uv_sphere_add, chrome, yaw, radius=0.03 * s)
+    smooth(mesh_obj(f"{name}.knuckle", bpy.ops.mesh.primitive_uv_sphere_add, chrome, yaw, radius=0.03 * s,
+                    segments=24, ring_count=12))
     tilt = empty(f"{name}.tilt", (0, 0, -0.03 * s), yaw)
-    body = mesh_obj(f"{name}.body", bpy.ops.mesh.primitive_cube_add, plastic, tilt, size=1,
-                    location=(0, -0.1 * s, -0.04 * s))
-    body.scale = (0.13 * s, 0.3 * s, 0.12 * s)
-    bevel(body, 0.02 * s, 3)
-    hood = mesh_obj(f"{name}.hood", bpy.ops.mesh.primitive_cube_add, plastic, tilt, size=1,
-                    location=(0, -0.14 * s, 0.03 * s))
-    hood.scale = (0.17 * s, 0.38 * s, 0.012 * s)
-    bevel(hood, 0.004 * s, 2)
+    block("body", plastic, tilt, (0, -0.1 * s, -0.04 * s), (0.12 * s, 0.28 * s, 0.11 * s), 0.025 * s)
+    block("cap", dark, tilt, (0, 0.045 * s, -0.04 * s), (0.124 * s, 0.025 * s, 0.114 * s), 0.02 * s)
+    for k in range(3):  # cooling grooves along each side
+        for sx in (-1, 1):
+            block(f"groove{k}{sx}", dark, tilt, (sx * 0.061 * s, -0.1 * s, -0.065 * s + k * 0.022 * s),
+                  (0.004 * s, 0.18 * s, 0.006 * s), 0.0015 * s, 2)
+    block("hood", plastic, tilt, (0, -0.14 * s, 0.026 * s), (0.16 * s, 0.38 * s, 0.012 * s), 0.005 * s)
     for sx in (-1, 1):  # the hood's side skirts
-        sk = mesh_obj(f"{name}.skirt{sx}", bpy.ops.mesh.primitive_cube_add, plastic, tilt, size=1,
-                      location=(sx * 0.08 * s, -0.22 * s, 0.0))
-        sk.scale = (0.008 * s, 0.2 * s, 0.05 * s)
-    ring = mesh_obj(f"{name}.ring", bpy.ops.mesh.primitive_cylinder_add, chrome, tilt, radius=0.05 * s,
-                    depth=0.03 * s, vertices=32, location=(0, -0.26 * s, -0.04 * s), rotation=(math.pi / 2, 0, 0))
+        block(f"skirt{sx}", plastic, tilt, (sx * 0.074 * s, -0.24 * s, 0.002 * s), (0.008 * s, 0.17 * s, 0.045 * s),
+              0.003 * s, 2)
+    barrel = mesh_obj(f"{name}.barrel", bpy.ops.mesh.primitive_cylinder_add, dark, tilt, radius=0.045 * s,
+                      depth=0.04 * s, vertices=48, location=(0, -0.255 * s, -0.04 * s), rotation=(math.pi / 2, 0, 0))
+    bevel(barrel, 0.004 * s, 2)
+    smooth(barrel)
+    ring = mesh_obj(f"{name}.ring", bpy.ops.mesh.primitive_torus_add, chrome, tilt, major_radius=0.043 * s,
+                    minor_radius=0.007 * s, major_segments=48, minor_segments=12, location=(0, -0.276 * s, -0.04 * s),
+                    rotation=(math.pi / 2, 0, 0))
     smooth(ring)
     lens = mesh_obj(f"{name}.lens", bpy.ops.mesh.primitive_uv_sphere_add, mat_plastic(f"{name}.lens", "lens", 0.02),
-                    tilt, radius=0.04 * s, location=(0, -0.268 * s, -0.04 * s))
-    lens.scale = (1, 0.45, 1)
+                    tilt, radius=0.036 * s, segments=32, ring_count=16, location=(0, -0.272 * s, -0.04 * s))
+    lens.scale = (1, 0.4, 1)
     smooth(lens)
-    mesh_obj(f"{name}.tally", bpy.ops.mesh.primitive_uv_sphere_add, mat_emission(f"{name}.tally", "alarm", 30.0),
-             tilt, radius=0.01 * s, location=(0.045 * s, -0.25 * s, 0.015 * s))
+    smooth(mesh_obj(f"{name}.tally", bpy.ops.mesh.primitive_uv_sphere_add, mat_emission(f"{name}.tally", "alarm", 30.0),
+                    tilt, radius=0.008 * s, segments=16, ring_count=8, location=(0.04 * s, -0.242 * s, 0.006 * s)))
+    cable = bpy.data.curves.new(f"{name}.cable", "CURVE")  # a loop from the housing's back up into the arm
+    cable.dimensions, cable.bevel_depth, cable.bevel_resolution = "3D", 0.006 * s, 3
+    sp = cable.splines.new("BEZIER")
+    sp.bezier_points.add(1)
+    for bp, co, h in zip(sp.bezier_points, ((0, 0.06 * s, -0.03 * s), (0, 0.015 * s, 0.03 * s)),
+                         ((0, 0.05 * s, 0), (0, 0, -0.05 * s))):
+        bp.co = co
+        bp.handle_left_type = bp.handle_right_type = "FREE"
+        bp.handle_right = Vector(co) + Vector(h)
+        bp.handle_left = Vector(co) - Vector(h)
+    co = link(bpy.data.objects.new(f"{name}.cable", cable))
+    co.data.materials.append(dark)
+    co.parent = tilt
     return root, yaw, tilt
 
 

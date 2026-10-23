@@ -26,6 +26,7 @@ import bpy
 from mathutils import Vector
 
 import sr_anim as A
+import props_hi as P  # noqa: E402
 import sr_kit as K
 
 ROAD_X0, MOAT_R0, MOAT_R1, ROAD_X1, ROAD_W = 2.0, 3.0, 3.8, 16.0, 1.6
@@ -249,7 +250,8 @@ def build():
     dash_m = K.mat_emission("lane_dash", "amber", 6.0)
     x = MOAT_R1 + 0.3
     while x < ROAD_X1 - 0.3:
-        dashes.append(_box(f"dash{len(dashes)}", dash_m, None, (x, 0, 0.026), (0.4, 0.05, 0.004)))
+        dashes.append(P.blk(f"dash{len(dashes)}", dash_m, None, (x, 0, 0.026), (0.4, 0.05, 0.004), bev=0.0015,
+                            segs=2))
         x += 0.8
     out.update(tube=tube, roads=roads, dashes=dashes)
 
@@ -259,7 +261,24 @@ def build():
     # or that only the lyrics give (regions, nodes, minutes, 198) are left out. Re-check with the fact card's sources
     # before the final render.
     wall = K.empty("dash_wall", (0, 5.0, 0))
-    _box("dash_wall.back", K.mat_plastic("dashwall", "lab_dark", 0.3), wall, (0, 0.12, 1.55), (6.4, 0.1, 3.1))
+    # The wall is a cabinet of open bays, one per card (C5 placeholder pass: was a flat slab, and the cards swept
+    # into it as they flipped): mullions and rails between the bays, a back deep enough for a card's half-width
+    # (0.68 m) to turn clear of it, a header with a status strip, feet and cable trays.
+    cab, trim = K.mat_plastic("dashwall", "lab_dark", 0.3), K.mat_metal("dashwall_trim", "chrome", 0.35)
+    P.blk("dash_wall.back", cab, wall, (0, 0.78, 1.55), (6.4, 0.08, 3.1), bev=0.01)
+    for c in range(5):  # mullions between the bays, clear of each card's sweep
+        P.blk(f"dash_wall.mullion{c}", cab, wall, (-3.0 + 1.5 * c, 0.37, 1.55), (0.06, 0.86, 3.1), bev=0.01)
+        P.blk(f"dash_wall.mullion{c}.trim", trim, wall, (-3.0 + 1.5 * c, -0.065, 1.55), (0.07, 0.012, 3.1), bev=0.003)
+    for r, z in enumerate((0.03, 1.05, 2.05, 3.07)):  # rails between the rows, the top one a header
+        P.blk(f"dash_wall.rail{r}", cab, wall, (0, 0.37, z), (6.4, 0.86, 0.06), bev=0.01)
+        P.blk(f"dash_wall.rail{r}.trim", trim, wall, (0, -0.065, z), (6.4, 0.012, 0.07), bev=0.003)
+    P.blk("dash_wall.header", cab, wall, (0, 0.37, 3.25), (6.5, 0.9, 0.3), bev=0.02)
+    P.blk("dash_wall.header.strip", K.mat_emission("dashwall_strip", "lab_glow", 1.5), wall, (0, -0.085, 3.25),
+          (6.0, 0.01, 0.05), bev=0.002)
+    for c in range(4):  # a cable tray under each column, at the back of the lowest bay
+        P.blk(f"dash_wall.tray{c}", trim, wall, (-2.25 + 1.5 * c, 0.72, 0.09), (1.2, 0.06, 0.04), bev=0.004)
+    for x in (-3.0, 3.0):
+        P.blk(f"dash_wall.foot{x}", trim, wall, (x, 0.37, -0.0), (0.3, 1.0, 0.04), bev=0.008)
     teal, red = K.mat_emission("dash_ok", "lab_glow", 0.9), K.mat_emission("dash_red", "alarm", 2.5)  # dim: ink reads
     trace = K.mat_ink("dash_trace", "shadow")
     cards = []
@@ -293,11 +312,52 @@ def build():
     for k in range(5):
         _box(f"bridge.slat{k}", K.mat_plastic("slat", "lab_dark", 0.4), bridge,
              (0.08 + 0.16 * k, 0, 0.022), (0.03, ROAD_W, 0.006))
+    # The chain towers: steel lattice (four corner angles, girts and cross-bracing on every face) on a concrete
+    # plinth, a cap plate, and bearing cheeks holding the sprocket's axle (C5 placeholder pass: were plain posts).
+    # Each pops from its base.
     towers = []
-    for s in (-1, 1):
-        t = _box(f"bridge.tower{s}", K.mat_plastic("tower", "lab", 0.3), None,
-                 (MOAT_R0 - 0.1, s * (ROAD_W / 2 + 0.1), 0.55), (0.12, 0.12, 1.1))
-        K.bevel(t, 0.01)
+    steel, plinth = K.mat_metal("tower_steel", "lab", 0.35), K.mat_plastic("tower_plinth", "lab_dark", 0.6)
+    for si, s in enumerate((-1, 1)):
+        t = K.empty(f"bridge.tower{s}", (MOAT_R0 - 0.1, s * (ROAD_W / 2 + 0.1), 0))
+        if si == 0:
+            parts = [P.blk(f"bridge.tower{s}.plinth", plinth, t, (0, 0, 0.04), (0.2, 0.2, 0.08), bev=0.01)]
+            for cx in (-1, 1):
+                for cy in (-1, 1):
+                    parts.append(P.blk(f"bridge.tower{s}.post{cx}{cy}", steel, t, (cx * 0.06, cy * 0.06, 0.55),
+                                       (0.022, 0.022, 0.94), bev=0.003))
+            for j in range(5):  # girts
+                z = 0.12 + 0.22 * j
+                for ax in (0, 1):
+                    for c in (-1, 1):
+                        loc = (c * 0.06, 0, z) if ax else (0, c * 0.06, z)
+                        dims = (0.012, 0.12, 0.012) if ax else (0.12, 0.012, 0.012)
+                        parts.append(P.blk(f"bridge.tower{s}.girt{j}{ax}{c}", steel, t, loc, dims, bev=0.002))
+            ang = math.atan2(0.22, 0.12)
+            for j in range(4):  # one diagonal per bay per face, alternating
+                z = 0.23 + 0.22 * j
+                a = (ang if j % 2 else -ang) - math.pi / 2
+                for ax in (0, 1):
+                    for c in (-1, 1):
+                        if ax:
+                            parts.append(P.blk(f"bridge.tower{s}.brace{j}{ax}{c}", steel, t, (c * 0.06, 0, z),
+                                               (0.008, 0.25, 0.008), bev=0.0, rot=(a + math.pi / 2, 0, 0)))
+                        else:
+                            parts.append(P.blk(f"bridge.tower{s}.brace{j}{ax}{c}", steel, t, (0, c * 0.06, z),
+                                               (0.25, 0.008, 0.008), bev=0.0, rot=(0, a + math.pi / 2, 0)))
+            parts.append(P.blk(f"bridge.tower{s}.cap", steel, t, (0, 0, 1.03), (0.16, 0.16, 0.02), bev=0.004))
+            for cy in (-1, 1):
+                parts.append(P.blk(f"bridge.tower{s}.cheek{cy}", plinth, t, (0, cy * 0.045, 1.1), (0.06, 0.012, 0.15),
+                                   bev=0.004))
+            parts.append(P.cyl(f"bridge.tower{s}.axle", K.mat_chrome("tower_axle"), t, (0, 0, 1.14), 0.01, 0.11,
+                               rot=(math.pi / 2, 0, 0), verts=16))
+            for cx in (-1, 1):
+                for cy in (-1, 1):
+                    parts.append(P.cyl(f"bridge.tower{s}.bolt{cx}{cy}", K.mat_chrome("tower_bolt"), t,
+                                       (cx * 0.08, cy * 0.08, 0.085), 0.008, 0.012, verts=12))
+            first = t
+        else:
+            for c in first.children:
+                P.share(c, c.name.replace(f"bridge.tower{-s}", f"bridge.tower{s}", 1), t)
         towers.append(t)
     links = {s: [K.mesh_obj(f"chain{s}_{k}", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("chain"), None,
                             major_radius=0.035, minor_radius=0.009, location=(0, 0, 0),
@@ -526,15 +586,64 @@ def build():
     stamps = [_stamp_arm(f"stamp{k}", (-4.6 + 0.85 * k, 3.6, 0)) for k in range(4)]
     out.update(planes=planes, stamps=stamps)
 
-    # S56: the giant printer (from G), paper with the bill coming out.
+    # S56: the giant printer (from G), paper with the bill coming out. A line printer, not a box (C5 placeholder
+    # pass): a lower housing with a seam to its lid, the paper roll in an open well at the back on its spindle, the
+    # exit slot with a serrated chrome tear bar, the print head riding a rail across the front, a control panel
+    # (READY display, buttons, status LEDs), side vents and rubber feet. Footprint 2.0 x 1.2, 1.1 high, as before.
     pr = K.empty("printer", (-0.2, 3.3, 0))
     K.prop(pr, "head", 0.0, lo=-1.0, hi=1.0)
-    body = _box("printer.body", K.mat_plastic("printer", "lab", 0.3), pr, (0, 0, 0.55), (2.0, 1.2, 1.1))
-    K.bevel(body, 0.03)
-    _box("printer.slot", K.mat_plastic("pslot", "shadow", 0.6), pr, (0, -0.605, 0.85), (1.4, 0.01, 0.05))
+    shell, dark = K.mat_plastic("printer", "lab", 0.3), K.mat_plastic("printer_dark", "lab_dark", 0.4)
+    black, chrome = K.mat_plastic("pslot", "shadow", 0.6), K.mat_chrome("printer_chrome")
+    P.blk("printer.body", shell, pr, (0, 0, 0.47), (2.0, 1.2, 0.92), bev=0.05)
+    P.blk("printer.seam", black, pr, (0, 0, 0.935), (1.96, 1.16, 0.014))
+    P.blk("printer.lid", shell, pr, (0, -0.2, 1.01), (1.96, 0.78, 0.16), bev=0.04)
+    P.blk("printer.well", black, pr, (0, 0.4, 0.92), (1.7, 0.36, 0.04), bev=0.01)  # the roll's open well
+    roll = P.cyl("printer.roll", K.mat_matte("printer_roll", "paper"), pr, (0, 0.4, 1.04), 0.15, 1.56,
+                 rot=(0, math.pi / 2, 0), verts=64, bev=0.01)
+    P.cyl("printer.spindle", chrome, pr, (0, 0.4, 1.04), 0.03, 1.74, rot=(0, math.pi / 2, 0), verts=24)
+    for sx in (-1, 1):
+        P.prism(f"printer.cradle{sx}", dark, pr, (sx * 0.86, 0.4, 0.94),
+                [(-0.09, 0.0), (0.09, 0.0), (0.09, 0.08), (0.0, 0.12), (-0.09, 0.08)], 0.05,
+                rot=(0, 0, math.pi / 2), bev=0.006)
+    P.blk("printer.slot", black, pr, (0, -0.595, 0.85), (1.44, 0.03, 0.06), bev=0.008)
+    P.blk("printer.tearbar", chrome, pr, (0, -0.612, 0.8), (1.5, 0.03, 0.022), bev=0.004)
+    tooth = P.prism("printer.tooth0", chrome, pr, (-0.735, -0.62, 0.785), [(-0.012, 0.0), (0.012, 0.0), (0.0, -0.016)],
+                    0.012)
+    for j in range(1, 50):
+        P.share(tooth, f"printer.tooth{j}", pr, loc=(-0.735 + 0.03 * j, -0.62, 0.785))
+    # The head's rail across the front, above the slot, with end brackets.
+    P.cyl("printer.rail", chrome, pr, (0, -0.635, 0.95), 0.014, 1.5, rot=(0, math.pi / 2, 0), verts=24)
+    for sx in (-1, 1):
+        P.blk(f"printer.rail_end{sx}", dark, pr, (sx * 0.77, -0.62, 0.95), (0.05, 0.06, 0.08), bev=0.008)
     head = K.empty("printer.head", (0, -0.62, 0.95), pr)
     K.drive(head, "location", 0, pr, "head", "0.5 * x")
-    _box("printer.head.box", K.mat_plastic("phead", "alarm", 0.3), head, (0, 0, 0), (0.18, 0.08, 0.08))
+    P.blk("printer.head.box", K.mat_plastic("phead", "alarm", 0.3), head, (0, -0.03, 0), (0.18, 0.08, 0.1), bev=0.012)
+    P.blk("printer.head.ribbon", black, head, (0, -0.075, 0.0), (0.12, 0.012, 0.06), bev=0.004)
+    P.cyl("printer.head.pin", chrome, head, (0, -0.02, -0.065), 0.012, 0.04, verts=16)
+    # Control panel, front right, below the slot line.
+    panel = K.empty("printer.panel", (0.72, -0.6, 0.48), pr)
+    P.blk("printer.panel.plate", dark, panel, (0, -0.004, 0), (0.42, 0.012, 0.5), bev=0.006)
+    P.blk("printer.panel.lcd", K.mat_emission("printer_lcd", "lab_glow", 1.2), panel, (0, -0.012, 0.15),
+          (0.3, 0.006, 0.09), bev=0.002)
+    K.text("printer.panel.ready", "READY", 0.045, K.mat_ink("printer_lcd_ink", "shadow"), loc=(0, -0.0158, 0.15),
+           rot=(math.pi / 2, 0, 0), font="JetBrainsMono-SemiBold-flat.ttf", parent=panel)
+    for j, (lab, x) in enumerate((("FEED", -0.11), ("PAUSE", 0.0), ("CANCEL", 0.11))):
+        P.cyl(f"printer.panel.btn{j}", K.mat_plastic(f"printer_btn{j}", "paper" if j < 2 else "alarm", 0.35), panel,
+              (x, -0.016, -0.02), 0.032, 0.02, rot=(math.pi / 2, 0, 0), verts=32, bev=0.005)
+        K.text(f"printer.panel.lab{j}", lab, 0.018, K.mat_ink("printer_panel_ink", "paper"), loc=(x, -0.012, -0.075),
+               rot=(math.pi / 2, 0, 0), parent=panel)
+    for j, (role, x) in enumerate((("lab_glow", -0.1), ("amber", -0.04))):
+        P.cyl(f"printer.panel.led{j}", K.mat_emission(f"printer_led{j}", role, 20.0), panel, (x, -0.012, -0.16),
+              0.009, 0.012, rot=(math.pi / 2, 0, 0), verts=16)
+    K.text("printer.panel.status", "ONLINE  PAPER", 0.016, K.mat_ink("printer_panel_ink2", "paper"),
+           loc=(0.06, -0.012, -0.165), rot=(math.pi / 2, 0, 0), parent=panel)
+    K.text("printer.badge", "LINE PRINTER", 0.05, K.mat_ink("printer_badge", "lab_dark"), loc=(-0.62, -0.602, 0.45),
+           rot=(math.pi / 2, 0, 0), parent=pr)
+    for sx in (-1, 1):  # side vents
+        for j in range(7):
+            P.blk(f"printer.vent{sx}_{j}", black, pr, (sx * 1.0, 0.1, 0.3 + 0.06 * j), (0.012, 0.6, 0.02), bev=0.004)
+        for sy in (-1, 1):
+            P.cyl(f"printer.foot{sx}{sy}", black, pr, (sx * 0.85, sy * 0.5, 0.008), 0.06, 0.02, verts=32, bev=0.004)
     sheet = K.empty("printer.sheet", (0, -0.62, 0.85), pr)
     sheet.rotation_euler = (math.radians(40), 0, 0)
     feed = K.empty("printer.feed", (0, 0, 0), sheet)
@@ -545,16 +654,54 @@ def build():
     out.update(printer=pr, printer_feed=feed)
 
     # S57: the outer wall, sixteen segments on a ring, each with a beacon (FX).
+    # Each segment: a plinth, a brass wall with three raised, riveted panels on each face, a coping, pilasters at
+    # its ends, and its beacon in a caged housing (C5 placeholder pass: was a slab with a ball on it). The static
+    # parts share their meshes across the sixteen.
     walls = []
+    brass, panel_m = K.mat_metal("outerwall", "brass", 0.35), K.mat_metal("outerwall_panel", "copper", 0.4)
+    base_m, cap_m = K.mat_plastic("outerwall_base", "lab_dark", 0.5), K.mat_metal("outerwall_cap", "chrome", 0.3)
+    first = None
     for k in range(16):
         a = math.tau * k / 16 + math.pi / 16
         w = K.empty(f"wall{k}", (math.sin(a) * 9.5, -math.cos(a) * 9.5, 0))
         w.rotation_euler = (0, 0, a)
         K.prop(w, "beacon", 0.04)
-        _box(f"wall{k}.slab", K.mat_metal("outerwall", "brass", 0.35), w, (0, 0, 0.7), (3.6, 0.3, 1.4))
-        K.mesh_obj(f"wall{k}.beacon", bpy.ops.mesh.primitive_uv_sphere_add,
-                   K.mat_emission(f"wall{k}.beacon", "alarm", 40.0, w, "beacon"), w, radius=0.08,
-                   location=(0, 0, 1.5))
+        if first is None:
+            P.blk(f"wall{k}.plinth", base_m, w, (0, 0, 0.07), (3.64, 0.42, 0.14), bev=0.015)
+            P.blk(f"wall{k}.slab", brass, w, (0, 0, 0.72), (3.6, 0.3, 1.16), bev=0.02)
+            P.blk(f"wall{k}.coping", cap_m, w, (0, 0, 1.34), (3.68, 0.38, 0.08), bev=0.015)
+            for sx in (-1, 1):
+                P.blk(f"wall{k}.pilaster{sx}", brass, w, (sx * 1.72, 0, 0.7), (0.18, 0.4, 1.4), bev=0.02)
+            rivet = None
+            for fy in (-1, 1):
+                for j, px in enumerate((-1.1, 0.0, 1.1)):
+                    P.blk(f"wall{k}.panel{fy}{j}", panel_m, w, (px, fy * 0.165, 0.72), (0.92, 0.03, 0.82), bev=0.012)
+                    for rx in (-1, 1):
+                        for rz in (-1, 1):
+                            loc = (px + rx * 0.4, fy * 0.183, 0.72 + rz * 0.35)
+                            if rivet is None:
+                                rivet = K.mesh_obj(f"wall{k}.rivet", bpy.ops.mesh.primitive_uv_sphere_add, cap_m, w,
+                                                   radius=0.014, segments=12, ring_count=6, location=loc)
+                                K.smooth(rivet)
+                            else:
+                                P.share(rivet, f"wall{k}.rivet{fy}{j}{rx}{rz}", w, loc=loc)
+            P.cyl(f"wall{k}.beacon_base", cap_m, w, (0, 0, 1.41), 0.07, 0.06, verts=32, bev=0.008)
+            P.cyl(f"wall{k}.beacon_cap", cap_m, w, (0, 0, 1.6), 0.06, 0.02, verts=32, bev=0.005)
+            for j in range(4):
+                b = math.tau * j / 4 + math.pi / 4
+                P.cyl(f"wall{k}.cage{j}", cap_m, w, (math.cos(b) * 0.1, math.sin(b) * 0.1, 1.5), 0.006, 0.2, verts=8)
+            for z in (1.45, 1.55):
+                K.smooth(K.mesh_obj(f"wall{k}.cage_ring{z}", bpy.ops.mesh.primitive_torus_add, cap_m, w,
+                                    major_radius=0.1, minor_radius=0.005, major_segments=32, minor_segments=6,
+                                    location=(0, 0, z)))
+            first = w
+        else:
+            for c in first.children:
+                if not c.name.endswith(".beacon"):  # each beacon has its own material, driven by its own wall
+                    P.share(c, c.name.replace(first.name + ".", f"wall{k}.", 1), w)
+        K.smooth(K.mesh_obj(f"wall{k}.beacon", bpy.ops.mesh.primitive_uv_sphere_add,
+                            K.mat_emission(f"wall{k}.beacon", "alarm", 40.0, w, "beacon"), w, radius=0.08,
+                            location=(0, 0, 1.5)))
         walls.append(w)
     out["walls"] = walls
 

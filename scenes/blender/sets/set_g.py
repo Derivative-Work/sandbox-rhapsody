@@ -26,6 +26,7 @@ import bpy
 from mathutils import Matrix, Vector
 
 import sr_anim as A
+import props_fg as P
 import sr_kit as K
 
 COLS, ROWS = 70, 10                      # 700 seats
@@ -171,16 +172,49 @@ def _cold_storage(black, brass):
     recessed into its -X face, and the vault door on `vault_hinge` (keyed in animate())."""
     chrome = K.mat_chrome("cold_chrome")
     belt_m = K.mat_plastic("belt", "lab_dark", 0.6)
-    _box("conveyor", black, (1.45, -1.4, 0.07), (2.0, 0.26, 0.06), bev=0.01)
-    _box("conveyor.belt", belt_m, (1.45, -1.4, 0.163), (2.0, 0.26, 0.006))
-    for k in range(20):  # belt slats
-        _box(f"conveyor.slat{k}", black, (0.5 + 0.1 * k, -1.4, 0.1665), (0.012, 0.25, 0.002))
+    # The conveyor: bolted side channels on a bed plate, the belt with its cleats on top (top at 0.166, where the
+    # probes ride), round guide rails on posts, end rollers in bearing blocks, stands with feet and cross braces.
+    fr = P.Builder([black, chrome])
+    fr.box((0, 0, -0.33), (2.0, 0.22, 0.03), bev=0.006)  # bed plate (object origin at the old frame's height)
     for sy in (-1, 1):
-        _box(f"conveyor.rail{sy}", chrome, (1.45, -1.4 + sy * 0.15, 0.18), (2.04, 0.02, 0.04), bev=0.006)
+        fr.box((0, sy * 0.136, -0.29), (2.0, 0.012, 0.1), bev=0.004)
+        fr.box((0, sy * 0.124, -0.246), (2.0, 0.024, 0.008), bev=0.002)  # channel lip
+        for k in range(9):
+            fr.cyl((-0.9 + 0.225 * k, sy * 0.1435, -0.28), 0.006, 0.004, axis="Y", segs=6, m=1)
+    P.place("conveyor", fr.mesh("conveyor_frame"), (1.45, -1.4, 0.4))
+    bl = P.Builder([belt_m])
+    bl.box((0, 0, 0), (2.0, 0.26, 0.006), bev=0.0025)
+    P.place("conveyor.belt", bl.mesh("conveyor_belt"), (1.45, -1.4, 0.163))
+    cl = P.Builder([black])
+    cl.box((0, 0, 0), (0.012, 0.25, 0.003), bev=0.0012)
+    cleat = cl.mesh("conveyor_cleat")
+    for k in range(20):  # belt cleats
+        P.place(f"conveyor.slat{k}", cleat, (0.5 + 0.1 * k, -1.4, 0.1672))
+    for sy in (-1, 1):
+        gr = P.Builder([chrome])
+        gr.cyl((0, 0, 0.012), 0.011, 2.04, axis="X", segs=20)
         for k in range(5):
-            _box(f"conveyor.leg{sy}{k}", chrome, (0.5 + 0.475 * k, -1.4 + sy * 0.12, 0.05), (0.03, 0.03, 0.1))
-    for x in (0.45, 2.45):  # end rollers
-        _cyl(f"conveyor.roller{x}", chrome, None, (x, -1.4, 0.12), 0.045, 0.28, rot=(math.pi / 2, 0, 0))
+            gr.cyl((-0.95 + 0.475 * k, 0, -0.008), 0.005, 0.04, segs=10)
+        P.place(f"conveyor.rail{sy}", gr.mesh(f"conveyor_rail{sy}"), (1.45, -1.4 + sy * 0.15, 0.18))
+    lg = P.Builder([chrome, black])
+    lg.box((0, 0, 0.004), (0.03, 0.03, 0.092), bev=0.005)
+    lg.cyl((0, 0, -0.045), 0.022, 0.01, segs=20, m=1)
+    lg.box((0, 0, 0.047), (0.05, 0.05, 0.006), bev=0.0015)
+    leg_me = lg.mesh("conveyor_leg_g")
+    br = P.Builder([chrome])
+    br.box((0, 0, 0), (0.018, 0.22, 0.018), bev=0.003)
+    brace_me = br.mesh("conveyor_brace_g")
+    for k in range(5):
+        for sy in (-1, 1):
+            P.place(f"conveyor.leg{sy}{k}", leg_me, (0.5 + 0.475 * k, -1.4 + sy * 0.12, 0.05))
+        P.place(f"conveyor.brace{k}", brace_me, (0.5 + 0.475 * k, -1.4, 0.03))
+    for x in (0.45, 2.45):  # end rollers in bearing blocks
+        ro = P.Builder([chrome, black])
+        ro.cyl((0, 0, 0), 0.045, 0.24, axis="Y", segs=40)
+        ro.cyl((0, 0, 0), 0.012, 0.3, axis="Y", segs=16)
+        for sy in (-1, 1):
+            ro.box((0, sy * 0.15, -0.005), (0.06, 0.03, 0.06), bev=0.006, m=1)
+        P.place(f"conveyor.roller{x}", ro.mesh(f"conveyor_roller{x}"), (x, -1.4, 0.12))
     # The freezer cabinet: insulated white panels, seams, a fan unit on top, and the doorway: a recess that glows ice.
     cab_m = K.mat_plastic("freezer_body", "lab", 0.3)
     cab = _box("freezer", cab_m, (2.95, -1.4, 0.45), (0.9, 0.9, 0.9), bev=0.03)
@@ -191,10 +225,24 @@ def _cold_storage(black, brass):
     bo.object, bo.operation, bo.solver = cutter, "DIFFERENCE", "EXACT"
     bo.material_mode = "TRANSFER"
     cab.modifiers.move(cab.modifiers.find("doorway"), 0)
+    # Insulated-panel cabinet: aluminium corner guards, a dark kick plinth and a capping round the top, vertical
+    # panel seams. Exactly one door, the round one on the -X face where the conveyor runs in (human, C5: "make it so
+    # that it has exactly one door"; a service hatch on the front read as a second).
     seam = K.mat_plastic("freezer_seam", "lab_dark", 0.4)
-    for z in (0.3, 0.6):
-        _box(f"freezer.seam_y{z}", seam, (2.95, -1.853, z), (0.86, 0.004, 0.008))
-        _box(f"freezer.seam_x{z}", seam, (3.403, -1.4, z), (0.004, 0.86, 0.008))
+    alu = K.mat_metal("freezer_alu", "chrome", 0.35)
+    tr = P.Builder([alu, seam])
+    x0, x1, y0, y1 = 2.5, 3.4, -1.85, -0.95
+    for cx, sx in ((x0, 1), (x1, -1)):
+        for cy, sy in ((y0, 1), (y1, -1)):
+            tr.box((cx + sx * 0.022, cy - sy * 0.003, 0.45), (0.05, 0.006, 0.9), bev=0.002)
+            tr.box((cx - sx * 0.003, cy + sy * 0.022, 0.45), (0.006, 0.05, 0.9), bev=0.002)
+    tr.frame((2.95, -1.4, 0.04), (0.912, 0.912), (0.88, 0.88), 0.08, m=1, bev=0.004)
+    tr.frame((2.95, -1.4, 0.89), (0.912, 0.912), (0.88, 0.88), 0.02, bev=0.003)
+    for x in (2.8, 3.1):  # front panel seams
+        tr.box((x, y0 - 0.002, 0.45), (0.008, 0.004, 0.8), m=1)
+    for y in (-1.7, -1.4, -1.1):  # side (+X) panel seams
+        tr.box((x1 + 0.002, y, 0.47), (0.004, 0.008, 0.74), m=1)
+    P.place("freezer.trim", tr.mesh("freezer_trim"))
     K.mesh_obj("freezer.frame", bpy.ops.mesh.primitive_torus_add, chrome, None, major_radius=0.3, minor_radius=0.025,
                location=(2.495, -1.4, 0.42), rotation=(0, math.pi / 2, 0))
     _box("freezer.unit", K.mat_plastic("freezer_unit", "lab_dark", 0.35), (3.0, -1.4, 0.98), (0.6, 0.5, 0.16), bev=0.02)
@@ -205,9 +253,10 @@ def _cold_storage(black, brass):
         bl = _box(f"freezer.blade{k}", chrome, (0, 0, 0), (0.13, 0.04, 0.006), fan)
         bl.location = (math.cos(k * math.tau / 5) * 0.07, math.sin(k * math.tau / 5) * 0.07, 0)
         bl.rotation_euler = (0.4, 0, k * math.tau / 5)
-    _box("freezer.label_plate", K.mat_matte("freezer_plate", "paper"), (2.95, -1.853, 0.8), (0.62, 0.006, 0.13))
-    K.text("freezer.label", "COLD STORAGE", 0.09, K.mat_ink("freezer_ink", "shadow"),
-           loc=(2.95, -1.857, 0.8), parent=None).data.offset = 0.002
+    # The label over the door, on the door's face (human, C5: "put the 'cold storage' label on or above the door").
+    _box("freezer.label_plate", K.mat_matte("freezer_plate", "paper"), (2.494, -1.4, 0.815), (0.006, 0.66, 0.11))
+    K.text("freezer.label", "COLD STORAGE", 0.085, K.mat_ink("freezer_ink", "shadow"), loc=(2.4895, -1.4, 0.815),
+           rot=(math.pi / 2, 0, -math.pi / 2), parent=None).data.offset = 0.002
     for k in range(6):  # frost along the top edges
         fr = K.mesh_obj(f"freezer.frost{k}", bpy.ops.mesh.primitive_uv_sphere_add,
                         K.mat_acrylic("frost", "glass", alpha=0.6, emit=0.3), None, radius=0.07, segments=12,
@@ -215,8 +264,34 @@ def _cold_storage(black, brass):
         fr.scale = (1.2, 0.5, 0.35)
     # The vault door, on its hinge at the doorway's -Y edge; the slab faces -X when shut.
     door_hinge = K.empty("vault_hinge", (2.49, -1.4 - 0.3, 0.42))  # doorway centre 0.42: clear of the riders
+    # It reads as both a freezer door and a safe (human, C5): a white insulated face like the cabinet's, a dark rubber
+    # gasket round the frame and frost on its lower rim, a "-18°C" readout; a chrome rim, locking bolts, a brass
+    # handwheel and a combination dial.
+    _cyl("vault_door", cab_m, door_hinge, (0, 0.3, 0), 0.3, 0.07, rot=(0, math.pi / 2, 0), verts=96)
+    K.smooth(K.mesh_obj("freezer.gasket", bpy.ops.mesh.primitive_torus_add, K.mat_plastic("gasket", "shadow", 0.7),
+                        None, major_radius=0.272, minor_radius=0.014, major_segments=96, minor_segments=12,
+                        location=(2.497, -1.4, 0.42), rotation=(0, math.pi / 2, 0)))
+    dial = K.empty("vault_dial", (-0.04, 0.3, 0.19), door_hinge)
+    _cyl("vault_dial.face", K.mat_plastic("vault_dial", "shadow", 0.3), dial, (0, 0, 0), 0.045, 0.012,
+         rot=(0, math.pi / 2, 0), verts=48)
+    K.smooth(K.mesh_obj("vault_dial.ring", bpy.ops.mesh.primitive_torus_add, chrome, dial, major_radius=0.047,
+                        minor_radius=0.005, major_segments=48, minor_segments=8, location=(-0.006, 0, 0),
+                        rotation=(0, math.pi / 2, 0)))
+    for k in range(12):  # graduations
+        a = k * math.tau / 12
+        _box(f"vault_dial.tick{k}", K.mat_matte("dial_tick", "paper"), (-0.0065, math.cos(a) * 0.034,
+             math.sin(a) * 0.034), (0.001, 0.003, 0.009 if k % 3 else 0.014), dial).rotation_euler = (a - math.pi / 2, 0, 0)
+    _cyl("vault_dial.knob", chrome, dial, (-0.012, 0, 0), 0.016, 0.014, rot=(0, math.pi / 2, 0), verts=32)
+    _box("vault_display", K.mat_plastic("freezer_display", "shadow", 0.2), (-0.037, 0.3, -0.19), (0.008, 0.13, 0.055),
+         door_hinge, bev=0.004)
+    K.text("vault_temp", "-18°C", 0.036, K.mat_emission("freezer_temp", "rim", 8.0), loc=(-0.0415, 0.3, -0.19),
+           rot=(math.pi / 2, 0, -math.pi / 2), parent=door_hinge)
+    for k, a in enumerate((-2.2, -1.75, -1.35, -0.95)):  # frost on the lower rim
+        fr = K.mesh_obj(f"vault_frost{k}", bpy.ops.mesh.primitive_uv_sphere_add,
+                        K.mat_acrylic("frost", "glass", alpha=0.6, emit=0.3), door_hinge, radius=0.03, segments=12,
+                        ring_count=6, location=(-0.03, 0.3 + math.cos(a) * 0.29, math.sin(a) * 0.29))
+        fr.scale = (0.5, 1.4, 0.6)
     vault = K.mat_metal("vault", "chrome", 0.2)
-    _cyl("vault_door", vault, door_hinge, (0, 0.3, 0), 0.3, 0.07, rot=(0, math.pi / 2, 0), verts=64)
     K.mesh_obj("vault_rim", bpy.ops.mesh.primitive_torus_add, chrome, door_hinge, major_radius=0.29,
                minor_radius=0.02, location=(-0.035, 0.3, 0), rotation=(0, math.pi / 2, 0))
     for k in range(8):  # locking bolts round the rim
@@ -361,10 +436,21 @@ def build():
     _sector(bm, R0 + ROWS * DR + 0.3, R0 + ROWS * DR + 0.36, -SPAN - 0.1, SPAN + 0.1, 0, 3.0)
     _mesh_from("back_wall", bm, black)
     wall_r = R0 + ROWS * DR + 0.33
-    for k in range(9):  # brass pilasters on the back wall
+    # Brass pilasters on the back wall: a stepped plinth, a fluted shaft, a moulded capital (one mesh, nine copies;
+    # local -Y faces the stage).
+    pil = P.Builder([brass, black])
+    pil.box((0, 0.005, -1.5), (0.18, 0.1, 0.1), bev=0.008)
+    pil.box((0, 0.005, -1.43), (0.15, 0.09, 0.04), bev=0.008)
+    pil.box((0, 0, 0.0), (0.12, 0.08, 2.82), bev=0.01, seg=3)
+    for fx in (-0.034, 0.0, 0.034):  # flutes
+        pil.box((fx, -0.0405, 0.0), (0.012, 0.002, 2.6), bev=0.0009, m=1)
+    pil.box((0, 0.0, 1.43), (0.15, 0.095, 0.04), bev=0.008)
+    pil.box((0, 0.005, 1.5), (0.18, 0.11, 0.1), bev=0.01)
+    pil_me = pil.mesh("pilaster")
+    for k in range(9):
         a = -SPAN + 2 * SPAN * k / 8
-        _box(f"pilaster{k}", brass, (math.sin(a) * (wall_r - 0.05), math.cos(a) * (wall_r - 0.05), 1.55),
-             (0.12, 0.08, 3.1)).rotation_euler = (0, 0, -a)
+        P.place(f"pilaster{k}", pil_me, (math.sin(a) * (wall_r - 0.05), math.cos(a) * (wall_r - 0.05), 1.55),
+                rot=(0, 0, -a))
 
     # The swarm: 700 bodies in one mesh, 700 LEDs in another (UV = the seat's texel in the stunt bitmap).
     skip = {LONE, FLAGGER}
@@ -418,7 +504,18 @@ def build():
     a = -SPAN + 2 * SPAN * (FLAGGER[0] + 0.5) / COLS
     out["grader"] = K.turnstile("far_grader", (math.sin(a) * (wall_r + 0.4), math.cos(a) * (wall_r + 0.4), 3.0),
                                 rot_z=-a)
-    _box("grader_ledge", brass, (math.sin(a) * (wall_r + 0.4), math.cos(a) * (wall_r + 0.4), 2.98), (0.7, 0.7, 0.04))
+    # Its ledge: a brass slab with a moulded edge, bridged to the wall and carried on two corbels (local -Y, the
+    # stage side, meets the wall's back face).
+    led = P.Builder([brass])
+    led.box((0, 0, 0), (0.7, 0.7, 0.04), bev=0.008)
+    led.box((0, 0, -0.03), (0.66, 0.66, 0.02), bev=0.006)
+    led.box((0, -0.36, -0.005), (0.7, 0.03, 0.03), bev=0.005)
+    for cx in (-0.22, 0.22):
+        led.box((cx, -0.28, -0.08), (0.06, 0.14, 0.1), bev=0.01)
+        led.box((cx, -0.31, -0.17), (0.05, 0.08, 0.1), bev=0.01)
+        led.box((cx, -0.33, -0.24), (0.04, 0.04, 0.06), bev=0.008)
+    P.place("grader_ledge", led.mesh("grader_ledge"), (math.sin(a) * (wall_r + 0.4), math.cos(a) * (wall_r + 0.4),
+                                                       2.98), rot=(0, 0, -a))
 
     # The crowd's peeled SIMULATION decal, held on poles above the centre section (raised in S36).
     hold = K.empty("held_decal", (0, R0 + 4 * DR, -1.2))
@@ -517,8 +614,24 @@ def build():
         out["pile"].append(s)
 
     # The Auditors: five robotic stamp arms over a long table (paper-white, the Auditors' colour).
-    _box("stamp_table", black, (0, 0.28, 0.15), (1.9, 0.36, 0.3), bev=0.01)
-    _box("stamp_table.trim", brass, (0, 0.098, 0.293), (1.92, 0.012, 0.016))
+    # The Auditors' bench: a thick top (its surface at 0.30, where the prints land), an apron with a drawer under
+    # each arm and brass pulls, four legs and a stretcher shelf; the brass edge banding along the front.
+    tb = P.Builder([black, brass, K.mat_plastic("bench_drawer", "lab_dark", 0.35)])
+    tb.box((0, 0, 0.27), (1.9, 0.36, 0.06), bev=0.008, seg=3)
+    tb.box((0, 0.01, 0.2), (1.8, 0.3, 0.08), bev=0.005)
+    for k in range(5):
+        x = (k - 2) * 0.37
+        tb.box((x, -0.142, 0.2), (0.33, 0.012, 0.064), bev=0.004, m=2)
+        tb.box((x, -0.152, 0.2), (0.08, 0.01, 0.012), bev=0.003, m=1)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            tb.box((sx * 0.9, sy * 0.15, 0.08), (0.05, 0.05, 0.16), bev=0.008)
+            tb.cyl((sx * 0.9, sy * 0.15, 0.004), 0.03, 0.008, segs=20, m=1)
+    tb.box((0, 0, 0.06), (1.78, 0.28, 0.02), bev=0.004)
+    P.place("stamp_table", tb.mesh("stamp_bench"), (0, 0.28, 0.0))
+    st = P.Builder([brass])
+    st.box((0, 0, 0), (1.92, 0.012, 0.016), bev=0.003)
+    P.place("stamp_table.trim", st.mesh("stamp_bench_trim"), (0, 0.098, 0.293))
     stamp_ink = K.mat_ink("stamp_ink", "decal_ink")
     out["stamps"], out["stamp_prints"] = [], []
     for k in range(5):
@@ -803,5 +916,7 @@ CAMERAS = {
     "S41": [(0.0, _v(0.5, 1.8, 1.5), _v(0.5, 7.8, 1.0), 24), (1.0, _v(0.5, 2.0, 1.5), _v(0.5, 7.8, 1.0), 24)],
     "S42": [(0.0, _v(1.3, -2.6, 1.3), _v(0.0, -0.1, 0.45), 24), (1.0, _v(1.0, -2.5, 1.35), _v(0.0, -0.1, 0.45), 24)],
     "S43": [(0.0, _v(-2.0, -1.5, 1.2), _v(-3.0, 0.1, 1.75), 32), (1.0, _v(-2.3, -1.15, 1.4), _v(-3.0, 0.1, 1.85), 36)],
-    "S44": [(0.0, _v(0.8, -3.0, 1.1), _v(2.0, -1.4, 0.3), 28), (1.0, _v(1.1, -2.9, 1.05), _v(2.3, -1.4, 0.3), 30)],
+    # Turned toward the freezer's door face (-X), the conveyor running into it (human, C5: "turn the camera slightly
+    # more towards it").
+    "S44": [(0.0, _v(0.75, -2.65, 1.1), _v(2.15, -1.4, 0.35), 28), (1.0, _v(1.0, -2.5, 1.05), _v(2.45, -1.4, 0.38), 30)],
 }

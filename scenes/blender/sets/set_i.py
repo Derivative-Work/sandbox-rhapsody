@@ -20,6 +20,7 @@ import bpy
 from mathutils import Vector
 
 import sr_anim as A
+import props_hi as P  # noqa: E402
 import sr_kit as K
 
 WALL_Y, SIDE_X = 3.0, 3.6
@@ -70,29 +71,63 @@ def _flag(name, parent, loc, size, mat_pole, mat_flag, rot=(math.pi / 2, 0, 0), 
 
 
 def _crate(name, loc, size):
-    """A moulded plastic crate (was a plain box): a bevelled body with two raised ribs round its sides and a rim at
-    the top. Same footprint and height, so what stands on it stays put."""
-    body = _box(name, K.mat_plastic(f"{name}.body", "lab", 0.3), None, loc, size, 0.01)
-    rib = K.mat_plastic(f"{name}.rib", "decal_film", 0.25)  # a shade off the body: moulding, not stripes
+    """A moulded plastic stacking crate (C5 placeholder pass: was a box with two bands): a bevelled body, proud
+    corner posts, vertical ribs along its long sides, a hand-hold slot in each end, a stacking rim at the top and a
+    foot band. Same footprint and height, so what stands on it stays put. Returns the body."""
     x, y, z = loc
     w, d, h = size
-    for j, f in enumerate((0.3, 0.62)):
-        _box(f"{name}.rib{j}", rib, None, (x, y, z - h / 2 + f * h), (w + 0.008, d + 0.008, 0.012 * (1 + w)), 0.002)
-    _box(f"{name}.rim", rib, None, (x, y, z + h / 2 - 0.006), (w + 0.012, d + 0.012, 0.012), 0.003)
+    root = K.empty(f"{name}.parts")  # at the origin: the parts keep world positions; one prop for the audit
+    body = P.blk(name, K.mat_plastic(f"{name}.body", "lab", 0.3), root, loc, (w, d, h - 0.006), bev=0.006)
+    rib = K.mat_plastic(f"{name}.rib", "decal_film", 0.25)  # a shade off the body: moulding, not stripes
+    slot = K.mat_plastic(f"{name}.slot", "shadow", 0.6)
+    c = min(0.03, 0.18 * min(w, d))
+    for cx in (-1, 1):
+        for cy in (-1, 1):
+            P.blk(f"{name}.post{cx}{cy}", rib, root, (x + cx * (w / 2 - c / 2 + 0.003), y + cy * (d / 2 - c / 2 + 0.003), z),
+                  (c, c, h - 0.004), bev=0.004)
+    n = max(2, int(w / 0.07))
+    for fy in (-1, 1):
+        for j in range(n):
+            px = x - w / 2 + c + (w - 2 * c) * (j + 0.5) / n
+            P.blk(f"{name}.ridge{fy}_{j}", rib, root, (px, y + fy * (d / 2 + 0.002), z - h * 0.06), (0.012, 0.006, h * 0.62),
+                  bev=0.0025)
+    for fx in (-1, 1):
+        P.blk(f"{name}.hold{fx}", slot, root, (x + fx * (w / 2 + 0.0005), y, z + h / 2 - h * 0.24),
+              (0.004, d * 0.42, h * 0.13), bev=min(0.01, h * 0.05))
+    for j, f in enumerate((0.3, 0.62)):  # keep the old rib names: two bands across the long sides' ridges
+        P.blk(f"{name}.rib{j}", rib, root, (x, y, z - h / 2 + f * h), (w + 0.006, d + 0.006, 0.008 * (1 + w)), bev=0.002)
+    P.blk(f"{name}.rim", rib, root, (x, y, z + h / 2 - 0.009), (w + 0.012, d + 0.012, 0.018), bev=0.004)
+    P.blk(f"{name}.foot", rib, root, (x, y, z - h / 2 + 0.006), (w + 0.004, d + 0.004, 0.012), bev=0.003)
     return body
 
 
 def _shelf(name, x, z, sx):
-    """A chrome wall shelf: the board, a round front rail, and gusset brackets to the wall every metre."""
+    """A chrome wall shelf on slotted wall standards (C5 placeholder pass: the brackets were tilted slabs): the
+    board with a bevelled edge, a round front rail on posts, and a triangular bracket on a standard every metre."""
     chrome = K.mat_metal("shelf", "chrome", 0.25)
-    _box(name, chrome, None, (x, 0.75, z - 0.012), (0.4, 4.0, 0.024))
-    rail = K.mesh_obj(f"{name}.rail", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("shelf_rail"), None,
-                      radius=0.01, depth=4.0, vertices=12, location=(x - sx * 0.2, 0.75, z + 0.01),
+    root = K.empty(f"{name}.parts")  # at the origin: one prop for the audit
+    P.blk(name, chrome, root, (x, 0.75, z - 0.012), (0.4, 4.0, 0.024), bev=0.006)
+    rail = K.mesh_obj(f"{name}.rail", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("shelf_rail"), root,
+                      radius=0.01, depth=4.0, vertices=16, location=(x - sx * 0.19, 0.75, z + 0.03),
                       rotation=(math.pi / 2, 0, 0))
     K.smooth(rail)
+    wall_x = sx * SIDE_X
+    br = None
     for j in range(5):
-        g = _box(f"{name}.gusset{j}", chrome, None, (x + sx * 0.1, -1.2 + j * 0.98, z - 0.1), (0.2, 0.02, 0.16))
-        g.rotation_euler = (0, sx * 0.6, 0)
+        yj = -1.2 + j * 0.98
+        if br is None:
+            outline = [(0.0, 0.0), (-sx * 0.3, 0.0), (-sx * 0.27, -0.025), (0.0, -0.2)]
+            if sx < 0:
+                outline = outline[::-1]
+            br = P.prism(f"{name}.gusset{j}", chrome, root, (wall_x, yj, z - 0.024), outline, 0.012, bev=0.002)
+            std = P.blk(f"{name}.standard{j}", K.mat_metal("shelf_std", "lab_dark", 0.4), root,
+                        (wall_x - sx * 0.006, yj, z - 0.12), (0.012, 0.03, 0.34), bev=0.002)
+            post = P.cyl(f"{name}.railpost{j}", K.mat_chrome("shelf_rail"), root, (x - sx * 0.19, yj, z + 0.008),
+                         0.005, 0.04, verts=12)
+        else:
+            P.share(br, f"{name}.gusset{j}", root, loc=(wall_x, yj, z - 0.024))
+            P.share(std, f"{name}.standard{j}", root, loc=(wall_x - sx * 0.006, yj, z - 0.12))
+            P.share(post, f"{name}.railpost{j}", root, loc=(x - sx * 0.19, yj, z + 0.008))
 
 
 def _cymbal(name, loc, r, height, hat=False):
@@ -171,12 +206,24 @@ def build():
         _box(f"wall_side{sx}", frost, None, (sx * (SIDE_X + 0.05), 0.0, 1.6), (0.1, 2 * WALL_Y + 0.2, 3.2))
     _box("ceiling", dark, None, (0, 0, 3.25), (2 * SIDE_X + 0.2, 2 * WALL_Y + 0.2, 0.1))
     _box("frost_floor", K.mat_plastic("frost_floor", "horizon", 0.5), None, (0, 0.4, 0.004), (4.4, 4.2, 0.008))
-    # One work light, hanging over the music box: cord, shade, bulb.
-    _box("lamp.cord", dark, None, (0, 0, 2.85), (0.01, 0.01, 0.75))
-    K.mesh_obj("lamp.shade", bpy.ops.mesh.primitive_cone_add, K.mat_metal("shade", "chrome", 0.3), None, radius1=0.22,
-               radius2=0.05, depth=0.18, location=(0, 0, 2.4))
-    K.mesh_obj("lamp.bulb", bpy.ops.mesh.primitive_uv_sphere_add, K.mat_emission("bulb", "key", 30.0), None,
-               radius=0.05, location=(0, 0, 2.3))
+    # One work light, hanging over the music box: an industrial pendant (C5 placeholder pass: was a cone and a
+    # ball on a stick). A ceiling canopy, the cable, a ribbed strain relief and socket, an enamelled dome shade with
+    # a rolled lip, and a pear bulb hanging just below the rim. The work light (lights()) sits under it.
+    lamp_dark = K.mat_plastic("lamp_fitting", "lab_dark", 0.35)
+    lamp = K.empty("lamp")
+    P.lathe("lamp.canopy", lamp_dark, lamp, (0, 0, 0), [(0.0, 3.2), (0.075, 3.2), (0.075, 3.19), (0.06, 3.165),
+                                                        (0.012, 3.155), (0.0, 3.155)])
+    P.cyl("lamp.cord", K.mat_plastic("lamp_cable", "shadow", 0.5), lamp, (0, 0, 2.84), 0.0055, 0.64, verts=16)
+    P.lathe("lamp.fitting", lamp_dark, lamp, (0, 0, 0),
+            [(0.0, 2.53), (0.012, 2.53), (0.016, 2.52)] + [(0.019 if k % 2 else 0.016, 2.51 - 0.008 * k) for k in range(6)]
+            + [(0.03, 2.46), (0.032, 2.44), (0.032, 2.405), (0.026, 2.395), (0.0, 2.395)], segs=48)
+    P.lathe("lamp.shade", K.mat_metal("shade", "chrome", 0.3), lamp, (0, 0, 0),
+            [(0.032, 2.43), (0.07, 2.422), (0.12, 2.395), (0.17, 2.355), (0.205, 2.322), (0.222, 2.305),
+             (0.227, 2.297), (0.221, 2.292), (0.2, 2.31), (0.16, 2.343), (0.11, 2.378), (0.06, 2.4), (0.032, 2.405)],
+            segs=96)
+    P.lathe("lamp.bulb", K.mat_emission("bulb", "key", 30.0), lamp, (0, 0, 0),
+            [(0.0, 2.262), (0.022, 2.266), (0.038, 2.28), (0.046, 2.302), (0.043, 2.326), (0.03, 2.348), (0.02, 2.366),
+             (0.018, 2.395), (0.0, 2.395)], segs=48)
 
     room = K.empty("room")
     for k, v in (("breath", 0.0), ("awake", 0.0)):

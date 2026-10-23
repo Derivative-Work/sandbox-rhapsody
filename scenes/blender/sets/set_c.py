@@ -15,6 +15,7 @@ import math
 import bpy
 from mathutils import Vector
 
+import props_cde as P
 import sr_anim as A
 import sr_kit as K
 
@@ -184,14 +185,34 @@ def build():
     for k in range(9):
         K.mesh_obj(f"centre{k}", bpy.ops.mesh.primitive_cube_add, line, None, size=1,
                    location=(0.75, -1.0 + k * 1.7, 0.003)).scale = (0.05, 0.7, 0.004)
-    # Street lamps: magenta glow heads on chrome posts.
+    # Street lamps: a cast plinth with an access door, a tapered post with a collar, an arm reaching out over the
+    # street, and a shallow luminaire whose lens glows magenta (C5 placeholder pass: a ball on a stick before).
     lamp = K.mat_emission("street_lamp", "web", 20.0)
     post_m = K.mat_plastic("lamp_post", "lab_dark", 0.5)
+    trim = K.mat_chrome("lamp_trim")
     for k, (x, y) in enumerate(((-1.45, 2.4), (1.45, 5.9), (-1.45, 9.4), (1.45, 12.9))):
-        K.mesh_obj(f"lamp_post{k}", bpy.ops.mesh.primitive_cylinder_add, post_m, None, radius=0.025, depth=3.0,
-                   location=(x, y, 1.5))
-        K.mesh_obj(f"lamp_head{k}", bpy.ops.mesh.primitive_uv_sphere_add, lamp, None, radius=0.09,
-                   location=(x, y, 3.05))
+        reach = -0.55 if x > 0 else 0.55  # towards the middle of the street
+        post = P.lathe(f"lamp_post{k}", post_m, None, (x, y, 0.0),
+                       [(0.0, 0.0), (0.075, 0.0), (0.075, 0.32), (0.06, 0.36), (0.045, 0.38), (0.042, 1.4),
+                        (0.032, 2.6), (0.028, 2.92), (0.0, 2.92)], steps=8, smooth=False, share="lamp_post")
+        P.box(f"lamp_post{k}.door", trim, post, (-0.06 if x > 0 else 0.06, 0.0, 0.17), (0.012, 0.07, 0.16),
+              bev=0.004, share="lamp_door")
+        P.lathe(f"lamp_post{k}.collar", trim, post, (0, 0, 2.88), [(0.0, 0.0), (0.045, 0.0), (0.048, 0.02),
+                                                                  (0.045, 0.06), (0.0, 0.06)], steps=24,
+                share="lamp_collar")
+        arm_end = (reach, 0.0, 3.0)
+        P.rod(f"lamp_post{k}.arm", post_m, post, (0.0, 0.0, 2.9), (reach * 0.55, 0.0, 3.04), 0.022, share=None)
+        P.rod(f"lamp_post{k}.arm2", post_m, post, (reach * 0.55, 0.0, 3.04), arm_end, 0.02, share=None)
+        P.rod(f"lamp_post{k}.brace", trim, post, (0.0, 0.0, 2.7), (reach * 0.4, 0.0, 3.0), 0.008)
+        head = K.empty(f"lamp_head{k}", (reach, 0.0, 3.0), post)
+        P.lathe(f"lamp_head{k}.hood", post_m, head, (0, 0, 0), [(0.0, 0.07), (0.06, 0.068), (0.13, 0.04),
+                                                                (0.16, 0.0), (0.165, -0.015), (0.0, -0.015)],
+                steps=48, share="lamp_hood")
+        P.lathe(f"lamp_head{k}.lens", lamp, head, (0, 0, 0), [(0.0, -0.015), (0.15, -0.015), (0.13, -0.04),
+                                                              (0.07, -0.055), (0.0, -0.058)], steps=48,
+                share="lamp_lens")
+        P.lathe(f"lamp_head{k}.cap", trim, head, (0, 0, 0.068), [(0.0, 0.02), (0.025, 0.018), (0.03, 0.0),
+                                                                (0.0, 0.0)], steps=24, share="lamp_cap")
 
     # The fourteen keys, down the middle of the street (a fixed zig-zag).
     brass = K.mat_metal("key_brass", "brass", 0.12)

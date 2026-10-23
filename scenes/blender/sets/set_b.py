@@ -19,6 +19,7 @@ import math
 import bpy
 from mathutils import Matrix, Vector
 
+import props_ab as P
 import sr_anim as A
 import sr_kit as K
 
@@ -109,23 +110,40 @@ def _coil_cord(name, mat, hooks, turns=70, coil_r=0.007, wire_r=0.0018):
     return coil
 
 
-def _shelf_row(prefix, x0, x1, y, facing, crate_me, frame_me, n_rows=ROWS, out_of=7):
+def _shelf_row(prefix, x0, x1, y, facing, M, n_rows=ROWS, out_of=7):
     """A plain shelving run from x0 to x1 at y; crates face -Y (facing=1) or +Y (facing=-1). A fixed pattern pulls
-    every `out_of`-th crate a little forward, so the rows aren't a flat wall."""
+    every `out_of`-th crate a little forward, so the rows aren't a flat wall. `M`: the shared meshes (_meshes)."""
     n = int((x1 - x0) / PITCH_X)
     for c in range(n + 1):
         x = x0 + c * PITCH_X - PITCH_X / 2
-        _inst(f"{prefix}_up{c}", frame_me, None, (x, y, (Z0 + n_rows * PITCH_Z) / 2),
-              (0.03, DD + 0.06, Z0 + n_rows * PITCH_Z))
+        P.inst(f"{prefix}_up{c}", M["upright"], (x, y, (Z0 + n_rows * PITCH_Z) / 2))
     for r in range(n_rows + 1):
-        _inst(f"{prefix}_board{r}", frame_me, None, ((x0 + x1) / 2 - PITCH_X / 2, y, Z0 - 0.02 + r * PITCH_Z),
-              (n * PITCH_X, DD + 0.06, 0.02))
+        P.inst(f"{prefix}_board{r}", M["board"](n * PITCH_X), ((x0 + x1) / 2 - PITCH_X / 2, y, Z0 - 0.02 + r * PITCH_Z))
+    turn = (0, 0, math.pi) if facing < 0 else (0, 0, 0)
     for c in range(n):
         for r in range(n_rows):
             k = c * 7 + r * 3
             dy = -0.06 * facing if k % out_of == 0 else 0.0
-            _inst(f"{prefix}_crate{c}_{r}", crate_me, None, (x0 + c * PITCH_X, y + dy, Z0 + r * PITCH_Z + DH / 2),
-                  (DW, DD, DH))
+            P.inst(f"{prefix}_crate{c}_{r}", M["crate"], (x0 + c * PITCH_X, y + dy, Z0 + r * PITCH_Z + DH / 2), turn)
+
+
+def _meshes(crate_m, frame_m):
+    """The warehouse's shared meshes (scenes/blender/lib/props_ab.py; C5 placeholder pass: the crates, shelving and
+    drawers were scaled cubes): totes, slotted end frames, shelf levels by length."""
+    dark = K.mat_plastic("crate_dark", "lab_dark", 0.45)
+    card = K.mat_matte("crate_card", "paper")
+    deck = K.mat_plastic("shelf_deck", "lab_dark", 0.4)
+    boards = {}
+
+    def board(length):
+        key = round(length, 3)
+        if key not in boards:
+            boards[key] = P.board_mesh(f"shelf_board_{key}", length, DD + 0.06, frame_m, deck)
+        return boards[key]
+
+    return {"crate": P.crate_mesh("crate", DW, DD, DH, crate_m, dark, card),
+            "upright": P.upright_mesh("shelf_upright", Z0 + ROWS * PITCH_Z, DD + 0.06, frame_m, dark),
+            "board": board, "dark": dark, "card": card}
 
 
 def build():
@@ -133,16 +151,15 @@ def build():
     out = {}
     crate_m = K.mat_plastic("crate", "lab", 0.25)
     frame_m = K.mat_chrome("shelf_frame")
-    crate_me = _cube_mesh("crate", crate_m)
-    frame_me = _cube_mesh("shelf_frame", frame_m)
+    M = _meshes(crate_m, frame_m)
+    card_me = _cube_mesh("card", crate_m)  # a unit card, scaled: the pinned notes' paper
 
     # The piano shelf (x -2.3..2.3, y = 0), drawers sliding toward the aisle (-Y).
     x_left = -(COLS - 1) / 2 * PITCH_X
     for c in range(COLS + 1):
-        _inst(f"piano_up{c}", frame_me, None, (x_left + (c - 0.5) * PITCH_X, 0, (Z0 + ROWS * PITCH_Z) / 2),
-              (0.03, DD + 0.06, Z0 + ROWS * PITCH_Z))
+        P.inst(f"piano_up{c}", M["upright"], (x_left + (c - 0.5) * PITCH_X, 0, (Z0 + ROWS * PITCH_Z) / 2))
     for r in range(ROWS + 1):
-        _inst(f"piano_board{r}", frame_me, None, (0, 0, Z0 - 0.02 + r * PITCH_Z), (COLS * PITCH_X, DD + 0.06, 0.02))
+        P.inst(f"piano_board{r}", M["board"](COLS * PITCH_X), (0, 0, Z0 - 0.02 + r * PITCH_Z))
     root = K.empty("warehouse")
     K.prop(root, "all_open", 0.0)
     out["root"] = root
@@ -152,6 +169,8 @@ def build():
     front_m = K.mat_plastic("drawer_front", "lab", 0.2)
     label_m = K.mat_plastic("drawer_label", "lab_dark", 0.3)
     hero = _hero_drawer()
+    drawer_me = P.drawer_mesh("drawer", DW, DD, DH, front_m, M["dark"])
+    label_me = P.label_mesh("drawer_label", label_m, M["card"])
     for r in range(ROWS):
         for c in range(COLS):
             name = f"drawer_{r}_{c:02d}"
@@ -160,13 +179,12 @@ def build():
             slide = K.empty(f"{name}.slide", (0, 0, 0), d)
             _drive_vars(slide, "location", 1, {"x": (d, "out"), "a": (root, "all_open")},
                         f"-{SLIDE} * max(x, 0.8 * a)")
-            _inst(f"{name}.box", crate_me, front_m, (0, 0, DH / 2), (DW, DD, DH), parent=slide)
-            _inst(f"{name}.label", crate_me, label_m, (0, -DD / 2 - 0.002, DH * 0.62), (DW * 0.5, 0.004, DH * 0.16),
-                  parent=slide)
+            P.inst(f"{name}.box", drawer_me, parent=slide)
+            P.inst(f"{name}.label", label_me, (0, -DD / 2 - 0.002, DH * 0.62), parent=slide)
             # The note pinned on the drawer's front, slightly crooked; scale 0 until it's pinned (animate()).
             nr = K.empty(f"{name}.note", (0.0, -DD / 2 - 0.006, DH / 2), slide)
             nr.rotation_euler = (0, 0.06 * ((r + c) % 3 - 1), 0)
-            _inst(f"{name}.paper", crate_me, paper, (0, 0, 0), (DW * 0.82, 0.003, DH * 0.82), parent=nr)
+            _inst(f"{name}.paper", card_me, paper, (0, 0, 0), (DW * 0.82, 0.003, DH * 0.82), parent=nr)
             body = NOTES[0] if (r, c) == hero else NOTES[(r * 5 + c * 7) % len(NOTES)]
             K.text(f"{name}.ink", body, 0.05 if (r, c) == hero else 0.045, ink, loc=(0, -0.003, 0),
                    font="InstrumentSerif-Italic.ttf", parent=nr).data.offset = 0.001
@@ -177,22 +195,24 @@ def build():
     out["hero"] = drawers[hero]
 
     # Plain shelving: the rest of the run, the row across the aisle, and rows behind.
-    _shelf_row("runL", -11.5, -2.6, 0.0, 1, crate_me, frame_me)
-    _shelf_row("runR", 3.5, 12.0, 0.0, 1, crate_me, frame_me)
-    _shelf_row("across", -11.5, 12.0, -3.4, -1, crate_me, frame_me)
+    _shelf_row("runL", -11.5, -2.6, 0.0, 1, M)
+    _shelf_row("runR", 3.5, 12.0, 0.0, 1, M)
+    _shelf_row("across", -11.5, 12.0, -3.4, -1, M)
     for k, y in enumerate((2.6, 5.2)):
-        _shelf_row(f"back{k}", -11.5, 12.0, y, 1, crate_me, frame_me)
+        _shelf_row(f"back{k}", -11.5, 12.0, y, 1, M)
 
     # Work lights: long cool strips over the aisle; "glow" pulses on the kick (instrument_map: work lights).
     lights = K.empty("work_lights")
     K.prop(lights, "glow", 0.6)
     lamp = K.mat_emission("work_light", "lab", 9.0, lights, "glow")
-    lamp_me = _cube_mesh("work_light", lamp)
+    lamp_me = P.work_lens_mesh("work_light", lamp)
+    hood_me = P.work_hood_mesh("work_hood", frame_m, K.mat_plastic("work_hood", "lab_dark", 0.35))
+    wire_me = P.wire_mesh("work_wire", frame_m)
     for k in range(8):
-        _inst(f"work_light{k}", lamp_me, None, (-10.5 + k * 3.0, -1.7, 3.3), (2.2, 0.08, 0.04))
-        _inst(f"work_hood{k}", frame_me, None, (-10.5 + k * 3.0, -1.7, 3.34), (2.3, 0.18, 0.03))
-        for sx in (-1, 1):  # hung from the dark on two wires
-            _inst(f"work_wire{k}{sx}", frame_me, None, (-10.5 + k * 3.0 + sx * 0.95, -1.7, 4.36), (0.008, 0.008, 2.0))
+        P.inst(f"work_light{k}", lamp_me, (-10.5 + k * 3.0, -1.7, 3.3))
+        P.inst(f"work_hood{k}", hood_me, (-10.5 + k * 3.0, -1.7, 3.34))
+        for sx in (-1, 1):  # hung from the dark on two wires, clipped to the hood's tabs
+            P.inst(f"work_wire{k}{sx}", wire_me, (-10.5 + k * 3.0 + sx * 0.95, -1.7, 4.36))
     out["work_lights"] = lights
 
     # The phone on a bracket at the piano shelf's right end.
@@ -248,8 +268,10 @@ def _phone():
     the handset's end. The handset root is keyed in animate() (S22: off the hook)."""
     out = {}
     # Rough, not the shelf frames' chrome: a chrome bracket smeared the cord's reflection into a blue sheet (C4 v5).
-    K.mesh_obj("phone.bracket", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("phone_bracket", "shadow", 0.7), None,
-               size=1, location=PHONE + Vector((0, 0.05, -0.04))).scale = (0.34, 0.36, 0.03)
+    # A wall bracket bolted to the shelf's end upright, two arms and struts under it (C5 placeholder pass).
+    P.inst("phone.bracket", P.phone_bracket_mesh("phone.bracket", K.mat_plastic("phone_bracket", "shadow", 0.7),
+                                                 K.mat_metal("phone_bracket_bolts", "chrome", 0.35)),
+           PHONE + Vector((0, 0.05, -0.04)))
     base_root = K.empty("phone", PHONE)
     K.prop(base_root, "dial", 0.0)
     with bpy.data.libraries.load(str(PHONE_BLEND)) as (src, dst):
