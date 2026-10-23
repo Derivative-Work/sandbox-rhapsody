@@ -912,3 +912,7 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Re-render:** set C had already rendered (17:57–18:39) in this pass. It re-renders once the main queue ends (`renders/c5/queue6.log`), then its reel and pack; the current reel, contact sheet, frames and anchors are set aside first (`_superseded_straps`).
 - **Housekeeping:** stopped two stale shells from this morning's deadlocked waiter (queue2), still looping; had it ever exited it would have re-run set F's follower.
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-23T19:42:17-04:00 — Every commit is pushed
+
+- **Standing instruction** (human): push each commit to `origin/main` as soon as it is made. Pushes are not logged one by one; `git log origin/main` records them.

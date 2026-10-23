@@ -281,3 +281,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** "there appears to be a mirror in set C -- is this intentional". Told the cause, the human answered: "Make that one change and queue it for re-render (I was only able to see it because it had already rendered by the time I asked)".
+
+## 2026-10-23T19:42:17-04:00 — Push every commit
+
+- **Rule:** R1.
+- **What:** "Push them right away from here on out".
