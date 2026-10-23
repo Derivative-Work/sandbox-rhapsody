@@ -6,8 +6,9 @@ shot (0 = cut, 1 = next cut), or a list of such moves for cuts inside the shot; 
 Plates run one frame past the shot's end on each side, so the edit can dissolve.
 
 Usage: blender -b --factory-startup --python scenes/blender/animatic.py -- SET [shot ...] [--size 640x360]
-       [--samples 8] [--step 1] [--out DIR]
+       [--samples 8] [--step 1] [--out DIR] [--anchors]
   -> renders/animatic/plates/<shot>/f_<frame>.png  (frame numbers are the 60 fps timeline's)
+  --anchors: one still per shot at its anchor (C5's contact sheets) -> <out>/<shot>.png
 """
 import importlib
 import json
@@ -35,6 +36,8 @@ while i < len(args):
     else:
         pos.append(args[i])
         i += 1
+anchors = "--anchors" in pos
+pos = [a for a in pos if a != "--anchors"]
 SET, only = pos[0].upper(), set(pos[1:])
 w, h = (int(v) for v in opts["--size"].split("x"))
 
@@ -93,6 +96,15 @@ for s in mine:
             m = scene.timeline_markers.new(f"{sid}.{j}", frame=A.frame(a + seg[0][0] * (b - a)) if j else 0)
             m.camera = cam
     scene.camera = bpy.data.objects[f"cam_{sid}" + (".0" if len(segments) > 1 else "")]
+    if anchors:  # one still at the shot's anchor (its cut if it has none), clamped inside the shot
+        f = min(max(A.frame(s.get("anchor") or a), A.frame(a)), A.frame(b) - 1)
+        scene.frame_set(f)
+        Path(opts["--out"]).mkdir(parents=True, exist_ok=True)
+        scene.render.filepath = str(Path(opts["--out"]) / f"{sid}.png")
+        scene.render.image_settings.file_format = "PNG"
+        bpy.ops.render.render(write_still=True)
+        report.append(f"{sid}: anchor frame {f}")
+        continue
     scene.frame_start, scene.frame_end = A.frame(a) - 1, A.frame(b) + 1
     scene.frame_step = int(opts["--step"])
     out = Path(opts["--out"]) / sid

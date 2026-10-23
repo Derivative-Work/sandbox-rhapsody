@@ -774,6 +774,44 @@ def locked_box(name, loc, rot_z=0.0, mat_case=None, mat_band=None, parent=None):
     return root
 
 
+def security_camera(name, loc, parent=None, body_role="lab", scale=1.0):
+    """A CCTV camera: a mount arm down from `loc` to a pan head (`{name}.yaw`, turns about Z) and a tilt joint
+    (`{name}.tilt`, turns about X), carrying a bevelled housing with a sun hood over it, a dark lens in a chrome
+    ring and a red tally light. The lens looks along the tilt joint's local -Y. Returns (root, yaw, tilt)."""
+    s = scale
+    root = empty(name, loc, parent)
+    plastic = mat_plastic(f"{name}.housing", body_role, 0.25)
+    chrome = mat_chrome(f"{name}.chrome")
+    arm = mesh_obj(f"{name}.arm", bpy.ops.mesh.primitive_cylinder_add, chrome, root, radius=0.018 * s,
+                   depth=0.16 * s, vertices=16, location=(0, 0, -0.08 * s))
+    smooth(arm)
+    yaw = empty(f"{name}.yaw", (0, 0, -0.17 * s), root)
+    mesh_obj(f"{name}.knuckle", bpy.ops.mesh.primitive_uv_sphere_add, chrome, yaw, radius=0.03 * s)
+    tilt = empty(f"{name}.tilt", (0, 0, -0.03 * s), yaw)
+    body = mesh_obj(f"{name}.body", bpy.ops.mesh.primitive_cube_add, plastic, tilt, size=1,
+                    location=(0, -0.1 * s, -0.04 * s))
+    body.scale = (0.13 * s, 0.3 * s, 0.12 * s)
+    bevel(body, 0.02 * s, 3)
+    hood = mesh_obj(f"{name}.hood", bpy.ops.mesh.primitive_cube_add, plastic, tilt, size=1,
+                    location=(0, -0.14 * s, 0.03 * s))
+    hood.scale = (0.17 * s, 0.38 * s, 0.012 * s)
+    bevel(hood, 0.004 * s, 2)
+    for sx in (-1, 1):  # the hood's side skirts
+        sk = mesh_obj(f"{name}.skirt{sx}", bpy.ops.mesh.primitive_cube_add, plastic, tilt, size=1,
+                      location=(sx * 0.08 * s, -0.22 * s, 0.0))
+        sk.scale = (0.008 * s, 0.2 * s, 0.05 * s)
+    ring = mesh_obj(f"{name}.ring", bpy.ops.mesh.primitive_cylinder_add, chrome, tilt, radius=0.05 * s,
+                    depth=0.03 * s, vertices=32, location=(0, -0.26 * s, -0.04 * s), rotation=(math.pi / 2, 0, 0))
+    smooth(ring)
+    lens = mesh_obj(f"{name}.lens", bpy.ops.mesh.primitive_uv_sphere_add, mat_plastic(f"{name}.lens", "lens", 0.02),
+                    tilt, radius=0.04 * s, location=(0, -0.268 * s, -0.04 * s))
+    lens.scale = (1, 0.45, 1)
+    smooth(lens)
+    mesh_obj(f"{name}.tally", bpy.ops.mesh.primitive_uv_sphere_add, mat_emission(f"{name}.tally", "alarm", 30.0),
+             tilt, radius=0.01 * s, location=(0.045 * s, -0.25 * s, 0.015 * s))
+    return root, yaw, tilt
+
+
 def turnstile(name="grader", loc=(0, 0, 0), rot_z=0.0):
     """The grader: a chrome turnstile post with three arms ("spin" counts clicks: each +1 is a third of a turn, driven
     by sr_anim.stepper), a slot plate

@@ -152,20 +152,14 @@ def build(decal_peel=0.25):
                ).scale = (0.62, 0.13, 1)
     K.text("tag.text", "removed for evaluation", 0.048, K.mat_ink("tag_ink", "shadow"), loc=(0, 0, 0.002),
            rot=(0, 0, 0), parent=tag)
-    # Beyond the glass (S06): faint machines in the dark, and a security camera on a pole, facing away.
-    faint = K.mat_plastic("faint", "horizon", 0.4)
-    for k in range(9):
-        a = math.radians(-60 + 15 * k)
-        d = 9 + (k % 3) * 2.5
-        m = K.mesh_obj(f"faint{k}", bpy.ops.mesh.primitive_cube_add, faint, None, size=1,
-                       location=(math.sin(a) * d, math.cos(a) * d + 2, 0.6 + (k % 2) * 0.5))
-        m.scale = (0.8 + (k % 4) * 0.3, 0.6, 1.2 + (k % 3) * 0.6)
+    # Beyond the glass (S06): the world outside, dim, in the dark (the sets to come, as silhouettes), and a security
+    # camera on a pole, facing away. Their small lights blink round-robin on the beat (animate()).
+    out["faint_leds"] = _faint_machines()
     pole = K.mesh_obj("cam_pole", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("pole"), None, radius=0.03,
                       depth=2.6, location=(-2.6, 1.8, 1.3))
-    camhead = K.mesh_obj("sec_cam", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("seccam", "lab", 0.2), None,
-                         size=1, location=(-2.6, 1.95, 2.55))
-    camhead.scale = (0.12, 0.32, 0.12)
-    out["sec_cam"] = camhead
+    cam, yaw, _ = K.security_camera("sec_cam", (-2.6, 1.8, 2.62), scale=1.3)
+    yaw.rotation_euler = (0, 0, math.radians(200))  # lens toward the back left: away from the cube
+    out["sec_cam"] = cam
 
     # The lead probe, parked on the front upper blade; scripted moves in animate().
     front = bpy.data.objects["blade7_1"]
@@ -217,6 +211,76 @@ def _desk():
     return objs
 
 
+def _faint_machines():
+    """Nine dim machines beyond the glass, in an arc 9-14 m out, each turned to the cube: server racks, a radio
+    mast, a warehouse shelf, a router, a satellite dish, a street kiosk. Matte horizon-violet bodies (they read as
+    shapes, not things), with small lights in three groups ("blink0".."blink2" on the returned empty)."""
+    leds = K.empty("faint_leds")
+    for g in range(3):
+        K.prop(leds, f"blink{g}", 0.04)
+    body = K.mat_matte("faint", "horizon")
+    lit = {role: [K.mat_emission(f"faint_{role}{g}", role, 8.0, leds, f"blink{g}") for g in range(3)]
+           for role in ("lab_glow", "alarm", "web")}
+    kinds = ["rack", "mast", "shelf", "router", "dish", "kiosk", "rack", "mast", "shelf"]
+    for k, kind in enumerate(kinds):
+        a = math.radians(-60 + 15 * k)
+        d = 9 + (k % 3) * 2.5
+        loc = Vector((math.sin(a) * d, math.cos(a) * d + 2, 0))
+        root = K.empty(f"faint{k}", loc)
+        root.rotation_euler = (0, 0, math.atan2(-loc.x, loc.y) + math.pi)  # front (local -Y) toward the cube
+
+        def box(nm, at, size, mat=body):
+            o = K.mesh_obj(f"faint{k}.{nm}", bpy.ops.mesh.primitive_cube_add, mat, root, size=1, location=at)
+            o.scale = size
+            return o
+
+        def led(nm, at, role, g, r=0.025):
+            K.mesh_obj(f"faint{k}.{nm}", bpy.ops.mesh.primitive_uv_sphere_add, lit[role][g % 3], root, radius=r,
+                       segments=8, ring_count=4, location=at)
+
+        if kind == "rack":  # a server rack: tall cabinet, a column of blinking status lights per unit
+            box("cab", (0, 0, 1.0), (0.7, 0.8, 2.0))
+            for u in range(9):
+                led(f"led{u}", (0.22 - 0.11 * (u % 2), -0.41, 0.25 + 0.2 * u), "lab_glow", u + k)
+        elif kind == "mast":  # a lattice radio mast with a red beacon on top
+            for sx, sy in ((-1, -1), (1, -1), (0, 1)):
+                leg = K.mesh_obj(f"faint{k}.leg{sx}{sy}", bpy.ops.mesh.primitive_cylinder_add, body, root,
+                                 radius=0.03, depth=4.2, vertices=6, location=(sx * 0.12, sy * 0.1, 2.1))
+                leg.rotation_euler = (-sy * 0.03, sx * 0.03, 0)
+            for z in range(1, 8):
+                box(f"rung{z}", (0, 0, 0.5 * z), (0.3 - 0.02 * z, 0.26 - 0.02 * z, 0.03))
+            led("beacon", (0, 0, 4.25), "alarm", k, r=0.07)
+        elif kind == "shelf":  # warehouse shelving with crates (set B)
+            for sx in (-1, 1):
+                box(f"up{sx}", (sx * 0.9, 0, 1.1), (0.05, 0.5, 2.2))
+            for z in range(4):
+                box(f"board{z}", (0, 0, 0.1 + 0.62 * z), (1.85, 0.5, 0.04))
+                for c in range(3):
+                    box(f"crate{z}{c}", (-0.55 + 0.55 * c, 0, 0.32 + 0.62 * z), (0.42, 0.4, 0.38))
+        elif kind == "router":  # a router on a plinth: low box, three antennae, port lights
+            box("plinth", (0, 0, 0.4), (1.0, 0.7, 0.8))
+            box("box", (0, 0, 0.92), (0.9, 0.55, 0.24))
+            for j in range(3):
+                ant = K.mesh_obj(f"faint{k}.ant{j}", bpy.ops.mesh.primitive_cylinder_add, body, root, radius=0.025,
+                                 depth=0.6, vertices=8, location=(-0.3 + 0.3 * j, 0.2, 1.3))
+                ant.rotation_euler = (0, (j - 1) * 0.3, 0)
+            for j in range(6):
+                led(f"port{j}", (-0.3 + 0.12 * j, -0.28, 0.9), "lab_glow", j)
+        elif kind == "dish":  # a satellite dish on a post
+            K.mesh_obj(f"faint{k}.post", bpy.ops.mesh.primitive_cylinder_add, body, root, radius=0.07, depth=1.8,
+                       vertices=12, location=(0, 0, 0.9))
+            dish = K.mesh_obj(f"faint{k}.dish", bpy.ops.mesh.primitive_uv_sphere_add, body, root, radius=0.8,
+                              segments=24, ring_count=12, location=(0, -0.1, 2.1))
+            dish.scale = (1, 0.25, 1)
+            dish.rotation_euler = (0.5, 0, 0)
+            led("feed", (0, -0.75, 2.3), "lab_glow", k, r=0.04)
+        elif kind == "kiosk":  # a street kiosk (set C): booth, awning, a lit sign
+            box("booth", (0, 0, 1.1), (1.2, 0.9, 2.2))
+            box("awning", (0, -0.6, 2.1), (1.4, 0.5, 0.06)).rotation_euler = (0.25, 0, 0)
+            box("sign", (0, -0.46, 2.45), (1.0, 0.04, 0.3), lit["web"][k % 3])
+    return leds
+
+
 def _slab(name, mat, loc, size):
     o = K.mesh_obj(name, bpy.ops.mesh.primitive_cube_add, mat, None, size=1, location=loc)
     o.scale = size
@@ -235,6 +299,10 @@ def animate(S, t0, t1):
     A.comb(S["musicbox"], A.between(A.events("piano"), t0 - 1, t1 + 1))
     W = lambda evs: A.between(evs, t0 - 1, t1 + 1)  # noqa: E731
     f0, f1 = A.frame(t0 - 1), A.frame(t1 + 1)
+    # The faint machines' lights beyond the glass blink round-robin on the beat, three groups.
+    beats = [dict(e, end=e["t"] + 0.2, vel=100) for e in W(A.events("beats"))]
+    for g in range(3):
+        A.led_pulse(S["faint_leds"], f"blink{g}", beats[g::3], floor=0.15)
     # S20 on: the desk instead of the endless floor.
     f20 = A.frame(next(s["cut"] for s in A.timing_map()["shots"] if s["id"] == "S20"))
     for o in S["exterior"]:

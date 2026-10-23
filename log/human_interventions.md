@@ -226,3 +226,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
   - Question: is any geometry or asset still a placeholder needing more work?
 
   Addressed in v8 (production log).
+
+## 2026-10-22T21:35:51-04:00 — C4 approved (R1)
+
+- **Rule:** R1.
+- **What:** The human approved animatic v8 ("this is great, keep going"). C4 is closed; C5, the per-set full-quality renders, begins.

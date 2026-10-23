@@ -733,3 +733,15 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Re-rendered:** sets B, G and H; invalid drivers after rebind: 0.
 - **Outputs:** `renders/animatic/animatic_v8.mp4`. Superseded: `archive/renders/animatic_v7_superseded_c4-review-7.mp4`.
 - **Why:** Human feedback, R1 (human interventions).
+
+## 2026-10-22T22:04:56-04:00 — C5 begins: set A fleshed out, anchor stills and contact sheet, full render started
+
+- **C4 approved** by the human (R1, human interventions).
+- **Render settings** (brief: 3840×2160; style spec: 60 fps): Eevee at 64 samples, raytracing as in `sr_kit.setup_render`, and no motion blur (the spec doesn't ask for it; raised with the human).
+  - **Measured:** about 2.7 s per 4K frame alone, after about 3 min of set build and shader compile per session. Two concurrent sessions run at 3.7 s per frame each, 1.46× the throughput; three gave no further gain.
+  - **So:** `scripts/render_c5.sh SET N` deals a set's shots, longest first, across N=2 sessions. Frames go to `renders/c5/set_<SET>/frames/<shot>/` (frame sequences: never archived, regenerable).
+- **Set A's placeholders**, fleshed out:
+  - **The faint machines beyond the glass** (S06): were nine boxes. Now nine dim silhouettes of the world outside, turned to the cube: two server racks with status lights, two lattice radio masts with red beacons, two warehouse shelves with crates, a router with antennae and port lights, a satellite dish, and a street kiosk with a lit sign. Matte horizon-violet bodies; the lights blink round-robin on the beat in three groups.
+  - **The security camera on the pole:** was a box. Now `sr_kit.security_camera`: a mount arm and knuckle, pan and tilt joints, a bevelled housing with a sun hood and skirts, a dark lens in a chrome ring, a red tally light. Its lens faces away from the cube. The kit camera is for sets B and H too.
+- **Anchor stills:** `scenes/blender/animatic.py --anchors` renders one still per shot at its anchor. Set A's 13, at 4K and 64 samples, are in `renders/c5/set_A/anchors/`, and `scripts/c5_sheet.py` assembles them as `renders/c5/set_A/contact_sheet.jpg`, captioned with each shot's line and the brief's visual.
+- **Next:** set A's full render (two sessions, about 3 h). In parallel, four sub-agents (forks of this session, same model) flesh out the placeholders of sets B–I from the C4 v8 audit.
