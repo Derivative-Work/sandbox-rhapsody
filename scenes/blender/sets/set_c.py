@@ -382,11 +382,13 @@ def animate(S, t0, t1):
         z = c.location.z
         A.write_keys(c, "location", [(0, z + 3.0, "CONSTANT"), (f - 16, z + 3.0, "BEZIER"), (f, z, "LINEAR"),
                                      (f + 4, z + 0.03), (f + 8, z)], index=2)
-        A.write_keys(c, "hide_render", [(0, 1, "CONSTANT"), (f - 16, 0, "CONSTANT")], interp="CONSTANT")
+        for o in (c, *c.children):  # the straps too: hidden with their crate (human, C5: they floated as a mirror)
+            A.write_keys(o, "hide_render", [(0, 1, "CONSTANT"), (f - 16, 0, "CONSTANT")], interp="CONSTANT")
     # The probe directs each drop with its arm.
     A.striker(p, "arm_l", hits, wind=10, settle=20)
-    for c in S["crates"][len(hits):]:  # more slots than hits: the rest stay away
-        c.hide_render = True
+    for c in S["crates"][len(hits):]:  # more slots than hits: the rest stay away, straps and all
+        for o in (c, *c.children):
+            o.hide_render = True
     A.envelope_rig(p, "led", A.envelope("vocal_env") ** 2.0, A.frame(t0 - 1), A.frame(t1 + 1), gain=0.6, offset=0.3)
     A.led_pulse(S["floor_ring"], "pulse", W(A.strikes(A.events("bass"), 0.05)))
 

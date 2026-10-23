@@ -898,3 +898,17 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Superseded:** the A–F reels and contact sheets and G's contact sheet (archived, `_superseded_bloom`); the A–G frame packs and anchors are set aside in `renders/c5/set_*/frames_superseded_bloom/` and `anchors_superseded_bloom/` for the human to delete. G was 1.5 h into its render and was stopped.
 - **Renders:** every set re-renders (`renders/c5/queue5.log`), with the follower building reels and packs.
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-23T18:43:27-04:00 — Pushed to GitHub
+
+- **Remote:** `origin` = https://github.com/Derivative-Work/sandbox-rhapsody (created by the human, R4). Pushed `main` through a686234 unchanged; the repo's history is 9.5 MB, every large file stays local and listed in `MANIFEST.sha256`.
+- **Logged late:** the human asked for no changes while renders ran, so this entry waited for the next commit.
+
+## 2026-10-23T19:34:34-04:00 — C5 set C: the floating "mirror" was crate straps; C queued to re-render
+
+- **The note** (human, R1): a mirror in set C (S24).
+- **Cause:** found by ray-casting S24's camera through the rectangle: the launchpad camp's crates are hidden until 16 frames before they land, but their two chrome straps are child objects and were never hidden. `camp18` (19 slots, 18 kick/snare hits) never drops, so its straps stood by the pile all shot, face-on to the camera: a dark chrome square mirroring the scene. The straps of crates waiting 3 m up showed as chrome flecks.
+- **Fix** (`set_c.py`): each crate's hide keys go to its straps too; the unused slots hide straps and all. Checked through S13, S14 and S24: only dropping or landed crates and their straps are visible; invalid drivers 0.
+- **Re-render:** set C had already rendered (17:57–18:39) in this pass. It re-renders once the main queue ends (`renders/c5/queue6.log`), then its reel and pack; the current reel, contact sheet, frames and anchors are set aside first (`_superseded_straps`).
+- **Housekeeping:** stopped two stale shells from this morning's deadlocked waiter (queue2), still looping; had it ever exited it would have re-run set F's follower.
+- **Why:** human feedback, R1 (human interventions).

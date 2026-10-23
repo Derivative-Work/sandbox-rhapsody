@@ -271,3 +271,13 @@ Every human action: timestamp, what, why, and which production rule allows it. R
   - "in set E, is the thing next to the guitar supposed to be a stand-in for an amp? if so, it looks like the cone is inverted".
   - "in set F, there is flickering on the box with the keys".
   - "in many of these, particularly noticeable in A's closeups, throughout B and C, and F's boxes, there appears to be too much light spilling into air, like there's too much smoke relative to the light or similar. it's reducing the contrast and making things hard to see".
+
+## 2026-10-23T18:43:27-04:00 — GitHub repository created
+
+- **Rule:** R4 (an interface the agent has no access to).
+- **What:** the human created https://github.com/Derivative-Work/sandbox-rhapsody, gave the agent write access, and asked it to push what was already in git without changing anything while renders ran.
+
+## 2026-10-23T19:34:34-04:00 — C5 note: a mirror in set C
+
+- **Rule:** R1.
+- **What:** "there appears to be a mirror in set C -- is this intentional". Told the cause, the human answered: "Make that one change and queue it for re-render (I was only able to see it because it had already rendered by the time I asked)".
