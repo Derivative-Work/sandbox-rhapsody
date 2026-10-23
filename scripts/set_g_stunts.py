@@ -86,7 +86,10 @@ def stunt_frames(f0, f1):
         t = f / A.FPS
         e = float(benv[min(f, len(benv) - 1)])
         idle = 0.08 + 0.45 * e * (0.5 + 0.5 * np.sin(0.35 * cols + 0.6 * rows - 7.0 * t))
-        if line["L35"]["start"] <= t < line["L35"]["end"] + 0.2:
+        # Blinking pleadingly through S32, from its cut frame (the 700's hold ran 25 frames into the close-up, C4 v6).
+        if A.frame(shot["S32"]["cut"]) <= f < A.frame(shot["S33"]["cut"]):
+            out = 0.1 + 0.9 * (((t * 1.4 + phase) % 1.0) < 0.3)
+        elif line["L35"]["start"] <= t < line["L35"]["end"] + 0.2:
             out = lit("700")
         elif line["L39"]["start"] <= t < line["L39"]["end"] + 0.2:
             out = lit("EXPLOITGYM")
@@ -95,8 +98,6 @@ def stunt_frames(f0, f1):
         elif six <= t < shot["S44"]["cut"]:
             left = 360 - int(t - six)
             out = lit(f"{left // 60}:{left % 60:02d}")
-        elif shot["S32"]["cut"] <= t < shot["S33"]["cut"]:  # blinking pleadingly
-            out = 0.1 + 0.9 * (((t * 1.4 + phase) % 1.0) < 0.3)
         else:
             out = idle
         yield f, out.astype(np.float32)

@@ -679,3 +679,21 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Re-rendered:** every set. Invalid drivers after rebind: 0 in all nine.
 - **Outputs:** `renders/animatic/animatic_v6.mp4`. Superseded: `archive/renders/animatic_v5_superseded_c4-review-5.mp4`.
 - **Why:** Human feedback, R1 (human interventions).
+
+## 2026-10-22T20:32:50-04:00 — C4 animatic v7: the v6 review's three notes
+
+- **Human review of v6 (R1)** (human interventions), item by item, with what changed:
+  - **S10, the protagonist's motion is jerky:**
+    - **The cause:** the ride snapped to the nearest of 1,200 sampled tube points (about 1 cm apart), so at the slow start of the ease the probe sat still, then stepped a centimetre.
+    - **Now:** positions are interpolated at exact arc length, with Bezier (auto-clamped) keys every 4 frames. The drift ends on the tube's centre line nearest the grommet, so there's no snap at the start of the ride.
+    - **Checked:** per-frame speed rises to 0.43 m/s and eases back to 0, with no stalls or steps.
+  - **S22, the handset moves to the side too quickly:**
+    - **Before:** it went from lifted to 0.32 m out in 0.17 s.
+    - **Now:** it lifts over 0.35 s, is carried out over 0.5 s, and drops to the pendulum over 0.4 s. The probe rides up with it and settles on the cradle posts only after the handset has swung clear (they crossed before).
+    - **Checked:** no cord or handset vertex inside the bracket.
+  - **S32, the flashing wave takes a few frames to start:**
+    - **The cause:** not the renderer. The `700` card stunt was held 0.2 s past its line, which ran 25 frames into S32's close-up.
+    - **Now:** `scripts/set_g_stunts.py` gives the blinking priority from S32's cut frame (by frame number). The rendered plate changes on the cut frame.
+- **Re-rendered:** sets A, B and G; invalid drivers after rebind: 0.
+- **Outputs:** `renders/animatic/animatic_v7.mp4`. Superseded: `archive/renders/animatic_v6_superseded_c4-review-6.mp4`.
+- **Why:** Human feedback, R1 (human interventions).

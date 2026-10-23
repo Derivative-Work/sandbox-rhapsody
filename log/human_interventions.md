@@ -205,3 +205,13 @@ Every human action: timestamp, what, why, and which production rule allows it. R
   - the letter "A" is missing its crossbar throughout.
 
   Addressed in v6 (production log).
+
+## 2026-10-22T19:57:27-04:00 — C4 review of animatic v6 (R1)
+
+- **Rule:** R1.
+- **What:** Three notes:
+  - S10: the protagonist's motion is jerky;
+  - S22: the handset moves to the side too quickly;
+  - S32: the flashing wave takes a few frames to start.
+
+  Addressed in v7 (production log).

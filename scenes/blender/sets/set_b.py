@@ -376,7 +376,9 @@ def _lead(S, shot, line):
                    offset=0.2)
     # S22: the handset goes; the probe hops up and settles on the cradle's posts, where the handset lay.
     t = _off_hook(shot)
-    for dt, loc in ((-0.1, perch), (0.25, perch + Vector((0.0, 0.0, 0.12))), (0.6, perch + Vector((0.0, -0.03, -0.02)))):
+    # It rises with the lifted handset and stays up until the handset has swung clear, then settles.
+    for dt, d in ((-0.1, (0, 0, 0)), (0.35, (0.0, -0.02, 0.13)), (0.85, (0.0, -0.03, 0.13)), (1.1, (0.0, -0.03, -0.02))):
+        loc = perch + Vector(d)
         p.location = loc
         p.keyframe_insert("location", frame=A.frame(t + dt))
 
@@ -401,18 +403,19 @@ def _handset(S, shot):
     rest_loc, rest_rot = hs.location.copy(), hs.rotation_euler.copy()
     drape = Vector((0.2, -0.04, -0.01))  # phone-local: just past the bracket's edge (x 0.17), above its top
     length = 0.42  # drape point to the handset's centre (cord drop plus half the handset)
-    seq = [(t - 0.1, rest_loc, rest_rot), (t + 0.25, rest_loc + Vector((0, -0.05, 0.12)), (0.2, 0, 0)),
-           (t + 0.42, rest_loc + Vector((0.32, -0.12, 0.1)), (0.1, -0.6, 0.2))]
+    # Lifted (0.35 s), carried out past the base's side (0.5 s; it shot sideways in 0.17 s, C4 v6), dropped (0.4 s).
+    seq = [(t - 0.1, rest_loc, rest_rot), (t + 0.35, rest_loc + Vector((0, -0.05, 0.12)), (0.2, 0, 0)),
+           (t + 0.85, rest_loc + Vector((0.32, -0.12, 0.1)), (0.1, -0.6, 0.2))]
     for k in range(7):  # a damped pendulum about the drape point: it tilts as it swings, cord end toward the drape
         phi = 0.0 if k == 0 else 0.22 * math.exp(-0.55 * (k - 1)) * (1 if k % 2 else -1)
         centre = drape + Vector((length * math.sin(phi), 0.0, -length * math.cos(phi)))
-        seq.append((t + 0.62 + 0.42 * k, centre, (0, -math.pi / 2 - phi, 0.3 * phi)))
+        seq.append((t + 1.25 + 0.42 * k, centre, (0, -math.pi / 2 - phi, 0.3 * phi)))
     for tt, loc, rot in seq:
         hs.location, hs.rotation_euler = loc, rot
         hs.keyframe_insert("location", frame=A.frame(tt))
         hs.keyframe_insert("rotation_euler", frame=A.frame(tt))
     # The slack point: by the base while the handset is up, then on the drape point over the bracket's edge.
-    for tt, loc in ((t - 0.1, CORD_MID_REST), (t + 0.42, (0.21, -0.04, 0.05)), (t + 0.62, tuple(drape))):
+    for tt, loc in ((t - 0.1, CORD_MID_REST), (t + 0.85, (0.21, -0.04, 0.05)), (t + 1.25, tuple(drape))):
         mid.location = loc
         mid.keyframe_insert("location", frame=A.frame(tt))
 

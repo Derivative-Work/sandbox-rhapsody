@@ -298,9 +298,12 @@ def probe_moves(S):
         p.location = loc
         p.keyframe_insert("location", frame=A.frame(t))
     # S10: the probe drifts up to the tube's mouth and peels the note off as it gets there; the note flutters to the
-    # floor (two swings); the probe slips into the tube on "wherever" and glides along it (Follow Path, offset keyed),
-    # only part way by the cut (human, C4 v4: it flew out far too fast).
-    mouth = S["exit_pt"] + Vector((-0.08, 0, 0))
+    # floor (two swings); the probe slips into the tube on "wherever" and glides along it, only part way by the cut
+    # (human, C4 v4: it flew out far too fast). The mouth is the tube's centre line nearest the grommet's inside, so
+    # the ride starts where the drift ends.
+    path = _tube_points(S["tube"])
+    i0 = min(range(len(path)), key=lambda i: (path[i] - (S["exit_pt"] + Vector((-0.08, 0, 0)))).length)
+    mouth = path[i0]
     t_arrive = t10 + 2.4
     t_in = next(w["start"] for li in tm["lines"] if li["id"] == "L16" for w in li["words"])
     p.location = home
@@ -316,30 +319,33 @@ def probe_moves(S):
         n.location, n.rotation_euler = n0 + Vector(dloc), rot
         n.keyframe_insert("location", frame=A.frame(t_arrive + dt))
         n.keyframe_insert("rotation_euler", frame=A.frame(t_arrive + dt))
-    # Into the tube: keyed straight along points sampled from the tube's centre line (a Follow Path constraint
-    # hands over badly: the probe jerked backwards as it took hold; human, C4 v5). It holds at the mouth, then eases
-    # along about 1.6 m by the cut.
-    path = _tube_points(S["tube"])
-    i0 = min(range(len(path)), key=lambda i: (path[i] - mouth).length)
+    # Into the tube: keyed along the tube's centre line (a Follow Path constraint handed over badly: the probe jerked
+    # backwards as it took hold; human, C4 v5), at the exact arc length for each key, interpolated between the
+    # samples (snapping to the nearest one stepped a centimetre at a time at the slow start: jerky, C4 v6). It holds
+    # at the mouth, then eases along about 1.6 m by the cut; smooth keys every 4 frames.
+    pts = path[i0:]
     dist = [0.0]
-    for i in range(i0 + 1, len(path)):
-        dist.append(dist[-1] + (path[i] - path[i - 1]).length)
+    for i in range(1, len(pts)):
+        dist.append(dist[-1] + (pts[i] - pts[i - 1]).length)
+
+    def at(d):
+        j = next((k for k in range(1, len(dist)) if dist[k] >= d), len(dist) - 1)
+        w = (d - dist[j - 1]) / max(1e-9, dist[j] - dist[j - 1])
+        return pts[j - 1].lerp(pts[j], min(1.0, max(0.0, w)))
+
     travel = 1.6
     fa, fb = A.frame(t_in), A.frame(t11)
+    frames = list(range(fa, fb, 4)) + [fb]
+    locs = [at(travel * u * u * (3 - 2 * u)) for u in ((f - fa) / (fb - fa) for f in frames)]  # smoothstep
     for ax in range(3):
-        keys = [(fa, mouth[ax], "LINEAR")]
-        for f in range(fa + 2, fb + 1, 2):
-            u = (f - fa) / (fb - fa)
-            d = travel * u * u * (3 - 2 * u)  # smoothstep: eases in and out
-            j = next((k for k in range(len(dist)) if dist[k] >= d), len(dist) - 1)
-            keys.append((f, path[i0 + j][ax], "LINEAR"))
         fc = A._fcurve(p, "location", ax)
         for kp in list(fc.keyframe_points):
             if kp.co.x > fa:
                 fc.keyframe_points.remove(kp)
-        for f, v, interp in keys:
-            kp = fc.keyframe_points.insert(f, v)
-            kp.interpolation = interp
+        for f, loc in zip(frames[1:], locs[1:]):
+            kp = fc.keyframe_points.insert(f, loc[ax])
+            kp.interpolation, kp.handle_left_type, kp.handle_right_type = "BEZIER", "AUTO_CLAMPED", "AUTO_CLAMPED"
+        fc.update()
 
 
 def _tube_points(tube, n=1200):
