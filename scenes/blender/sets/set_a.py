@@ -12,9 +12,10 @@ Deterministic: placement is arithmetic, never random.
 """
 import math
 
+import bmesh
 import bpy
 import numpy as np
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 import sr_anim as A
 import sr_kit as K
@@ -67,8 +68,9 @@ def build(decal_peel=0.25):
     tube = K.link(bpy.data.objects.new("proxy_tube", cd))
     tube.data.materials.append(K.mat_acrylic("tube", "lab_glow", alpha=0.5, emit=1.2))
     out["tube"] = tube
-    K.mesh_obj("grommet", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("grommet"), None, major_radius=0.04,
-               minor_radius=0.01, location=exit_pt + Vector((0.004, 0, 0)), rotation=(0, math.pi / 2, 0))
+    K.smooth(K.mesh_obj("grommet", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("grommet"), None, major_radius=0.04,
+                        minor_radius=0.01, major_segments=128, minor_segments=32,
+                        location=exit_pt + Vector((0.004, 0, 0)), rotation=(0, math.pi / 2, 0)))  # smooth in close-up (C5 set A)
     # Sticky note stuck over the hole on the inside, slightly crooked, with its message.
     note_root = K.empty("sticky", exit_pt + Vector((-0.012, -0.0, 0.0)))
     note_root.rotation_euler = (math.pi / 2, 0.08, -math.pi / 2)
@@ -127,15 +129,7 @@ def build(decal_peel=0.25):
     out["wall_lights"] = cols_root
     out["wall_cols"] = cols
 
-    # STOP socket on the cube's base (S21): an empty socket, no button.
-    sock = K.empty("stop_socket", (0.55, -1.008, 0.12))
-    sock.rotation_euler = (math.pi / 2, 0, 0)
-    K.mesh_obj("stop_socket.plate", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("socket", "lab_dark", 0.2), sock,
-               size=1, location=(0, 0, 0)).scale = (0.14, 0.14, 0.01)
-    K.mesh_obj("stop_socket.hole", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("hole", "shadow", 0.6), sock,
-               radius=0.035, depth=0.012, location=(0, 0.01, 0.004))
-    K.text("stop_socket.label", "STOP", 0.03, K.mat_plastic("socket_ink", "paper", 0.4), loc=(0, -0.05, 0.007),
-           rot=(0, 0, 0), parent=sock)
+    _stop_socket()
     # Guardrails lying unbolted beside the cube, a wrench, a tag (S23).
     rail_m = K.mat_metal("guardrail", "brass", 0.25)
     for k, (x, y, rz) in enumerate(((-1.55, -0.9, 0.2), (-1.45, -1.25, -0.15))):
@@ -174,6 +168,60 @@ def build(decal_peel=0.25):
     return out
 
 
+def _stop_socket():
+    """S21: an emergency-stop station on the cube's base with its button missing. A yellow housing with bevelled
+    edges and four screws, a black collar round an empty hole, the bare brass stem and contact blocks inside, a
+    paler ring where the mushroom head sat, and the STOP legend (human, C5 set A: the flat plate "still looks like
+    placeholder graphics"). Local +Z faces out of the glass, +Y up."""
+    sock = K.empty("stop_socket", (0.55, -1.008, 0.12))
+    sock.rotation_euler = (math.pi / 2, 0, 0)
+
+    def part(nm, op, mat, at, dims=None, **kw):
+        o = K.mesh_obj(f"stop_socket.{nm}", op, mat, sock, location=at, **kw)
+        if dims:
+            o.data.transform(Matrix.Diagonal((*dims, 1.0)))
+        return o
+
+    yellow = K.mat_plastic("estop_housing", "note", 0.35)
+    black = K.mat_plastic("estop_collar", "shadow", 0.45)
+    chrome = K.mat_chrome("estop_screw")
+    brass = K.mat_metal("estop_brass", "brass", 0.3)
+    house = part("housing", bpy.ops.mesh.primitive_cube_add, yellow, (0, 0, 0.016), (0.15, 0.17, 0.032), size=1)
+    K.bevel(house, 0.008, 4)
+    K.smooth(house)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            s = part(f"screw{sx}{sy}", bpy.ops.mesh.primitive_cylinder_add, chrome,
+                     (sx * 0.06, sy * 0.07, 0.033), radius=0.006, depth=0.003, vertices=24)
+            part(f"slot{sx}{sy}", bpy.ops.mesh.primitive_cube_add, black, (sx * 0.06, sy * 0.07, 0.0347),
+                 (0.009, 0.0016, 0.0006), size=1).rotation_euler = (0, 0, 0.6 * sx * sy)
+            K.smooth(s)
+    cy = 0.012  # the socket sits above centre; the legend below
+    collar = part("collar", bpy.ops.mesh.primitive_torus_add, black, (0, cy, 0.034), major_radius=0.041,
+                  minor_radius=0.009, major_segments=96, minor_segments=24)
+    collar.scale = (1, 1, 0.7)
+    K.smooth(collar)
+    part("hole", bpy.ops.mesh.primitive_cylinder_add, K.mat_matte("estop_hole", "shadow"), (0, cy, 0.0335),
+         radius=0.034, depth=0.002, vertices=96)
+    ghost = part("ghost", bpy.ops.mesh.primitive_torus_add, K.mat_matte("estop_ghost", "paper"), (0, cy, 0.0331),
+                 major_radius=0.05, minor_radius=0.0018, major_segments=96, minor_segments=8)
+    ghost.scale = (1, 1, 0.3)  # a pale ring where the button's skirt sat
+    stem = part("stem", bpy.ops.mesh.primitive_cylinder_add, brass, (0, cy, 0.038), radius=0.007, depth=0.012,
+                vertices=32)
+    K.smooth(stem)
+    part("stem_cap", bpy.ops.mesh.primitive_cylinder_add, brass, (0, cy, 0.0445), radius=0.0045, depth=0.002,
+         vertices=24)
+    for sx in (-1, 1):  # contact blocks either side of the stem
+        part(f"contact{sx}", bpy.ops.mesh.primitive_cube_add, brass, (sx * 0.019, cy, 0.0355),
+             (0.008, 0.016, 0.004), size=1)
+        part(f"contact_screw{sx}", bpy.ops.mesh.primitive_cylinder_add, chrome, (sx * 0.019, cy, 0.038),
+             radius=0.0028, depth=0.0015, vertices=16)
+    K.text("stop_socket.label", "STOP", 0.028, K.mat_ink("estop_ink", "shadow"), loc=(0, -0.058, 0.0325),
+           rot=(0, 0, 0), font="Inter-Medium-flat.ttf", parent=sock)
+    K.text("stop_socket.small", "EMERGENCY", 0.011, K.mat_ink("estop_ink_small", "shadow"), loc=(0, 0.069, 0.0325),
+           rot=(0, 0, 0), parent=sock)
+
+
 def _desk():
     """S20's reveal (brief: "the cube is toy-sized on a vast desk in a dim lab"): at about 20x, a desk top with its
     edge, thickness and legs, a lab floor far below, a mug and a pencil for scale, and a desk lamp's pool of light.
@@ -190,10 +238,23 @@ def _desk():
     objs.append(_slab("lab_floor", K.mat_plastic("lab_floor", "horizon", 0.7), (3.0, -1.0, -16.05), (160, 160, 0.1)))
     # A mug, back left, and a pencil lying at an angle, front right.
     mug_m = K.mat_plastic("mug", "paper", 0.25)
-    objs.append(K.mesh_obj("mug", bpy.ops.mesh.primitive_cylinder_add, mug_m, None, radius=1.6, depth=4.0,
-                           vertices=48, location=(-9.0, 6.0, 2.0)))
+    # Open-topped with a rounded rim, coffee a little below it (human, C5 set A: "the mug is missing its inside").
+    mug = K.mesh_obj("mug", bpy.ops.mesh.primitive_cylinder_add, mug_m, None, radius=1.6, depth=4.0, vertices=96,
+                     location=(-9.0, 6.0, 2.0))
+    top_face = max(mug.data.polygons, key=lambda p: p.center.z)
+    bm = bmesh.new()
+    bm.from_mesh(mug.data)
+    bm.faces.ensure_lookup_table()
+    bmesh.ops.delete(bm, geom=[bm.faces[top_face.index]], context="FACES_ONLY")
+    bm.to_mesh(mug.data)
+    bm.free()
+    sol = mug.modifiers.new("wall", "SOLIDIFY")
+    sol.thickness, sol.offset, sol.use_even_offset = 0.14, -1.0, True
+    K.bevel(mug, 0.05, 4)
+    K.smooth(mug)
+    objs.append(mug)
     objs.append(K.mesh_obj("mug.coffee", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("coffee", "shadow", 0.1),
-                           None, radius=1.45, depth=0.05, vertices=48, location=(-9.0, 6.0, 3.6)))
+                           None, radius=1.47, depth=0.05, vertices=96, location=(-9.0, 6.0, 3.75)))
     objs.append(K.mesh_obj("mug.handle", bpy.ops.mesh.primitive_torus_add, mug_m, None, major_radius=0.9,
                            minor_radius=0.22, location=(-10.6, 6.0, 2.1), rotation=(math.pi / 2, 0, 0)))
     pencil = K.mesh_obj("pencil", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("pencil", "note", 0.3), None,
@@ -414,6 +475,25 @@ def probe_moves(S):
             kp = fc.keyframe_points.insert(f, loc[ax])
             kp.interpolation, kp.handle_left_type, kp.handle_right_type = "BEZIER", "AUTO_CLAMPED", "AUTO_CLAMPED"
         fc.update()
+    # Facing: the lens (local -Y) turns from the room to the note as the probe drifts up, faces the note while it
+    # peels it, then looks along the tube for the ride (human, C5 set A: it faced the wrong way, backing in).
+    def aim(d):
+        d = d.normalized()
+        return Vector((-math.asin(max(-1.0, min(1.0, d.z))), 0.0, math.atan2(d.x, -d.y)))
+
+    ahead = [(pts[min(len(pts) - 1, i + 8)] - pts[i]) for i in range(len(pts))]
+    rots = [(A.frame(t10 + 0.2), Vector((0, 0, 0))),
+            (A.frame(t_arrive - 0.3), aim(S["exit_pt"] - (mouth + Vector((-0.06, -0.02, -0.04))))),
+            (A.frame(t_arrive + 1.2), aim(S["exit_pt"] - mouth)),
+            (fa, aim(ahead[0]))]
+    for f, loc in zip(frames[1:], locs[1:]):
+        rots.append((f, aim(ahead[min(range(len(pts)), key=lambda i: (pts[i] - loc).length)])))
+    prev = 0.0
+    for f, r in rots:  # unwrap the yaw so it turns the short way
+        r.z = prev + (r.z - prev + math.pi) % (2 * math.pi) - math.pi
+        prev = r.z
+        p.rotation_euler = r
+        p.keyframe_insert("rotation_euler", frame=f)
 
 
 def _tube_points(tube, n=1200):
@@ -446,7 +526,10 @@ CAMERAS = {
     "S04": [(0.0, _v(0.55, 0.25, 0.6), _v(1.0, 0.55, 0.62), 28), (1.0, _v(0.78, 0.45, 0.62), _v(1.0, 0.56, 0.62), 28)],
     "S05": [(0.0, _v(0.5, -1.9, 0.75), _v(0.12, -0.9, 0.6), 50), (1.0, _v(0.3, -1.45, 0.66), _v(0.12, -0.95, 0.62), 60)],
     "S06": [(0.0, _v(0.4, -1.6, 0.6), _v(0.0, 3.0, 1.0), 28), (1.0, _v(0.6, -3.6, 4.2), _v(0.0, 6.0, 0.8), 28)],
-    "S07": [(0.0, _v(3.2, -2.2, 1.1), _v(1.75, -0.7, 0.6), 40), (1.0, _v(2.6, -1.5, 0.9), _v(1.75, -0.7, 0.6), 45)],
+    # S07: close on the singer (front of the music box, lens toward the glass) for "I'm just a model", then across to
+    # the turnstile for "flags and points" (human, C5 set A: the singing "too subtle"; it was at the frame's edge).
+    "S07": [(0.0, _v(0.42, -1.42, 0.56), _v(0.0, -0.52, 0.42), 40), (0.35, _v(0.55, -1.5, 0.6), _v(0.05, -0.52, 0.42), 40),
+            (1.0, _v(2.4, -2.7, 1.05), _v(1.7, -0.7, 0.55), 40)],
     "S08": [(0.0, _v(2.0, -1.25, 0.8), _v(1.72, -0.78, 0.6), 40), (1.0, _v(1.95, -1.1, 0.75), _v(1.72, -0.78, 0.58), 50)],
     "S09": [(0.0, _v(-2.6, 1.0, 0.55), _v(-2.2, 2.7, 0.35), 32), (1.0, _v(2.6, 1.0, 0.55), _v(2.2, 2.7, 0.35), 32)],
     "S10": [(0.0, _v(1.9, -0.6, 1.0), _v(1.0, 0.55, 0.62), 35), (0.45, _v(1.5, 0.3, 0.7), _v(1.0, 0.55, 0.62), 35),
@@ -455,3 +538,10 @@ CAMERAS = {
     "S21": [(0.0, _v(1.6, -2.6, 0.5), _v(0.55, -1.0, 0.15), 40), (1.0, _v(1.0, -1.7, 0.3), _v(0.55, -1.0, 0.13), 50)],
     "S23": [(0.0, _v(-0.6, -3.4, 0.9), _v(-1.45, -1.1, 0.05), 35), (1.0, _v(-1.55, -2.0, 0.55), _v(-1.7, -1.05, 0.08), 40)],
 }
+
+
+def shot_cameras(S, sid, t0, t1, cams):
+    """S08 is the protagonist's POV: its voice rings leave the lens, into the shot (human, C5 set A: the singing in
+    S07/S08 "too subtle"; the singer is the camera here)."""
+    if sid == "S08":
+        A.voice_rings(K.pov_voice("pov_S08", cams[0]), t0, t1)

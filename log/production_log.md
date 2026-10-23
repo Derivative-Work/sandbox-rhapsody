@@ -809,3 +809,21 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Follower:** new `scripts/c5_follow.sh B C D E F G H I` builds each set's reel and packs its frames as soon as the queue logs it as done (log: `renders/c5/follow.log`).
 - **Queue:** set B started at 01:35; its anchor stills and contact sheet are done.
 - **Why:** C5, one set at a time (brief).
+
+## 2026-10-23T03:47:37-04:00 — C5 set A review: voice rings, S07 reframed, S10 facing, mug, E-stop; A–C re-render
+
+- **Human review of set A (R1)** (human interventions), item by item:
+  - **S07, S08, "the 'singing' visualization is too subtle":**
+    - **The cause:** in S07 the protagonist was at the frame's edge; S08 is its POV, so it isn't in frame at all. A lift, a tilt and a halo can't carry that.
+    - **Voice rings** (`sr_kit.voice_rings`, keyed by `sr_anim.voice_rings` from `sing()`): on each sung word a glowing ring leaves the singer's lens, widening to about two probe-widths and fading over 36 frames; brightness follows the vocal stem. Three per probe in flight; they fade to clear (`mat_glow_fade`) and are hidden between words. Every singing probe has them: the lead (A, B, C, I), the lone agent (G), the honest probe (H).
+    - **S07:** opens close on the singing probe for "I'm just a model", then swings across to the turnstile for "flags and points".
+    - **S08:** the POV's voice rings leave the camera into the shot (`sr_kit.pov_voice`, set up through a new `shot_cameras` hook in `animatic.py`).
+  - **S10, the probe "facing the wrong way while removing the post it":** it kept its lens toward the room, backing into the tube. It now turns to the note as it drifts up, faces it while peeling it, and looks along the tube for the ride (yaw and pitch keyed from the tube's direction).
+  - **S10, the ring "very noticeably low-poly":** the grommet was a 48×12 flat-shaded torus; now 128×32, smooth.
+  - **S20, the mug "missing its inside":** open-topped, with a solid wall, a rounded rim and the coffee just below it.
+  - **S21, the STOP socket "still looks like placeholder graphics":** an emergency-stop station: a yellow bevelled housing with four slotted screws, a black collar round the empty hole, the bare brass stem and contact blocks, a pale ring where the button sat, and EMERGENCY / STOP legends in matte ink.
+- **Disk (R3):** the human freed space: 349 GB free.
+- **Tools:** `animatic.py --at S1,S2,...` renders check stills at times into each shot. Check stills (1280×720, 16 samples) for S07, S08, S10, S20 and S21 confirmed each fix; invalid drivers after rebind: 0.
+- **Re-render:** the voice rings change every set with a singer. D, E and F have none and stand as rendered; G, H and I hadn't started. A, B and C re-render. The superseded reels and contact sheets are archived as `archive/renders/c5_set_{A,B,C}_*superseded_c5-review-A.*`. Their frame packs are set aside in `renders/c5/set_{A,B,C}/frames_superseded_c5-review-A/` (about 45 GB, regenerable, kept out of the manifest) for the human to delete.
+- **Queue:** set F finishes; then `scripts/c5_queue.sh A B C G H I` (log `renders/c5/queue2.log`), followed by reels and packs (`C5_QUEUE_LOG` now selects the follower's queue log).
+- **Why:** human feedback, R1; disk space, R3 (human interventions).

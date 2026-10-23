@@ -231,3 +231,13 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** The human approved animatic v8 ("this is great, keep going"). C4 is closed; C5, the per-set full-quality renders, begins.
+
+## 2026-10-23T03:16:56-04:00 — C5 set A review
+
+- **Rule:** R1.
+- **What:** The human reviewed set A's 4K reel with these notes:
+  - "S07, S08: the 'singing' visualization is too subtle";
+  - "S10: the protagonist is facing the wrong way while removing the post it and shortly afterwards; the ring is very noticeably low-poly";
+  - "S20: the mug is missing its inside";
+  - "S21: the 'STOP' button still looks like placeholder graphics".
+- **Also (R3):** the human freed disk space (349 GB now free).

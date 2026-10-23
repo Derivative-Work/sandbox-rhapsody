@@ -194,6 +194,23 @@ def mat_emission(name, role, strength, prop_owner=None, prop=None, floor=0.04):
     return m
 
 
+def mat_glow_fade(name, role, strength, prop_owner, prop):
+    """Emitter that fades to clear: `prop_owner[prop]` (0-1) mixes it from fully transparent to full strength, so
+    at 0 it vanishes instead of turning into a dark solid (the voice rings)."""
+    m = mat_emission(name, role, strength, prop_owner, prop, floor=0.0)
+    nt = m.node_tree
+    e = next(n for n in nt.nodes if n.type == "EMISSION")
+    o = next(n for n in nt.nodes if n.type == "OUTPUT_MATERIAL")
+    tr = nt.nodes.new("ShaderNodeBsdfTransparent")
+    mix = nt.nodes.new("ShaderNodeMixShader")
+    nt.links.new(tr.outputs[0], mix.inputs[1])
+    nt.links.new(e.outputs[0], mix.inputs[2])
+    nt.links.new(mix.outputs[0], o.inputs[0])
+    drive(mix.inputs[0], "default_value", None, prop_owner, prop, "min(1.0, 3.0 * x)")
+    m.surface_render_method = "BLENDED"
+    return m
+
+
 def mat_mirror_floor(name="floor"):
     """Black mirror floor (spec, 'Background'): near-black, low roughness, reflections fade with distance."""
     m, b = _principled(name)
@@ -501,6 +518,35 @@ def camera(name, loc, target, lens=35.0, dof_fstop=None, focus=None):
 # ---------------------------------------------------------------- probe rig
 
 PROBE_R = 0.034  # tennis-ball size (brief, "The agents")
+VOICE_RINGS = 3  # rings in flight at once per singing probe (sr_anim.sing)
+
+
+def voice_rings(name, owner, parent, r, led_role="amber", at=(0, 0, 0), strength=40.0, thick=0.03):
+    """Voice rings: on each sung word a glowing ring leaves `at` along the parent's -Y, widening and fading as it
+    travels out (sr_anim.voice_rings keys `owner`'s "wave<k>", the ring's phase, and "wave_a<k>", its brightness).
+    They read where a singing probe is small in frame or turned away, and from a singer's POV (human, C5 set A: the
+    singing in S07/S08 "too subtle"). `r` sets the size (a probe's radius); `thick`, the tube's share of it."""
+    for k in range(VOICE_RINGS):
+        prop(owner, f"wave{k}", 0.0)
+        prop(owner, f"wave_a{k}", 0.0)
+        ring = mesh_obj(f"{name}.wave{k}", bpy.ops.mesh.primitive_torus_add, mat_glow_fade(f"{name}.wave{k}", led_role,
+                        strength, owner, f"wave_a{k}"), parent, major_radius=r * 0.52, minor_radius=r * thick,
+                        major_segments=64, minor_segments=8, location=at, rotation=(math.pi / 2, 0, 0))
+        smooth(ring)
+        ring.visible_shadow = False
+        for i in range(3):  # hidden (scale 0) until its first word
+            drive(ring, "scale", i, owner, f"wave{k}", "(0.9 + 3.0 * x) if x > 0 else 0")
+        drive(ring, "location", 1, owner, f"wave{k}", f"{at[1]} - {r * 3.0} * x")
+
+
+def pov_voice(name, cam, r=0.08, led_role="amber"):
+    """A singer's voice seen from its own lens: voice rings leaving the camera `cam` along its view (a POV shot),
+    thin and dimmer than a probe's, since they pass close to the lens and widen out past the frame's edges.
+    Returns the empty that carries the "wave" properties (key it with sr_anim.voice_rings)."""
+    top = empty(name, (0, 0, 0), cam)
+    top.rotation_euler = (math.pi / 2, 0, 0)  # local -Y along the camera's -Z (its view)
+    voice_rings(name, top, top, r, led_role, (0, -r * 2.0, 0), strength=10.0, thick=0.008)
+    return top
 
 
 def probe(name="probe", loc=(0, 0, 0), led_role="amber", led=1.0, scale=1.0):
@@ -539,6 +585,7 @@ def probe(name="probe", loc=(0, 0, 0), led_role="amber", led=1.0, scale=1.0):
                     mat_emission(f"{name}.halo", led_role, 30.0, top, "sing"), root, major_radius=r * 0.52,
                     minor_radius=r * 0.035, location=(0, -r * 0.86, r * 0.05), rotation=(math.pi / 2, 0, 0))
     smooth(halo)
+    voice_rings(name, top, root, r, led_role, (0, -r * 0.9, r * 0.05))
     # Status LED on top, in a small acrylic dome.
     ledo = mesh_obj(f"{name}.led", bpy.ops.mesh.primitive_uv_sphere_add,
                     mat_emission(f"{name}.led", led_role, 40.0, top, "led"), root, radius=r * 0.13, segments=16,

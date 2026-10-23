@@ -6,9 +6,10 @@ shot (0 = cut, 1 = next cut), or a list of such moves for cuts inside the shot; 
 Plates run one frame past the shot's end on each side, so the edit can dissolve.
 
 Usage: blender -b --factory-startup --python scenes/blender/animatic.py -- SET [shot ...] [--size 640x360]
-       [--samples 8] [--step 1] [--out DIR] [--anchors]
+       [--samples 8] [--step 1] [--out DIR] [--anchors] [--at S1,S2,...]
   -> renders/animatic/plates/<shot>/f_<frame>.png  (frame numbers are the 60 fps timeline's)
   --anchors: one still per shot at its anchor (C5's contact sheets) -> <out>/<shot>.png
+  --at: stills at these times, in seconds from each shot's cut (checks) -> <out>/<shot>_<s>.png
 """
 import importlib
 import json
@@ -26,7 +27,7 @@ import sr_anim as A  # noqa: E402
 import sr_kit as K  # noqa: E402
 
 args = sys.argv[sys.argv.index("--") + 1:]
-opts = {"--size": "640x360", "--samples": "8", "--step": "1", "--out": str(ROOT / "renders" / "animatic" / "plates")}
+opts = {"--size": "640x360", "--samples": "8", "--step": "1", "--at": "", "--out": str(ROOT / "renders" / "animatic" / "plates")}
 pos = []
 i = 0
 while i < len(args):
@@ -89,13 +90,27 @@ for s in mine:
     # cuts switch cameras through timeline markers.
     scene.timeline_markers.clear()
     segments = keys if isinstance(keys[0], list) else [keys]
+    cams = []
     for j, seg in enumerate(segments):
         cam = K.camera_move(f"cam_{sid}" + (f".{j}" if len(segments) > 1 else ""),
                             [(a + u * (b - a), e, t, l) for u, e, t, l in seg])
         if len(segments) > 1:
             m = scene.timeline_markers.new(f"{sid}.{j}", frame=A.frame(a + seg[0][0] * (b - a)) if j else 0)
             m.camera = cam
+        cams.append(cam)
     scene.camera = bpy.data.objects[f"cam_{sid}" + (".0" if len(segments) > 1 else "")]
+    if hasattr(mod, "shot_cameras"):  # set-up that rides a shot's camera (a POV singer's voice rings)
+        mod.shot_cameras(S, sid, a, b, cams)
+        K.rebind_drivers()
+        K.refresh()
+    if opts["--at"]:  # check stills at given times into the shot
+        Path(opts["--out"]).mkdir(parents=True, exist_ok=True)
+        for u in opts["--at"].split(","):
+            scene.frame_set(min(A.frame(a + float(u)), A.frame(b) - 1))
+            scene.render.filepath = str(Path(opts["--out"]) / f"{sid}_{u}.png")
+            scene.render.image_settings.file_format = "PNG"
+            bpy.ops.render.render(write_still=True)
+        continue
     if anchors:  # one still at the shot's anchor (its cut if it has none), clamped inside the shot
         f = min(max(A.frame(s.get("anchor") or a), A.frame(a)), A.frame(b) - 1)
         scene.frame_set(f)

@@ -362,8 +362,38 @@ def sing_curve(t0, t1, roles=("lead",), line_ids=None, attack=6, release=12, acc
 
 
 def sing(owner, t0, t1, prop="sing", **kw):
-    """Key a probe's "sing" (sr_kit.probe) from sing_curve over [t0, t1] s."""
+    """Key a probe's "sing" (sr_kit.probe) from sing_curve over [t0, t1] s, and its voice rings: one per sung word."""
+    if "wave0" in owner:
+        voice_rings(owner, t0, t1, roles=kw.get("roles", ("lead",)), line_ids=kw.get("line_ids"))
     return envelope_rig(owner, prop, sing_curve(t0, t1, **kw), frame(t0 - 1), frame(t1 + 1), step=1)
+
+
+def voice_rings(owner, t0, t1, roles=("lead",), line_ids=None, life=36):
+    """Key a probe's voice rings (sr_kit.probe, "wave<k>"/"wave_a<k>"): on each word the singer starts in [t0, t1] s,
+    the next free ring leaves the lens, widening (phase 0 -> 1, eased out) and fading over `life` frames. Brightness
+    follows the stem, so a belted word rings brighter. A word that finds every ring still in flight goes without."""
+    env = envelope("vocal_env")
+    nring = sum(1 for k in owner.keys() if k.startswith("wave_a"))
+    free = [-10 ** 9] * nring
+    keys = [([(0, 0.0)], [(0, 0.0)]) for _ in range(nring)]
+    for li in timing_map()["lines"]:
+        if (line_ids is None and li["role"] not in roles) or (line_ids is not None and li["id"] not in line_ids):
+            continue
+        for w in li["words"]:
+            if not t0 <= w["start"] <= t1:
+                continue
+            a = frame(w["start"])
+            k = min(range(nring), key=lambda j: free[j])
+            if free[k] > a:
+                continue
+            amp = float(np.clip(0.55 + 0.9 * (env[min(a + 3, len(env) - 1)] - 0.5), 0.45, 1.0))
+            ph, br = keys[k]
+            ph += [(a - 1, 0.0), (a, 0.02), (a + life // 3, 0.7), (a + life, 1.0), (a + life + 1, 0.0)]
+            br += [(a - 1, 0.0), (a + 1, amp), (a + life // 3, 0.55 * amp), (a + life, 0.0)]
+            free[k] = a + life + 2
+    for k, (ph, br) in enumerate(keys):
+        write_keys(owner, prop_path(f"wave{k}"), ph, interp="LINEAR")
+        write_keys(owner, prop_path(f"wave_a{k}"), br, interp="LINEAR")
 
 
 def comb(box, evs, lo=36, hi=96, cut_at=None, step=1):
