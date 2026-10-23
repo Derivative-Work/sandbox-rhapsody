@@ -34,6 +34,7 @@ RENDERABLE = {"MESH", "CURVE", "FONT", "SURFACE", "META"}
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = K.setup_render(bpy.context.scene, 640, 480, 16)
 importlib.import_module(f"set_{SET.lower()}").build()
+K.smooth_by_angle()  # as animatic.py renders it
 bpy.context.view_layer.update()
 for o in bpy.data.objects:  # the set's own lights and cameras play no part
     if o.type in {"LIGHT", "CAMERA"}:

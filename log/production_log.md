@@ -868,3 +868,14 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Security camera** (`sr_kit.security_camera`, used in A, B and H): the housing was a stretched cube. Now a rounded box housing sized in the mesh, a rear cap, cooling grooves, a hood with skirts, a lens barrel with a chrome ring, a ceiling plate with screws, and a cable loop.
 - **Superseded:** the C5 set D and E reels and contact sheets (archived) and the D, E and F frames (set aside in `renders/c5/set_{D,E,F}/frames_superseded_placeholders/` for the human to delete). Every set re-renders.
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-23T05:39:24-04:00 — C5: round things round (torus resolution, smooth-by-angle pass)
+
+- **The note** (human, R1): the cold-storage door's ring looked low-poly. The faceting was the doorway's chrome frame, the door's rim and its handwheel: Blender's default 48×12 tori, flat-shaded. The hole itself was a 48-sided boolean cut.
+- **Set G:** the doorway is cut 128-sided; the frame, rim and handwheel are 128×24 or 96×16 tori, smooth; the bolts and hub are 32- and 48-sided.
+- **Kit-wide, the same flaw in every set:** the audit found 20 tori at the default resolution and flat-shaded curved meshes in most sets.
+  - `sr_kit.mesh_obj`: tori default to 96×16 segments.
+  - New `sr_kit.smooth_by_angle()`, run after every set is built (`animatic.py`, `prop_audit.py`): every flat-shaded mesh is shaded smooth with edges over 35° kept sharp. Cylinders, spheres, tori and lathes read round; boxes, bevel flats and hex sections keep their edges.
+- **Checks:** S44 before and after (rim, frame and wheel now smooth); S16's boxes unchanged; invalid drivers after rebind: 0.
+- **Renders:** set A's re-render had started on the old kit; stopped at about 10 minutes and restarted with every set (`renders/c5/queue4.log`).
+- **Why:** human feedback, R1 (human interventions).

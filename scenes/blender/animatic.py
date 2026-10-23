@@ -73,6 +73,7 @@ else:
     K.reflection_cards(center=(0, 0, 0.8))
 t0, t1 = min(s["cut"] for s in mine), max(end_of[s["id"]] for s in mine)
 mod.animate(S, t0, t1)
+K.smooth_by_angle()
 K.bloom(scene)
 K.rebind_drivers()
 K.refresh()

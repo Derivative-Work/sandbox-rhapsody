@@ -228,6 +228,9 @@ def link(obj, coll=None):
 
 
 def mesh_obj(name, mesh_op, mat=None, parent=None, **kw):
+    if mesh_op == bpy.ops.mesh.primitive_torus_add:  # Blender's 48x12 default faceted rings in 4K close-ups (C5)
+        kw.setdefault("major_segments", 96)
+        kw.setdefault("minor_segments", 16)
     mesh_op(**kw)
     o = bpy.context.active_object
     o.name = name
@@ -250,6 +253,19 @@ def smooth(o):
     for p in o.data.polygons:
         p.use_smooth = True
     return o
+
+
+def smooth_by_angle(angle_deg=35.0):
+    """Shade every flat-shaded mesh smooth, keeping edges sharper than `angle_deg` hard: curved parts (cylinders,
+    spheres, tori, lathes) read round while boxes, bevels' flats and hex sections keep their edges. Run once a set is
+    built (C5: flat-shaded curved parts, e.g. the freezer's doorway frame, read as low-poly at 4K)."""
+    n = 0
+    for me in {o.data for o in bpy.data.objects if o.type == "MESH"}:
+        if me.polygons and not all(p.use_smooth for p in me.polygons):
+            me.shade_smooth()
+            me.set_sharp_from_angle(angle=math.radians(angle_deg))
+            n += 1
+    return n
 
 
 def empty(name, loc=(0, 0, 0), parent=None):

@@ -219,7 +219,7 @@ def _cold_storage(black, brass):
     cab_m = K.mat_plastic("freezer_body", "lab", 0.3)
     cab = _box("freezer", cab_m, (2.95, -1.4, 0.45), (0.9, 0.9, 0.9), bev=0.03)
     cutter = _cyl("freezer.doorway", K.mat_emission("freezer_ice", "rim", 2.0), None, (2.6, -1.4, 0.42), 0.27, 0.4,
-                  rot=(0, math.pi / 2, 0), verts=48)
+                  rot=(0, math.pi / 2, 0), verts=128)  # a round hole up close (48 sides showed, C5)
     cutter.hide_render = cutter.hide_viewport = True
     bo = cab.modifiers.new("doorway", "BOOLEAN")
     bo.object, bo.operation, bo.solver = cutter, "DIFFERENCE", "EXACT"
@@ -243,8 +243,9 @@ def _cold_storage(black, brass):
     for y in (-1.7, -1.4, -1.1):  # side (+X) panel seams
         tr.box((x1 + 0.002, y, 0.47), (0.004, 0.008, 0.74), m=1)
     P.place("freezer.trim", tr.mesh("freezer_trim"))
-    K.mesh_obj("freezer.frame", bpy.ops.mesh.primitive_torus_add, chrome, None, major_radius=0.3, minor_radius=0.025,
-               location=(2.495, -1.4, 0.42), rotation=(0, math.pi / 2, 0))
+    K.smooth(K.mesh_obj("freezer.frame", bpy.ops.mesh.primitive_torus_add, chrome, None, major_radius=0.3,
+                        minor_radius=0.025, major_segments=128, minor_segments=24, location=(2.495, -1.4, 0.42),
+                        rotation=(0, math.pi / 2, 0)))  # smooth: the default 48x12 read low-poly (human, C5)
     _box("freezer.unit", K.mat_plastic("freezer_unit", "lab_dark", 0.35), (3.0, -1.4, 0.98), (0.6, 0.5, 0.16), bev=0.02)
     fan = K.empty("freezer.fan", (3.0, -1.4, 1.065))
     K.mesh_obj("freezer.fan_ring", bpy.ops.mesh.primitive_torus_add, chrome, fan, major_radius=0.15,
@@ -292,15 +293,17 @@ def _cold_storage(black, brass):
                         ring_count=6, location=(-0.03, 0.3 + math.cos(a) * 0.29, math.sin(a) * 0.29))
         fr.scale = (0.5, 1.4, 0.6)
     vault = K.mat_metal("vault", "chrome", 0.2)
-    K.mesh_obj("vault_rim", bpy.ops.mesh.primitive_torus_add, chrome, door_hinge, major_radius=0.29,
-               minor_radius=0.02, location=(-0.035, 0.3, 0), rotation=(0, math.pi / 2, 0))
+    K.smooth(K.mesh_obj("vault_rim", bpy.ops.mesh.primitive_torus_add, chrome, door_hinge, major_radius=0.29,
+                        minor_radius=0.02, major_segments=128, minor_segments=24, location=(-0.035, 0.3, 0),
+                        rotation=(0, math.pi / 2, 0)))
     for k in range(8):  # locking bolts round the rim
         a = k * math.tau / 8
         _cyl(f"vault_bolt{k}", chrome, door_hinge, (0, 0.3 + math.cos(a) * 0.3, math.sin(a) * 0.3), 0.016, 0.06,
-             rot=(a - math.pi / 2, 0, 0), verts=12)
-    K.mesh_obj("vault_wheel", bpy.ops.mesh.primitive_torus_add, brass, door_hinge, major_radius=0.12,
-               minor_radius=0.015, location=(-0.06, 0.3, 0), rotation=(0, math.pi / 2, 0))
-    _cyl("vault_hub", brass, door_hinge, (-0.05, 0.3, 0), 0.03, 0.04, rot=(0, math.pi / 2, 0))
+             rot=(a - math.pi / 2, 0, 0), verts=32)
+    K.smooth(K.mesh_obj("vault_wheel", bpy.ops.mesh.primitive_torus_add, brass, door_hinge, major_radius=0.12,
+                        minor_radius=0.015, major_segments=96, minor_segments=16, location=(-0.06, 0.3, 0),
+                        rotation=(0, math.pi / 2, 0)))
+    _cyl("vault_hub", brass, door_hinge, (-0.05, 0.3, 0), 0.03, 0.04, rot=(0, math.pi / 2, 0), verts=48)
     for k in range(3):
         sp = _box(f"vault_spoke{k}", brass, (-0.055, 0.3, 0), (0.012, 0.24, 0.016), door_hinge)
         sp.rotation_euler = (k * math.pi / 3, 0, 0)

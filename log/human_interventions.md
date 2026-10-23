@@ -258,3 +258,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** "the 'emergency stop' is not reading like an emergency stop either -- I was expecting the kind that you'd see in industrial or medical equipment (i.e. as a big red button with a rotate-to-reset mechanism)". Asked how, since the brief's S21 gag is the missing button; the human chose "Removed, lying beside it".
+
+## 2026-10-23T05:39:24-04:00 — C5 note: the cold-storage ring
+
+- **Rule:** R1.
+- **What:** "wait the 'cold storage' gasket looks low-poly (at least in the render you sent)".
