@@ -5,7 +5,9 @@
 # Usage: scripts/c5_queue.sh B C D ...   (waits for any C5 render already running to finish first)
 set -euo pipefail
 cd "$(dirname "$0")/.."
-while pgrep -f "render_c5.sh" > /dev/null; do sleep 60; done
+# Match the script itself ("bash scripts/render_c5.sh ..."), not any command line that mentions it (a waiter's
+# "until ! pgrep -f render_c5.sh" deadlocked the queue, C5 set A review).
+while pgrep -f '^(/usr/bin/)?bash [^ ]*render_c5\.sh' > /dev/null; do sleep 60; done
 for S in "$@"; do
   size=3840x2160
   case "$S" in G|H|I) size=3840x3840 ;; esac

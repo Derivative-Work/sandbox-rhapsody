@@ -827,3 +827,21 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Re-render:** the voice rings change every set with a singer. D, E and F have none and stand as rendered; G, H and I hadn't started. A, B and C re-render. The superseded reels and contact sheets are archived as `archive/renders/c5_set_{A,B,C}_*superseded_c5-review-A.*`. Their frame packs are set aside in `renders/c5/set_{A,B,C}/frames_superseded_c5-review-A/` (about 45 GB, regenerable, kept out of the manifest) for the human to delete.
 - **Queue:** set F finishes; then `scripts/c5_queue.sh A B C G H I` (log `renders/c5/queue2.log`), followed by reels and packs (`C5_QUEUE_LOG` now selects the follower's queue log).
 - **Why:** human feedback, R1; disk space, R3 (human interventions).
+
+## 2026-10-23T04:50:29-04:00 — C5: placeholder audit, prop by prop
+
+- **Trigger:** the human's set D note (R1, human interventions): the pager "looks very boxy"; "are you sure you went through all of the assets for placeholders". No: the earlier pass judged whole-set stills, where small props hide.
+- **Renders paused:** the A–C re-render hadn't started (its wait matched the waiter's own command line and deadlocked; `c5_queue.sh` now matches only a running `render_c5.sh`). Nothing more renders until the props are fixed; set F's frames are kept.
+- **New audit:** `scenes/blender/prop_audit.py SET` renders every prop alone, framed to fill the shot, under neutral lights, and lists each prop's size, bare boxes (8-vertex meshes with no bevel) and flat-shaded meshes (`renders/audit/set_<SET>/audit.tsv`). `scripts/audit_sheet.py SET` tiles them (`sheet.jpg`). 323 props across the nine sets.
+- **Placeholders found** (props that stand for real objects but are still one or two primitives):
+  - A: wrench, guardrails, pencil, flags and tray, desk legs, lock boxes (×198), wall lights.
+  - B: warehouse crates (~1,300), drawers, shelving boards and uprights, phone bracket, work lights and hoods.
+  - C: street lamps.
+  - D: pager, monitors, desk, hall lamps, sirens, bells.
+  - E: portal racks, portal disc.
+  - F: crates and bands, door posts and lintel, seams, legs, tunnel.
+  - G: conveyor and legs, stamp table, grader ledge, pilasters; the freezer body.
+  - H: bill printer, bridge towers, LIABILITY walls, dashboard strips.
+  - I: crates under the music box and lead, hanging lamp, shelf gussets.
+  - Left simple on purpose: architecture (walls, floors, ceilings), abstract network lines and nodes (E), frost shells (I), the faint background silhouettes (A).
+- **Next:** four sub-agents model the placeholders, sets split A+B, C+D+E, F+G, H+I; each re-runs the audit on its sets.

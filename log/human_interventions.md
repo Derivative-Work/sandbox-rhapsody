@@ -241,3 +241,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
   - "S20: the mug is missing its inside";
   - "S21: the 'STOP' button still looks like placeholder graphics".
 - **Also (R3):** the human freed disk space (349 GB now free).
+
+## 2026-10-23T04:43:40-04:00 — C5 set D note
+
+- **Rule:** R1.
+- **What:** "for set D, the pager also looks very boxy. are you sure you went through all of the assets for placeholders". The pager was missed by the C5 placeholder pass, which looked at set stills, not at each prop up close.
