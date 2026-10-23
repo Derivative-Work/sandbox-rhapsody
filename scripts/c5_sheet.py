@@ -35,7 +35,11 @@ def main():
     bold, small = ImageFont.truetype(FONT, 26), ImageFont.truetype(FONT, 19)
     for i, p in enumerate(stills):
         x, y = PAD + (i % COLS) * (W + PAD), PAD + (i // COLS) * (H + CAP + PAD)
-        sheet.paste(Image.open(p).convert("RGB").resize((W, H), Image.LANCZOS), (x, y))
+        im = Image.open(p).convert("RGB")
+        if im.height > im.width * 9 // 16:  # a square render (S30-S65): the 16:9 main video is its centre band
+            band = im.width * 9 // 16
+            im = im.crop((0, (im.height - band) // 2, im.width, (im.height + band) // 2))
+        sheet.paste(im.resize((W, H), Image.LANCZOS), (x, y))
         r = rows.get(p.stem, {})
         d.text((x, y + H + 6), f"{p.stem}  ·  {r.get('anchor', '')}", font=bold, fill="#efe8da")
         for j, ln in enumerate(textwrap.wrap(r.get("visual", ""), 92)[:2]):

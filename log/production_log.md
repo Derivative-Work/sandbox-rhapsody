@@ -789,3 +789,13 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **I:** moulded crates under the music box and the lead, sleeper shelves with rails and brackets, and tripod stands for the hi-hat and crash.
 - **Not done:** no geometry clip test on the new G stamp arms and freezer doorway, or on set H (visual checks only). The full renders will show it.
 - **Stills:** the sub-agents' review stills are in the scratchpad. Each set's C5 contact sheet comes from its 4K anchor stills when it renders.
+
+## 2026-10-22T22:21:19-04:00 — C5: render queue, review reels, effects at 4K
+
+- **Queue:** `scripts/c5_queue.sh B C D E F G H I` starts once set A's render ends. For each set it renders the 4K anchor stills and contact sheet, then the full render in two sessions. G, H and I render at 3840×3840 (the vertical cut's format).
+- **Square-render check:** S37 at 640×360 against the centre band of a 640×640 render: mean difference 3.65/255 (noise and bloom), so the 16:9 framing is unchanged.
+- **Contact sheets:** `scripts/c5_sheet.py` crops square stills to their 16:9 centre band.
+- **Review reels:** `scripts/c5_reel.py SET` gives a set's shots at full quality, in timeline order, each with its stretch of the final audio, with S01's fade-up and `edit_fx` applied and no burn-ins → `renders/c5/set_<SET>/set_<SET>.mp4`.
+- **`edit_fx` at 4K:** pixel sizes (colour split, tear bands, tracking bar, scanlines, the CRT line and dot) now scale with frame height; at 360 lines they are unchanged.
+- **Manifest:** `scripts/manifest.sh` leaves out `frames/` (C5's frame sequences are never archived; they are regenerable).
+- **Set A's render:** it slowed to about 22 s per frame while the four sub-agents' test renders shared the GPU. It's back to about 5 s per frame per session (two sessions).

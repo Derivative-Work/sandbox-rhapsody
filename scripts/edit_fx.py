@@ -62,18 +62,21 @@ def apply(sid, f, img):
 def _rewind_look(img, f, snap=False):
     a = np.asarray(img).astype(np.int16)
     h, w, _ = a.shape
+    s = h / 360  # sizes below are in 360-line pixels, scaled to the frame
     rng = np.random.default_rng(f)  # deterministic per frame
     out = a.copy()
-    out[:, :, 0] = np.roll(a[:, :, 0], 4, axis=1)  # colour split
-    out[:, :, 2] = np.roll(a[:, :, 2], -4, axis=1)
+    out[:, :, 0] = np.roll(a[:, :, 0], round(4 * s), axis=1)  # colour split
+    out[:, :, 2] = np.roll(a[:, :, 2], -round(4 * s), axis=1)
     for _ in range(2 if snap else 4):  # tearing bands, shoved sideways
-        y = int(rng.integers(0, h - 12))
-        bh = int(rng.integers(4, 24 if snap else 14))
-        out[y:y + bh] = np.roll(out[y:y + bh], int(rng.integers(-40, 40)), axis=1)
+        y = int(rng.integers(0, h - round(12 * s)))
+        bh = round(int(rng.integers(4, 24 if snap else 14)) * s)
+        out[y:y + bh] = np.roll(out[y:y + bh], round(int(rng.integers(-40, 40)) * s), axis=1)
     if snap:  # the tracking bar as it locks back to real time
         y = int(h * (0.85 if f % 2 else 0.4))
-        out[y:y + 10] = 235
-    out[::3] = out[::3] * 0.7  # scanlines
+        out[y:y + round(10 * s)] = 235
+    step = max(3, round(3 * s))  # scanlines
+    for k in range(max(1, round(s))):
+        out[k::step] = out[k::step] * 0.7
     grey = out.mean(axis=2, keepdims=True)
     out = 0.75 * out + 0.25 * grey + 10  # washed out, lifted blacks
     return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
@@ -85,20 +88,21 @@ def _crt(img, k):
     out = Image.new("RGB", (w, h))
     if k < SQUASH:
         u = (k + 1) / SQUASH
-        hh = max(2, int(h * (1 - u) ** 2))
+        hh = max(round(2 * h / 360), int(h * (1 - u) ** 2))
         line = img.resize((w, hh))
         boost = np.asarray(line).astype(np.float32) * (1 + 2.5 * u) + 60 * u
         out.paste(Image.fromarray(np.clip(boost, 0, 255).astype(np.uint8)), (0, (h - hh) // 2))
         return out
     k -= SQUASH
+    s = h / 360  # sizes below are in 360-line pixels, scaled to the frame
     a = np.zeros((h, w, 3), np.float32)
     yy, xx = np.mgrid[0:h, 0:w]
     if k < SHRINK:  # the line shrinks toward the centre
-        half = max(3, int(w / 2 * (1 - (k + 1) / SHRINK) ** 1.5))
-        m = (np.abs(xx - w / 2) < half) & (np.abs(yy - h / 2) < 1.5)
+        half = max(3 * s, int(w / 2 * (1 - (k + 1) / SHRINK) ** 1.5))
+        m = (np.abs(xx - w / 2) < half) & (np.abs(yy - h / 2) < 1.5 * s)
         a[m] = 250
     elif k < SHRINK + FADE:  # the dot glows and fades
         g = 1 - (k - SHRINK) / FADE
         r2 = (xx - w / 2) ** 2 + (yy - h / 2) ** 2
-        a += (250 * g * np.exp(-r2 / (2 * (2.0 + 2 * g) ** 2)))[:, :, None]
+        a += (250 * g * np.exp(-r2 / (2 * ((2.0 + 2 * g) * s) ** 2)))[:, :, None]
     return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
