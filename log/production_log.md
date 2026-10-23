@@ -799,3 +799,13 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **`edit_fx` at 4K:** pixel sizes (colour split, tear bands, tracking bar, scanlines, the CRT line and dot) now scale with frame height; at 360 lines they are unchanged.
 - **Manifest:** `scripts/manifest.sh` leaves out `frames/` (C5's frame sequences are never archived; they are regenerable).
 - **Set A's render:** it slowed to about 22 s per frame while the four sub-agents' test renders shared the GPU. It's back to about 5 s per frame per session (two sessions).
+
+## 2026-10-23T02:22:35-04:00 — C5 set A: full render, review reel, lossless frame packs
+
+- **Render:** set A's 13 shots, 3840×2160, Eevee at 64 samples, every frame (5,351 frames with handles), in two sessions, 21:10 → 01:35. Invalid drivers after rebind: 0 in both sessions.
+- **Shadow pool:** 98 S20 frames logged "Shadow buffer full" (a few tiles over the 2048 MB pool). Checked for missing shadows: frame-to-frame change never spikes beyond the camera move (median 1.16/255, max 5.3/255 after the cut), and stills across the shot show nothing missing. Kept.
+- **Review reel:** `renders/c5/set_A/set_A.mp4` (`scripts/c5_reel.py A`), 88.6 s, 4K, with audio. Spot-checked: S01's fade-up, framing, no artefacts.
+- **Disk:** a 4K PNG frame is about 7.8 MB, so sets B–I (about 14,000 frames, many square) would not fit in the 82 GB that was free. New `scripts/c5_pack.sh SET` packs each shot's PNGs into one FFV1 file (`frames/<shot>.mkv`, intra-only, alpha dropped since every render is opaque). It removes the PNGs only after every frame of the pack decodes to the same RGB as its PNG (framemd5) and the frame counts match. Set A: 44 GB → 23 GB, all 13 shots bit-exact. The packs are frame sequences in another container: regenerable, never archived, out of the manifest.
+- **Follower:** new `scripts/c5_follow.sh B C D E F G H I` builds each set's reel and packs its frames as soon as the queue logs it as done (log: `renders/c5/follow.log`).
+- **Queue:** set B started at 01:35; its anchor stills and contact sheet are done.
+- **Why:** C5, one set at a time (brief).
