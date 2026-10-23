@@ -211,14 +211,15 @@ def build():
     tube.data.materials.append(K.mat_acrylic("tube_b", "lab_glow", alpha=0.5, emit=1.2))
     out["tube"] = tube
 
-    # The security camera, high in the corner, watching the piano shelf; "swivel" 1 = turned to the wall.
+    # The security camera, high in the corner. At "swivel" 0 its lens (local -Y) aims at the piano shelf's centre;
+    # at 1 it has swung about 140 degrees away from the shelf (it used to start facing away and swing toward it,
+    # human, C4 v7).
     cam = K.empty("sec_cam_b", (-2.9, -0.8, 2.75))
     K.prop(cam, "swivel", 0.0)
     K.mesh_obj("sec_cam_b.bracket", bpy.ops.mesh.primitive_cylinder_add, frame_m, cam, radius=0.02, depth=0.3,
                location=(0, 0, 0.15))
     yaw = K.empty("sec_cam_b.yaw", (0, 0, 0), cam)
-    yaw.rotation_euler = (0, 0, math.radians(-35))
-    _drive_vars(yaw, "rotation_euler", 2, {"x": (cam, "swivel")}, "-0.61 + 2.2 * x")
+    _drive_vars(yaw, "rotation_euler", 2, {"x": (cam, "swivel")}, "1.84 - 2.4 * x")
     body = K.mesh_obj("sec_cam_b.body", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("seccam_b", "lab", 0.2), yaw,
                       size=1, location=(0, -0.12, -0.05))
     body.scale = (0.14, 0.32, 0.14)
@@ -468,8 +469,9 @@ CAMERAS = {
     "S15": [(0.0, _v(1.2, -2.6, 2.4), _v(0, -0.3, 1.2), 30), (1.0, None, None, 42)],
     # Wide: every drawer open, notes everywhere, probes pinning.
     "S16": [(0.0, _v(3.6, -2.8, 3.2), _v(-0.5, -0.3, 0.9), 22), (1.0, _v(2.9, -2.7, 3.1), _v(-0.8, -0.3, 0.9), 22)],
-    # The corner camera swivels away (seen from below, the piano shelf behind it).
-    "S17": [(0.0, _v(-0.9, -2.7, 3.1), _v(-2.9, -0.8, 2.6), 38), (1.0, _v(-1.3, -2.4, 3.05), _v(-2.9, -0.8, 2.6), 45)],
+    # Over the corner camera's shoulder: it big in the foreground left, watching the noted drawers behind it; on
+    # "while you looked the other way" it swings off them, round toward us.
+    "S17": [(0.0, _v(-3.95, -1.75, 3.05), _v(-0.8, -0.25, 1.75), 28), (1.0, _v(-3.85, -1.65, 3.0), _v(-0.8, -0.25, 1.75), 30)],
     # The phone off the hook.
     "S22": [(0.0, PHONE + _v(1.0, -1.3, 0.35), PHONE + _v(0, 0, 0.0), 35),
             (1.0, PHONE + _v(0.75, -1.0, 0.2), PHONE + _v(0.1, 0, -0.15), 40)],

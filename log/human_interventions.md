@@ -215,3 +215,14 @@ Every human action: timestamp, what, why, and which production rule allows it. R
   - S32: the flashing wave takes a few frames to start.
 
   Addressed in v7 (production log).
+
+## 2026-10-22T20:43:26-04:00 — C4 review of animatic v7 (R1)
+
+- **Rule:** R1.
+- **What:** Three notes and a question:
+  - S17: the action and framing are wrong. The notes show bottom right, and the security camera turns *towards* them, not away. The human asks for a different shot that clearly shows both, with the camera clearly turning away.
+  - Opera: glare at the back makes the card-stunt text hard to read.
+  - S55: is there meant to be text on the paper airplanes? If so, it isn't visible from that angle.
+  - Question: is any geometry or asset still a placeholder needing more work?
+
+  Addressed in v8 (production log).

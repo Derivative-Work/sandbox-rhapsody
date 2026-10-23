@@ -95,7 +95,7 @@ def _mat_led_sequence(name, first, count):
     iu.use_auto_refresh, iu.use_cyclic = True, False
     mul = nt.nodes.new("ShaderNodeMath")
     mul.operation = "MULTIPLY"
-    mul.inputs[1].default_value = 30.0
+    mul.inputs[1].default_value = 45.0
     nt.links.new(tex.outputs["Color"], mul.inputs[0])
     e = nt.nodes.new("ShaderNodeEmission")
     e.inputs["Color"].default_value = K.col("amber")
@@ -127,8 +127,10 @@ def build():
     K.floor()
     K.star_dome()
     out = {}
-    black = K.mat_plastic("hall_black", "shadow", 0.25)
-    brass = K.mat_metal("hall_brass", "brass", 0.22)
+    # Matte black and satin brass: glossy black tiers and wall and polished brass mirrored the studio lights and
+    # reflection cards, washing the back of the hall out over the card stunts (human, C4 v7: "a lot of glare").
+    black = K.mat_matte("hall_black", "shadow")
+    brass = K.mat_metal("hall_brass", "brass", 0.5)
 
     # Tiers, rails, back wall.
     bm = bmesh.new()
@@ -169,7 +171,8 @@ def build():
             for f in faces:
                 for lp in f.loops:
                     lp[uv].uv = (u, v)
-    bodies = _mesh_from("swarm_bodies", bm_b, K.mat_chrome("swarm_shell", "probe"))
+    # Satin, not chrome: 700 chrome shells sparkled with highlights between the LEDs and blurred the card stunts.
+    bodies = _mesh_from("swarm_bodies", bm_b, K.mat_metal("swarm_shell", "probe", 0.45))
     for p in bodies.data.polygons:
         p.use_smooth = True
     out["swarm_leds"] = _mesh_from("swarm_leds", bm_l, _mat_led_sequence("swarm_led", f_first,

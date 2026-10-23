@@ -415,11 +415,17 @@ def build():
     out.update(honest=hp, flag=flag, dispenser=disp, ribbon=rib)
 
     # S55: subpoena paper airplanes (a V of seven) and the auditors' stamp arms.
-    paper = K.mat_plastic("subpoena", "paper", 0.5)
+    # Each a paper dart: flat wings with SUBPOENA printed across them, top and bottom, and a keel below (human,
+    # C4 v7: the text, if any, didn't show; it had none, and the wings were seen edge-on).
+    paper = K.mat_matte("subpoena", "decal_film")  # off-white: paper-white bloomed out in the key light
+    ink = K.mat_ink("subpoena_ink", "decal_ink")
     planes = []
     for k in range(7):
-        p = _poly(f"plane{k}", [(0.3, 0, 0), (-0.18, 0.22, 0.02), (-0.18, -0.22, 0.02), (-0.18, 0, -0.07)],
-                  [(0, 1, 3), (0, 3, 2)], paper)
+        p = _poly(f"plane{k}", [(0.3, 0, 0), (-0.18, 0.22, 0), (-0.14, 0, 0), (-0.18, -0.22, 0), (-0.16, 0, -0.07)],
+                  [(0, 1, 2), (0, 2, 3), (0, 2, 4)], paper)
+        p.data.polygons.foreach_set("use_smooth", [False] * 3)
+        for side, z, rot in (("top", 0.002, (0, 0, 0)), ("bottom", -0.002, (math.pi, 0, 0))):
+            K.text(f"plane{k}.{side}", "SUBPOENA", 0.06, ink, loc=(0.03, 0, z), rot=rot, parent=p)
         p.scale = (2.5, 2.5, 2.5)
         planes.append(p)
     stamps = []
@@ -714,7 +720,7 @@ def animate(S, t0, t1):
         off = Vector((-0.6 * row, side * 0.55 * row, -0.05 * row))
         for f, base in ((A.frame(a), Vector((-7.0, -4.0, 2.3))), (A.frame(b), Vector((4.0, -2.0, 2.6)))):
             p.location = base + off
-            p.rotation_euler = (0.25 * side * (row > 0) * math.sin(f), 0, math.atan2(4.0, 14.0))
+            p.rotation_euler = (0.35 + 0.08 * side * (row > 0) * math.sin(f), 0, math.atan2(4.0, 14.0))  # banked to us
             p.keyframe_insert("location", frame=f)
             p.keyframe_insert("rotation_euler", frame=f)
         for fc in A._fcurve(p, "location", 0), A._fcurve(p, "location", 1), A._fcurve(p, "location", 2):
@@ -788,7 +794,8 @@ CAMERAS = {
     "S52": [(0.0, _v(0.3, -0.15, 1.8), _v(0.0, -4.6, 0.95), 24), (1.0, _v(0.1, -0.3, 1.75), _v(0.0, -4.6, 0.95), 24)],
     "S53": [(0.0, _v(2.08, -2.45, 0.2), _v(1.86, -1.75, 0.17), 30), (1.0, _v(2.03, -2.3, 0.19), _v(1.86, -1.75, 0.17), 32)],
     "S54": [(0.0, _v(1.68, -2.35, 0.22), _v(2.0, -1.6, 0.1), 30), (1.0, _v(1.74, -2.2, 0.2), _v(2.0, -1.6, 0.1), 32)],
-    "S55": [(0.0, _v(1.5, -7.5, 2.0), _v(-1.5, 1.5, 1.6), 24), (1.0, _v(0.5, -7.0, 2.2), _v(-1.0, 1.5, 1.8), 24)],
+    # A little above the formation, so the printed wings face the lens; the stamp arms march in behind.
+    "S55": [(0.0, _v(1.2, -7.6, 3.9), _v(-1.2, 0.0, 1.7), 24), (1.0, _v(0.4, -7.1, 4.0), _v(-0.9, 0.2, 1.8), 24)],
     "S56": [(0.0, _v(1.7, 1.2, 1.8), _v(-0.2, 2.3, 0.5), 30), (1.0, _v(1.5, 1.3, 1.6), _v(-0.2, 2.3, 0.45), 32)],
     "S57": [(0.0, _v(3.0, -7.0, 2.5), _v(0.0, 0.0, 0.8), 30), (1.0, _v(16.0, -24.0, 14.0), _v(0.0, 0.5, 0.0), 30)],
     "S58": [(0.0, _v(-1.9, -1.5, 1.5), _v(-5.4, 0.3, 1.45), 28), (1.0, _v(-2.3, -0.8, 1.5), _v(-5.4, 0.3, 1.45), 28)],

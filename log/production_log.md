@@ -697,3 +697,39 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Re-rendered:** sets A, B and G; invalid drivers after rebind: 0.
 - **Outputs:** `renders/animatic/animatic_v7.mp4`. Superseded: `archive/renders/animatic_v6_superseded_c4-review-6.mp4`.
 - **Why:** Human feedback, R1 (human interventions).
+
+## 2026-10-22T21:07:19-04:00 — C4 animatic v8: the v7 review's notes, and a placeholder audit
+
+- **Human review of v7 (R1)** (human interventions), item by item, with what changed:
+  - **S17, the camera turns towards the notes, framing wrong:**
+    - **The cause:** the corner camera's rig was backwards. At swivel 0 its lens pointed away from the shelf, and the swivel turned it toward the shelf.
+    - **The rig now:** it aims at the shelf's centre at 0 (yaw 1.84 rad) and swings 2.4 rad (about 140°) away at 1.
+    - **The shot now:** over the camera's shoulder, about a metre behind it. It's large in the foreground with the noted drawers behind, and it swings round until its lens faces us on "while you looked the other way".
+    - **Checked:** the camera stays in frame throughout.
+  - **Opera, glare at the back making the stunts hard to read:**
+    - **The glare:** the hall's black was glossy and the brass polished, mirroring the studio lights and reflection cards. The black is now matte and the brass satin (roughness 0.5).
+    - **The stunts:** they read weakly too, so:
+      - off LEDs are fully dark (the 0.015 floor bloomed into the gaps);
+      - the LED gain is 45 (was 30);
+      - the 700 swarm shells are satin metal, not chrome, which sparkled between the LEDs.
+    - **Checked:** `700` and `GO` read in the re-rendered plates.
+  - **S55, airplane text not visible:**
+    - **Before:** the planes had no text and flew at camera height, wings edge-on.
+    - **The planes now:** flat-winged darts with a keel, `SUBPOENA` in red matte ink top and bottom, banked 0.35 rad toward the camera. The paper is off-white (`decal_film`), because paper-white bloomed.
+    - **The camera now:** a little above the formation.
+- **The human's question, placeholders still to flesh out** (reviewed on a frame of every shot against the brief's set descriptions):
+  - **Box stand-ins:**
+    - G: the receipt printer, the stamp arms, the kill-switch tower body, the freezer;
+    - H: the stamp arms, the ribbon dispenser, the security cameras;
+    - A and I: the grader turnstile;
+    - D: the SOC chair and desk;
+    - C: the street's kiosks, mailboxes and lockers, and the launchpad;
+    - E: the modem-guitar and amp;
+    - B: the corner camera.
+  - **Filler:** set A's background slabs.
+  - **Actions in the brief not built:** the subpoenas folding into airplanes; the drawbridge chain as the slide. The egress gate's bouncing pellets are to be checked.
+  - **The overlay layer (C6), not started:** HUD, styled captions with role names, the S13 counter, fact card, end card.
+  - Proposed for C5, set by set, before each full-quality render.
+- **Re-rendered:** sets B, G and H; invalid drivers after rebind: 0.
+- **Outputs:** `renders/animatic/animatic_v8.mp4`. Superseded: `archive/renders/animatic_v7_superseded_c4-review-7.mp4`.
+- **Why:** Human feedback, R1 (human interventions).

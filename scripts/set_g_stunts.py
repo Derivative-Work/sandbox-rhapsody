@@ -79,8 +79,8 @@ def stunt_frames(f0, f1):
             cache[s] = _text_bitmap(s)
         return cache[s]
 
-    def lit(s):
-        return 0.015 + 0.985 * txt(s)
+    def lit(s):  # off is fully dark: a faint floor bloomed into the gaps and blurred the letters (C4 v7)
+        return txt(s)
 
     for f in range(f0, f1 + 1):
         t = f / A.FPS
