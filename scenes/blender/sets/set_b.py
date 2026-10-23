@@ -191,6 +191,8 @@ def build():
     for k in range(8):
         _inst(f"work_light{k}", lamp_me, None, (-10.5 + k * 3.0, -1.7, 3.3), (2.2, 0.08, 0.04))
         _inst(f"work_hood{k}", frame_me, None, (-10.5 + k * 3.0, -1.7, 3.34), (2.3, 0.18, 0.03))
+        for sx in (-1, 1):  # hung from the dark on two wires
+            _inst(f"work_wire{k}{sx}", frame_me, None, (-10.5 + k * 3.0 + sx * 0.95, -1.7, 4.36), (0.008, 0.008, 2.0))
     out["work_lights"] = lights
 
     # The phone on a bracket at the piano shelf's right end.
@@ -214,19 +216,16 @@ def build():
     # The security camera, high in the corner. At "swivel" 0 its lens (local -Y) aims at the piano shelf's centre;
     # at 1 it has swung about 140 degrees away from the shelf (it used to start facing away and swing toward it,
     # human, C4 v7).
-    cam = K.empty("sec_cam_b", (-2.9, -0.8, 2.75))
+    # The kit's CCTV camera (C5): its pan head sits where the grey-box one turned (-2.9, -0.8, 2.75), hung from a
+    # wall plate on a chrome bracket; it tilts down toward the drawers.
+    cam, yaw, tilt = K.security_camera("sec_cam_b", (-2.9, -0.8, 2.75 + 0.17 * 1.15), scale=1.15)
     K.prop(cam, "swivel", 0.0)
-    K.mesh_obj("sec_cam_b.bracket", bpy.ops.mesh.primitive_cylinder_add, frame_m, cam, radius=0.02, depth=0.3,
+    K.mesh_obj("sec_cam_b.bracket", bpy.ops.mesh.primitive_cylinder_add, frame_m, cam, radius=0.022, depth=0.3,
                location=(0, 0, 0.15))
-    yaw = K.empty("sec_cam_b.yaw", (0, 0, 0), cam)
+    K.mesh_obj("sec_cam_b.plate", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("seccam_plate", "lab_dark", 0.3),
+               cam, size=1, location=(0, 0, 0.31)).scale = (0.16, 0.16, 0.025)
     _drive_vars(yaw, "rotation_euler", 2, {"x": (cam, "swivel")}, "1.84 - 2.4 * x")
-    body = K.mesh_obj("sec_cam_b.body", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("seccam_b", "lab", 0.2), yaw,
-                      size=1, location=(0, -0.12, -0.05))
-    body.scale = (0.14, 0.32, 0.14)
-    K.mesh_obj("sec_cam_b.lens", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("seccam_lens", "lens", 0.02), yaw,
-               radius=0.05, depth=0.03, location=(0, -0.29, -0.05), rotation=(math.pi / 2, 0, 0))
-    K.mesh_obj("sec_cam_b.tally", bpy.ops.mesh.primitive_uv_sphere_add, K.mat_emission("tally", "alarm", 30.0), yaw,
-               radius=0.012, location=(0.05, -0.28, 0.0))
+    tilt.rotation_euler = (0.2, 0, 0)  # lens (local -Y) pitched a little down toward the shelf
     out["sec_cam"] = cam
 
     # The lead probe (arrives through the tube in S11) and three probes pinning notes (S16).

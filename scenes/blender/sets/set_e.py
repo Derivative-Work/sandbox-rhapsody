@@ -1,4 +1,4 @@
-"""Set E, the Backbone (brief, "Sets → E"; guitar solo, first half). Grey-box for the C4 animatic.
+"""Set E, the Backbone (brief, "Sets → E"; guitar solo, first half). C5: modelled.
 
 Contents, as the brief lists them:
 - the internet as a glowing wireframe map on the mirror floor: a violet grid, magenta route nodes;
@@ -13,7 +13,7 @@ Deterministic: placement is arithmetic, never random.
 import math
 
 import bpy
-from mathutils import Vector
+from mathutils import Euler, Vector
 
 import sr_anim as A
 import sr_kit as K
@@ -91,6 +91,134 @@ def _curve(name, pts, bevel, mat, poly=False):
     return o
 
 
+def _bx(name, mat, parent, loc, size, bev=0.0, rot=(0, 0, 0)):
+    o = K.mesh_obj(name, bpy.ops.mesh.primitive_cube_add, mat, parent, size=1, location=loc, rotation=rot)
+    o.scale = size
+    if bev:
+        K.bevel(o, bev)
+    return o
+
+
+def _cy(name, mat, parent, loc, r, depth, rot=(0, 0, 0), verts=24):
+    o = K.mesh_obj(name, bpy.ops.mesh.primitive_cylinder_add, mat, parent, radius=r, depth=depth, vertices=verts,
+                   location=loc, rotation=rot)
+    K.smooth(o)
+    return o
+
+
+def _modem_guitar(gt):
+    """The modem guitar: a bevelled modem body (glossy black top inset, a vent grille, side vents, rear ports, a
+    status-LED strip that lights on each string's pluck, two hinged antennas with ball tips) that is also a guitar
+    (two chrome pickups with pole pieces, volume and tone knobs, bridge); a neck with a rounded back, fret inlays,
+    a nut with fiber ferrules where the strings leave as routes, and a headstock with six tuning pegs."""
+    body_m = K.mat_plastic("modem", "lab_dark", 0.15)
+    gloss = K.mat_plastic("modem_gloss", "shadow", 0.05)
+    slot = K.mat_plastic("modem_slot", "shadow", 0.6)
+    chrome = K.mat_chrome("modem_chrome")
+    body = _bx("modem.body", body_m, gt, (0, -0.05, 0.05), (0.5, 0.3, 0.1), bev=0.02)
+    _bx("modem.inset", gloss, gt, (-0.03, -0.05, 0.1005), (0.36, 0.24, 0.002), bev=0.004)
+    for k in range(7):  # the vent grille, top right, behind the knobs
+        _bx(f"modem.vent{k}", slot, gt, (0.19, -0.035 + 0.018 * k, 0.1008), (0.07, 0.008, 0.002))
+    for sx in (-1, 1):
+        for k in range(5):  # side vents
+            _bx(f"modem.side_vent{sx}_{k}", slot, gt, (sx * 0.2505, -0.13 + 0.04 * k, 0.05), (0.002, 0.022, 0.05))
+        # rear ports, either side of the neck
+        _bx(f"modem.port{sx}", slot, gt, (sx * 0.16, 0.1005, 0.045), (0.05, 0.004, 0.028))
+        _bx(f"modem.port_rim{sx}", chrome, gt, (sx * 0.16, 0.1002, 0.045), (0.058, 0.002, 0.036))
+    _bx("modem.led_strip", gloss, gt, (0, -0.2002, 0.07), (0.3, 0.002, 0.026), bev=0.002)
+    for k in range(6):  # front status LEDs, lit by the strum
+        K.prop(gt, f"pluck{k}", 0.0)
+        K.mesh_obj(f"modem.led{k}", bpy.ops.mesh.primitive_uv_sphere_add,
+                   K.mat_emission(f"modem.led{k}", "amber", 30.0, gt, f"pluck{k}"), gt, radius=0.008,
+                   location=(-0.12 + 0.048 * k, -0.201, 0.07))
+    for sx in (-1, 1):  # antennas on hinge knuckles, with ball tips
+        rot = Euler((-0.2, sx * 0.25, 0))
+        mid = Vector((sx * 0.21, 0.07, 0.22))
+        axis = rot.to_matrix() @ Vector((0, 0, 0.14))
+        _cy(f"modem.antenna{sx}", K.mat_plastic("antenna", "lab_dark", 0.2), gt, mid, 0.011, 0.28, rot=rot)
+        K.mesh_obj(f"modem.knuckle{sx}", bpy.ops.mesh.primitive_uv_sphere_add, chrome, gt, radius=0.02,
+                   location=mid - axis)
+        K.mesh_obj(f"modem.tip{sx}", bpy.ops.mesh.primitive_uv_sphere_add, chrome, gt, radius=0.014,
+                   location=mid + axis)
+    for k, y in enumerate((0.012, 0.062)):  # pickups under the strings, a pole piece per string
+        _bx(f"modem.pickup{k}", gloss, gt, (0, y, 0.104), (0.14, 0.028, 0.01), bev=0.004)
+        for st in range(STRINGS):
+            K.mesh_obj(f"modem.pole{k}_{st}", bpy.ops.mesh.primitive_cylinder_add, chrome, gt, radius=0.004,
+                       depth=0.003, location=(string_x(st), y, 0.1095))
+    for k, y in enumerate((-0.16, -0.1)):  # volume and tone
+        _cy(f"modem.knob{k}", chrome, gt, (0.19, y, 0.112), 0.018, 0.024, verts=32)
+    # The neck: a rounded back, fret inlays, the nut with a ferrule per fiber, a headstock with six pegs.
+    neck = _bx("modem.neck", K.mat_plastic("neck", "lab_dark", 0.2), gt, (0, 0.6, 0.085), (0.13, 0.95, 0.03),
+               bev=0.006)
+    back = _cy("modem.neck_back", K.mat_plastic("neck_back", "lab_dark", 0.2), gt, (0, 0.6, 0.074), 0.064, 0.93,
+               rot=(math.pi / 2, 0, 0))
+    back.scale = (1.0, 0.3, 1.0)
+    pearl = K.mat_plastic("inlay", "paper", 0.1)
+    for k in (1, 3, 5):
+        K.mesh_obj(f"modem.inlay{k}", bpy.ops.mesh.primitive_cylinder_add, pearl, gt, radius=0.008, depth=0.002,
+                   vertices=20, location=(0, 0.22 + 0.105 * k + 0.0525, 0.1003))
+    K.mesh_obj("modem.nut", bpy.ops.mesh.primitive_cube_add, K.mat_chrome("nut"), gt, size=1,
+               location=(0, NUT_Y, 0.108)).scale = (0.13, 0.015, 0.02)
+    for st in range(STRINGS):
+        K.mesh_obj(f"modem.ferrule{st}", bpy.ops.mesh.primitive_cylinder_add, chrome, gt, radius=0.0045,
+                   depth=0.022, vertices=12, location=(string_x(st), NUT_Y + 0.012, STRING_Z),
+                   rotation=(math.pi / 2, 0, 0))
+    _bx("modem.headstock", K.mat_plastic("headstock", "lab_dark", 0.15), gt, (0, NUT_Y + 0.13, 0.082),
+        (0.17, 0.22, 0.024), bev=0.01)
+    for sx in (-1, 1):
+        for k in range(3):
+            y = NUT_Y + 0.07 + 0.06 * k
+            _cy(f"modem.peg_post{sx}_{k}", chrome, gt, (sx * 0.06, y, 0.1), 0.006, 0.02, verts=12)
+            _cy(f"modem.peg_shaft{sx}_{k}", chrome, gt, (sx * 0.1, y, 0.082), 0.004, 0.04, rot=(0, math.pi / 2, 0),
+                verts=12)
+            key = K.mesh_obj(f"modem.peg_key{sx}_{k}", bpy.ops.mesh.primitive_uv_sphere_add, chrome, gt,
+                             radius=0.016, location=(sx * 0.128, y, 0.082))
+            key.scale = (0.35, 1.0, 0.7)
+    K.mesh_obj("modem.bridge", bpy.ops.mesh.primitive_cube_add, K.mat_chrome("bridge"), gt, size=1,
+               location=(0, BRIDGE_Y, 0.108)).scale = (0.13, 0.02, 0.02)
+
+
+def _amp():
+    """The amp: an open server rack (chrome corner rails with holes, top and bottom plates, smoked acrylic sides)
+    holding five 1U units with rack ears, drive bays and a row of status lights each (lit by "pump", the guitar
+    stem), over a speaker module whose cone pumps."""
+    amp = K.empty("amp", (0.85, 0.35, 0))
+    amp.rotation_euler = (0, 0, math.radians(-25))
+    K.prop(amp, "pump", 0.0)
+    dark = K.mat_plastic("amp", "lab_dark", 0.2)
+    chrome = K.mat_chrome("amp_chrome")
+    slot = K.mat_plastic("amp_slot", "shadow", 0.5)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            _bx(f"amp.rail{sx}{sy}", chrome, amp, (sx * 0.145, sy * 0.115, 0.3), (0.022, 0.022, 0.58), bev=0.003)
+        for k in range(14):  # rail holes on the front rails
+            _bx(f"amp.hole{sx}_{k}", slot, amp, (sx * 0.145, -0.1265, 0.06 + 0.038 * k), (0.008, 0.002, 0.008))
+        _bx(f"amp.side{sx}", K.mat_acrylic("amp_side", "lab_glow", alpha=0.25, emit=0.1), amp,
+            (sx * 0.158, 0, 0.3), (0.004, 0.23, 0.56))
+    for z in (0.012, 0.588):
+        _bx(f"amp.plate{z}", dark, amp, (0, 0, z), (0.32, 0.26, 0.024), bev=0.006)
+    led = K.mat_emission("amp.leds", "lab_glow", 20.0, amp, "pump")
+    for rr in range(5):
+        z = 0.38 + 0.042 * rr
+        _bx(f"amp.unit{rr}", dark, amp, (0, -0.005, z), (0.27, 0.24, 0.036), bev=0.004)
+        for sx in (-1, 1):
+            _bx(f"amp.ear{rr}{sx}", chrome, amp, (sx * 0.14, -0.126, z), (0.014, 0.004, 0.03))
+        for c in range(6):
+            K.mesh_obj(f"amp.led{rr}_{c}", bpy.ops.mesh.primitive_cube_add, led, amp, size=1,
+                       location=(-0.1 + 0.04 * c, -0.131, z)).scale = (0.022, 0.004, 0.012)
+    _bx("amp.speaker", dark, amp, (0, -0.005, 0.19), (0.27, 0.24, 0.29), bev=0.006)
+    _bx("amp.baffle", slot, amp, (0, -0.126, 0.19), (0.25, 0.003, 0.26), bev=0.004)
+    cone = K.empty("amp.cone_root", (0, -0.131, 0.18), amp)
+    K.drive(cone, "scale", 1, amp, "pump", "1 + 3 * x")
+    K.mesh_obj("amp.cone", bpy.ops.mesh.primitive_cone_add, K.mat_plastic("cone", "shadow", 0.5), cone, radius1=0.1,
+               radius2=0.03, depth=0.03, location=(0, -0.012, 0), rotation=(math.pi / 2, 0, 0))
+    K.mesh_obj("amp.dustcap", bpy.ops.mesh.primitive_uv_sphere_add, chrome, cone, radius=0.03,
+               location=(0, -0.026, 0)).scale = (1, 0.4, 1)
+    K.mesh_obj("amp.surround", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("surround"), amp, major_radius=0.105,
+               minor_radius=0.008, location=(0, -0.132, 0.18), rotation=(math.pi / 2, 0, 0))
+    return amp
+
+
 def build():
     K.floor()
     K.star_dome()
@@ -114,26 +242,7 @@ def build():
     # The modem guitar: a dark modem body (status LEDs, two antennas) with a neck; six fiber strings.
     gt = K.empty("guitar", (0, 0, 0))
     out["guitar"] = gt
-    body = K.mesh_obj("modem.body", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("modem", "lab_dark", 0.15), gt,
-                      size=1, location=(0, -0.05, 0.05))
-    body.scale = (0.5, 0.3, 0.1)
-    K.bevel(body, 0.02)
-    for k in range(6):  # front status LEDs, lit by the strum
-        K.prop(gt, f"pluck{k}", 0.0)
-        K.mesh_obj(f"modem.led{k}", bpy.ops.mesh.primitive_uv_sphere_add,
-                   K.mat_emission(f"modem.led{k}", "amber", 30.0, gt, f"pluck{k}"), gt, radius=0.008,
-                   location=(-0.12 + 0.048 * k, -0.201, 0.07))
-    for sx in (-1, 1):
-        K.mesh_obj(f"modem.antenna{sx}", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("antenna", "lab_dark", 0.2),
-                   gt, radius=0.008, depth=0.28, location=(sx * 0.21, 0.07, 0.22), rotation=(-0.2, sx * 0.25, 0))
-    neck = K.mesh_obj("modem.neck", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("neck", "lab_dark", 0.2), gt,
-                      size=1, location=(0, 0.6, 0.085))
-    neck.scale = (0.13, 0.95, 0.03)
-    K.bevel(neck, 0.006)
-    K.mesh_obj("modem.nut", bpy.ops.mesh.primitive_cube_add, K.mat_chrome("nut"), gt, size=1,
-               location=(0, NUT_Y, 0.108)).scale = (0.13, 0.015, 0.02)
-    K.mesh_obj("modem.bridge", bpy.ops.mesh.primitive_cube_add, K.mat_chrome("bridge"), gt, size=1,
-               location=(0, BRIDGE_Y, 0.108)).scale = (0.13, 0.02, 0.02)
+    _modem_guitar(gt)
     # Frets with handshake lights: one LED per fret on the neck's edge.
     for k in range(8):
         y = 0.22 + 0.105 * k
@@ -185,25 +294,7 @@ def build():
         r.scale = (0.08, 0.08, 0.5)
 
     # The amp: a server rack beside the guitar, LEDs and a speaker cone pumping with the guitar stem.
-    amp = K.empty("amp", (0.85, 0.35, 0))
-    amp.rotation_euler = (0, 0, math.radians(-25))
-    K.prop(amp, "pump", 0.0)
-    rack = K.mesh_obj("amp.rack", bpy.ops.mesh.primitive_cube_add, K.mat_plastic("amp", "lab_dark", 0.2), amp, size=1,
-                      location=(0, 0, 0.3))
-    rack.scale = (0.32, 0.26, 0.6)
-    K.bevel(rack, 0.01)
-    led = K.mat_emission("amp.leds", "lab_glow", 20.0, amp, "pump")
-    for rr in range(5):
-        for c in range(6):
-            K.mesh_obj(f"amp.led{rr}_{c}", bpy.ops.mesh.primitive_cube_add, led, amp, size=1,
-                       location=(-0.1 + 0.04 * c, -0.131, 0.38 + 0.042 * rr)).scale = (0.022, 0.004, 0.012)
-    cone = K.empty("amp.cone_root", (0, -0.131, 0.18), amp)
-    K.drive(cone, "scale", 1, amp, "pump", "1 + 3 * x")
-    K.mesh_obj("amp.cone", bpy.ops.mesh.primitive_cone_add, K.mat_plastic("cone", "shadow", 0.5), cone, radius1=0.1,
-               radius2=0.03, depth=0.03, location=(0, -0.012, 0), rotation=(math.pi / 2, 0, 0))
-    K.mesh_obj("amp.surround", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("surround"), amp, major_radius=0.105,
-               minor_radius=0.008, location=(0, -0.132, 0.18), rotation=(math.pi / 2, 0, 0))
-    out["amp"] = amp
+    out["amp"] = _amp()
 
     # The lead probe on the modem, by the strings; the bass floor ring around the guitar.
     out["lead"] = K.probe("lead", (-0.17, -0.12, 0.1 + K.PROBE_R * 1.6), led=0.6, scale=1.6)

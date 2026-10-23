@@ -78,6 +78,220 @@ def _box(name, mat, loc, size, parent=None, bev=0.0):
     return o
 
 
+
+def _cyl(name, mat, parent, loc, r, depth, rot=(0, 0, 0), verts=32, smooth=True):
+    o = K.mesh_obj(name, bpy.ops.mesh.primitive_cylinder_add, mat, parent, radius=r, depth=depth, vertices=verts,
+                   location=loc, rotation=rot)
+    if smooth:
+        K.smooth(o)
+    return o
+
+
+def _printer_body(pr, brass):
+    """The printer's housing and mechanism (names kept: printer.slot, printer.head_light, printer.label)."""
+    case = K.mat_plastic("printer_body", "lab", 0.3)
+    dark = K.mat_plastic("printer_dark", "lab_dark", 0.35)
+    chrome = K.mat_chrome("printer_chrome")
+    _box("printer.body", case, (0, 0, 0.21), (1.3, 0.7, 0.42), pr, bev=0.04)
+    _box("printer.rear", case, (0, 0.2, 0.5), (1.3, 0.3, 0.2), pr, bev=0.03)  # the raised rear deck
+    for sx in (-1, 1):  # side cheeks round the platen, with its knobs
+        _box(f"printer.cheek{sx}", case, (sx * 0.6, -0.05, 0.5), (0.1, 0.4, 0.2), pr, bev=0.02)
+        _cyl(f"printer.knob{sx}", dark, pr, (sx * 0.69, -0.05, 0.5), 0.07, 0.06, rot=(0, math.pi / 2, 0))
+        for k in range(4):  # side vents
+            _box(f"printer.vent{sx}{k}", dark, (sx * 0.651, 0.0, 0.1 + 0.07 * k), (0.004, 0.45, 0.025), pr)
+    _cyl("printer.platen", K.mat_plastic("platen", "shadow", 0.5), pr, (0, -0.05, 0.47), 0.07, 1.1,
+         rot=(0, math.pi / 2, 0))
+    for z in (0.56, 0.6):  # the carriage's rails, and the carriage shuttling across on each feed step
+        _cyl(f"printer.rail{z}", chrome, pr, (0, 0.06, z), 0.008, 1.12, rot=(0, math.pi / 2, 0), verts=12)
+    car = K.empty("printer.carriage", (0, 0.06, 0.58), pr)
+    K.drive(car, "location", 0, pr, "feed", "0.42 * sin(1.5708 * x)")
+    _box("printer.carriage.body", dark, (0, -0.02, 0.0), (0.16, 0.1, 0.09), car, bev=0.01)
+    _box("printer.carriage.head", chrome, (0, -0.085, -0.04), (0.06, 0.04, 0.05), car, bev=0.005)
+    _box("printer.lid", K.mat_acrylic("printer_lid", "lab_dark", alpha=0.35), (0, -0.07, 0.66), (1.1, 0.42, 0.012),
+         pr).rotation_euler = (0.2, 0, 0)
+    _box("printer.slot", K.mat_plastic("printer_slot", "shadow", 0.6), (0, -0.352, 0.03), (1.0, 0.01, 0.03), pr)
+    _box("printer.lip", chrome, (0, -0.37, 0.012), (1.04, 0.05, 0.008), pr)
+    for sx in (-1, 1):  # tractor sprockets at the slot, turning with the feed
+        sp = K.empty(f"printer.sprocket{sx}", (sx * 0.47, -0.37, 0.035), pr)
+        K.drive(sp, "rotation_euler", 0, pr, "feed", f"{-FEED / 0.035:.3f} * x")
+        _cyl(f"printer.sprocket{sx}.wheel", chrome, sp, (0, 0, 0), 0.03, 0.025, rot=(0, math.pi / 2, 0))
+        for k in range(8):
+            a = k * math.tau / 8
+            _cyl(f"printer.sprocket{sx}.pin{k}", dark, sp, (0, math.sin(a) * 0.034, math.cos(a) * 0.034), 0.005,
+                 0.012, rot=(0, math.pi / 2, 0), verts=8, smooth=False)
+    _box("printer.head_light", K.mat_emission("printer_light", "amber", 30.0, pr, "flash"), (0, -0.353, 0.36),
+         (1.0, 0.01, 0.025), pr)
+    _box("printer.label_plate", brass, (0, -0.352, 0.2), (0.5, 0.008, 0.12), pr, bev=0.004)
+    K.text("printer.label", "PLATFORM", 0.08, K.mat_ink("printer_ink", "shadow"), loc=(0, -0.358, 0.2),
+           parent=pr)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            _cyl(f"printer.foot{sx}{sy}", dark, pr, (sx * 0.58, sy * 0.28, 0.008), 0.04, 0.016, verts=16)
+    # The fan-fold supply behind, feeding up over the rear deck.
+    _box("printer.supply_box", K.mat_plastic("supply_box", "lab_dark", 0.4), (0, 0.65, 0.12), (1.05, 0.4, 0.24), pr,
+         bev=0.01)
+    _fanfold("printer.supply", K.mat_matte("supply_paper", "paper"), (0, 0.65, 0.24), folds=6, parent=pr,
+             size=(0.95, 0.34))
+    _box("printer.feed_in", K.mat_matte("feed_paper", "paper"), (0, 0.48, 0.43), (0.95, 0.004, 0.4), pr
+         ).rotation_euler = (-0.35, 0, 0)
+
+
+def _stamp_arm(k, root, pz, L, hh, stamp_ink, brass):
+    """One Auditor: a turret base behind the table, a shoulder knuckle at `stamp{k}.pivot` (the "strike" driver turns
+    it), an upper arm with its hydraulic piston, an elbow, a forearm down to the wrist, and the rubber stamp: a handle
+    block over a bevelled mount and the inked rubber (head, rubber at the same place as before)."""
+    white = K.mat_plastic("auditor_white", "paper", 0.2)
+    chrome = K.mat_chrome("auditor_chrome")
+    dark = K.mat_plastic("stamp_head", "lab_dark", 0.3)
+    _cyl(f"stamp{k}.base", white, root, (0, 0.75, 0.03), 0.09, 0.06)
+    _cyl(f"stamp{k}.post", chrome, root, (0, 0.75, (pz - 0.02) / 2 + 0.03), 0.028, pz - 0.05)
+    _box(f"stamp{k}.yoke", white, (0, 0.75, pz - 0.035), (0.11, 0.07, 0.07), root, bev=0.012)
+    pivot = K.empty(f"stamp{k}.pivot", (0, 0.75, pz), root)
+    K.drive(pivot, "rotation_euler", 0, root, "strike", "-(0.698 - 0.698 * max(x, 0) - 0.524 * min(x, 0))")
+    _cyl(f"stamp{k}.shoulder", chrome, pivot, (0, 0, 0), 0.04, 0.13, rot=(0, math.pi / 2, 0))
+    ub = 0.6 * L  # the elbow, out along the arm and a little up
+    up = _box(f"stamp{k}.upper", white, (0, -ub / 2, 0.035), (0.07, ub, 0.05), pivot, bev=0.015)
+    up.rotation_euler = (0.08, 0, 0)
+    _cyl(f"stamp{k}.piston", chrome, pivot, (0, -ub * 0.45, -0.015), 0.012, ub * 0.7, rot=(math.pi / 2, 0, 0),
+         verts=16)
+    _cyl(f"stamp{k}.piston_body", K.mat_plastic("auditor_dark", "lab_dark", 0.25), pivot, (0, -ub * 0.25, -0.015),
+         0.02, ub * 0.4, rot=(math.pi / 2, 0, 0), verts=16)
+    _cyl(f"stamp{k}.elbow", chrome, pivot, (0, -ub, 0.06), 0.034, 0.1, rot=(0, math.pi / 2, 0))
+    fl = L - ub  # forearm: elbow to wrist above the stamp
+    fore = _box(f"stamp{k}.fore", white, (0, -ub - fl / 2, 0.035), (0.06, fl + 0.02, 0.045), pivot, bev=0.012)
+    fore.rotation_euler = (-0.12, 0, 0)
+    _cyl(f"stamp{k}.wrist", chrome, pivot, (0, -L, 0.02), 0.03, 0.05)
+    _box(f"stamp{k}.handle", K.mat_plastic("stamp_handle", "copper", 0.35), (0, -L, -0.01), (0.12, 0.08, 0.04),
+         pivot, bev=0.012)
+    _box(f"stamp{k}.head", dark, (0, -L, -hh / 2 - 0.01), (0.3, 0.13, hh - 0.02), pivot, bev=0.01)
+    _box(f"stamp{k}.rubber", stamp_ink, (0, -L, -hh + 0.006), (0.29, 0.12, 0.012), pivot)
+
+def _cold_storage(black, brass):
+    """The conveyor (x 0.45-2.45 along y -1.4, belt top 0.166), the freezer cabinet (x 2.5-3.4) with a round doorway
+    recessed into its -X face, and the vault door on `vault_hinge` (keyed in animate())."""
+    chrome = K.mat_chrome("cold_chrome")
+    belt_m = K.mat_plastic("belt", "lab_dark", 0.6)
+    _box("conveyor", black, (1.45, -1.4, 0.07), (2.0, 0.26, 0.06), bev=0.01)
+    _box("conveyor.belt", belt_m, (1.45, -1.4, 0.163), (2.0, 0.26, 0.006))
+    for k in range(20):  # belt slats
+        _box(f"conveyor.slat{k}", black, (0.5 + 0.1 * k, -1.4, 0.1665), (0.012, 0.25, 0.002))
+    for sy in (-1, 1):
+        _box(f"conveyor.rail{sy}", chrome, (1.45, -1.4 + sy * 0.15, 0.18), (2.04, 0.02, 0.04), bev=0.006)
+        for k in range(5):
+            _box(f"conveyor.leg{sy}{k}", chrome, (0.5 + 0.475 * k, -1.4 + sy * 0.12, 0.05), (0.03, 0.03, 0.1))
+    for x in (0.45, 2.45):  # end rollers
+        _cyl(f"conveyor.roller{x}", chrome, None, (x, -1.4, 0.12), 0.045, 0.28, rot=(math.pi / 2, 0, 0))
+    # The freezer cabinet: insulated white panels, seams, a fan unit on top, and the doorway: a recess that glows ice.
+    cab_m = K.mat_plastic("freezer_body", "lab", 0.3)
+    cab = _box("freezer", cab_m, (2.95, -1.4, 0.45), (0.9, 0.9, 0.9), bev=0.03)
+    cutter = _cyl("freezer.doorway", K.mat_emission("freezer_ice", "rim", 2.0), None, (2.6, -1.4, 0.42), 0.27, 0.4,
+                  rot=(0, math.pi / 2, 0), verts=48)
+    cutter.hide_render = cutter.hide_viewport = True
+    bo = cab.modifiers.new("doorway", "BOOLEAN")
+    bo.object, bo.operation, bo.solver = cutter, "DIFFERENCE", "EXACT"
+    bo.material_mode = "TRANSFER"
+    cab.modifiers.move(cab.modifiers.find("doorway"), 0)
+    seam = K.mat_plastic("freezer_seam", "lab_dark", 0.4)
+    for z in (0.3, 0.6):
+        _box(f"freezer.seam_y{z}", seam, (2.95, -1.853, z), (0.86, 0.004, 0.008))
+        _box(f"freezer.seam_x{z}", seam, (3.403, -1.4, z), (0.004, 0.86, 0.008))
+    K.mesh_obj("freezer.frame", bpy.ops.mesh.primitive_torus_add, chrome, None, major_radius=0.3, minor_radius=0.025,
+               location=(2.495, -1.4, 0.42), rotation=(0, math.pi / 2, 0))
+    _box("freezer.unit", K.mat_plastic("freezer_unit", "lab_dark", 0.35), (3.0, -1.4, 0.98), (0.6, 0.5, 0.16), bev=0.02)
+    fan = K.empty("freezer.fan", (3.0, -1.4, 1.065))
+    K.mesh_obj("freezer.fan_ring", bpy.ops.mesh.primitive_torus_add, chrome, fan, major_radius=0.15,
+               minor_radius=0.012)
+    for k in range(5):
+        bl = _box(f"freezer.blade{k}", chrome, (0, 0, 0), (0.13, 0.04, 0.006), fan)
+        bl.location = (math.cos(k * math.tau / 5) * 0.07, math.sin(k * math.tau / 5) * 0.07, 0)
+        bl.rotation_euler = (0.4, 0, k * math.tau / 5)
+    _box("freezer.label_plate", K.mat_matte("freezer_plate", "paper"), (2.95, -1.853, 0.8), (0.62, 0.006, 0.13))
+    K.text("freezer.label", "COLD STORAGE", 0.09, K.mat_ink("freezer_ink", "shadow"),
+           loc=(2.95, -1.857, 0.8), parent=None).data.offset = 0.002
+    for k in range(6):  # frost along the top edges
+        fr = K.mesh_obj(f"freezer.frost{k}", bpy.ops.mesh.primitive_uv_sphere_add,
+                        K.mat_acrylic("frost", "glass", alpha=0.6, emit=0.3), None, radius=0.07, segments=12,
+                        ring_count=6, location=(2.55 + 0.17 * k, -1.85, 0.9))
+        fr.scale = (1.2, 0.5, 0.35)
+    # The vault door, on its hinge at the doorway's -Y edge; the slab faces -X when shut.
+    door_hinge = K.empty("vault_hinge", (2.49, -1.4 - 0.3, 0.42))  # doorway centre 0.42: clear of the riders
+    vault = K.mat_metal("vault", "chrome", 0.2)
+    _cyl("vault_door", vault, door_hinge, (0, 0.3, 0), 0.3, 0.07, rot=(0, math.pi / 2, 0), verts=64)
+    K.mesh_obj("vault_rim", bpy.ops.mesh.primitive_torus_add, chrome, door_hinge, major_radius=0.29,
+               minor_radius=0.02, location=(-0.035, 0.3, 0), rotation=(0, math.pi / 2, 0))
+    for k in range(8):  # locking bolts round the rim
+        a = k * math.tau / 8
+        _cyl(f"vault_bolt{k}", chrome, door_hinge, (0, 0.3 + math.cos(a) * 0.3, math.sin(a) * 0.3), 0.016, 0.06,
+             rot=(a - math.pi / 2, 0, 0), verts=12)
+    K.mesh_obj("vault_wheel", bpy.ops.mesh.primitive_torus_add, brass, door_hinge, major_radius=0.12,
+               minor_radius=0.015, location=(-0.06, 0.3, 0), rotation=(0, math.pi / 2, 0))
+    _cyl("vault_hub", brass, door_hinge, (-0.05, 0.3, 0), 0.03, 0.04, rot=(0, math.pi / 2, 0))
+    for k in range(3):
+        sp = _box(f"vault_spoke{k}", brass, (-0.055, 0.3, 0), (0.012, 0.24, 0.016), door_hinge)
+        sp.rotation_euler = (k * math.pi / 3, 0, 0)
+    for z in (-0.18, 0.18):
+        _cyl(f"vault_knuckle{z}", chrome, door_hinge, (0, 0, z), 0.025, 0.1, verts=16)
+
+def _mat_tractor_paper(mover):
+    """Continuous paper with tractor holes and perforation lines down both margins, procedural, in the coordinates
+    of the empty that carries the leading edge (so the holes ride out with the paper as it stretches)."""
+    m = bpy.data.materials.new("paper")
+    m.use_nodes = True
+    nt = m.node_tree
+    b = nt.nodes["Principled BSDF"]
+    b.inputs["Base Color"].default_value = K.col("paper")
+    b.inputs["Roughness"].default_value = 0.9
+    b.inputs["Specular IOR Level"].default_value = 0.0
+    tc = nt.nodes.new("ShaderNodeTexCoord")
+    tc.object = mover
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    nt.links.new(tc.outputs["Object"], sep.inputs[0])
+
+    def math_node(op, a, bv=None):
+        n = nt.nodes.new("ShaderNodeMath")
+        n.operation = op
+        for i, v in enumerate((a, bv)):
+            if v is None:
+                continue
+            if isinstance(v, float):
+                n.inputs[i].default_value = v
+            else:
+                nt.links.new(v, n.inputs[i])
+        return n.outputs[0]
+
+    ax = math_node("SUBTRACT", math_node("ABSOLUTE", sep.outputs["X"]), 0.43)
+    fy = math_node("SUBTRACT", math_node("FRACT", math_node("DIVIDE", sep.outputs["Y"], 0.05)), 0.5)
+    by = math_node("MULTIPLY", fy, 0.05)
+    d = math_node("SQRT", math_node("ADD", math_node("MULTIPLY", ax, ax), math_node("MULTIPLY", by, by)))
+    hole = math_node("LESS_THAN", d, 0.011)
+    perf = math_node("LESS_THAN", math_node("ABSOLUTE", math_node("SUBTRACT", math_node("ABSOLUTE", sep.outputs["X"]),
+                                                                  0.395)), 0.0015)
+    dark = math_node("MAXIMUM", hole, math_node("MULTIPLY", perf, 0.5))
+    mix = nt.nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.inputs["A"].default_value = K.col("paper")
+    mix.inputs["B"].default_value = K.col("shadow")
+    nt.links.new(dark, mix.inputs["Factor"])
+    nt.links.new(mix.outputs["Result"], b.inputs["Base Color"])
+    return m
+
+
+def _fanfold(name, mat, loc, folds=4, parent=None, size=(0.3, 0.2)):
+    """A stack of fan-folded paper: one zigzag strip, `folds` panels, a few millimetres between layers."""
+    w, l = size
+    bm = bmesh.new()
+    rows = []
+    for i in range(folds + 1):
+        y = 0.0 if i % 2 == 0 else l
+        rows.append([bm.verts.new((sx * w / 2, y - l / 2, 0.006 * i)) for sx in (-1, 1)])
+    for i in range(folds):
+        bm.faces.new((rows[i][0], rows[i][1], rows[i + 1][1], rows[i + 1][0]))
+    o = _mesh_from(name, bm, mat)
+    o.location = loc
+    if parent:
+        o.parent = parent
+    return o
+
 def _mat_led_sequence(name, first, count):
     """Emission whose strength per LED is a texel of the stunt image sequence (closest texel, by the LED's UV)."""
     m = bpy.data.materials.new(name)
@@ -219,8 +433,26 @@ def build():
     tower.rotation_euler = (0, 0, math.radians(18))
     # Body in the lab's dark grey under its own key light (C4 v2, "completely black": see sr_kit.rebind_drivers),
     # a lit label plate, brass bezels round each button.
-    _box("kill_tower.body", K.mat_plastic("kill_body", "lab_dark", 0.35), (0, 0, 0.8), (0.8, 0.4, 1.6), tower, bev=0.02)
+    # A plinth, brass corner pilasters and a stepped cornice (Congress's brass), a beacon dome on top lit with the
+    # presses (its "beacon" follows the most recent press: animate()).
+    body_m = K.mat_plastic("kill_body", "lab_dark", 0.35)
+    _box("kill_tower.plinth", body_m, (0, 0.01, 0.06), (0.96, 0.48, 0.12), tower, bev=0.02)
+    _box("kill_tower.plinth_trim", brass, (0, -0.232, 0.125), (0.94, 0.012, 0.012), tower)
+    _box("kill_tower.body", body_m, (0, 0, 0.86), (0.8, 0.4, 1.48), tower, bev=0.02)
+    for sx in (-1, 1):
+        _box(f"kill_tower.pilaster{sx}", brass, (sx * 0.405, -0.19, 0.86), (0.04, 0.04, 1.5), tower, bev=0.008)
+        for k in range(5):  # side ribs
+            _box(f"kill_tower.rib{sx}{k}", body_m, (sx * 0.405, 0.04, 0.35 + 0.28 * k), (0.02, 0.32, 0.03), tower)
     _box("kill_tower.trim", brass, (0, -0.205, 1.58), (0.82, 0.02, 0.05), tower)
+    _box("kill_tower.cornice", brass, (0, 0, 1.64), (0.9, 0.46, 0.06), tower, bev=0.01)
+    _box("kill_tower.cornice2", body_m, (0, 0, 1.7), (0.78, 0.38, 0.06), tower, bev=0.01)
+    K.prop(tower, "beacon", 0.0)
+    _cyl("kill_tower.beacon_base", brass, tower, (0, 0, 1.75), 0.09, 0.05)
+    bc = K.mesh_obj("kill_tower.beacon", bpy.ops.mesh.primitive_uv_sphere_add,
+                    K.mat_emission("kill_beacon", "alarm", 20.0, tower, "beacon", floor=0.1), tower, radius=0.08,
+                    segments=24, ring_count=12, location=(0, 0, 1.78))
+    bc.scale = (1, 1, 0.8)
+    K.smooth(bc)
     _box("kill_tower.plate", K.mat_emission("kill_plate", "paper", 2.5), (0, -0.203, 1.45), (0.7, 0.01, 0.15), tower)
     K.text("kill_tower.label", "KILL SWITCH", 0.085, K.mat_ink("kill_label", "shadow"),
            loc=(0, -0.209, 1.45), parent=tower)
@@ -244,17 +476,14 @@ def build():
         out["kill_buttons"].append(k)
     out["kill_tower"] = tower
 
-    # Platform: the receipt printer; the paper feeds out toward -Y along the floor.
+    # Platform: a dot-matrix receipt printer the size of a truck (to a probe); the tractor-feed paper comes out of the
+    # front slot and runs along the floor toward -Y. Under a smoked lid: the platen roller and a print-head carriage
+    # that shuttles across on every feed step; sprocket wheels at the slot; a fan-fold supply box behind.
     pr = K.empty("printer", (2.0, 1.3, 0))
     pr.rotation_euler = (0, 0, math.radians(-18))
-    _box("printer.body", K.mat_plastic("printer_body", "lab", 0.3), (0, 0, 0.32), (1.3, 0.7, 0.64), pr, bev=0.03)
-    _box("printer.slot", K.mat_plastic("printer_slot", "shadow", 0.6), (0, -0.352, 0.03), (1.0, 0.01, 0.03), pr)
     K.prop(pr, "flash", 0.0)
-    _box("printer.head_light", K.mat_emission("printer_light", "amber", 30.0, pr, "flash"), (0, -0.355, 0.5),
-         (1.0, 0.01, 0.03), pr)
-    K.text("printer.label", "PLATFORM", 0.08, K.mat_ink("printer_ink", "shadow"), loc=(0, -0.356, 0.32),
-           parent=pr)
     K.prop(pr, "feed", 0.0, lo=0.0, hi=1000.0)
+    _printer_body(pr, brass)
     paper_root = K.empty("paper_root", (0, -0.35, 0.003), pr)
     bpy.ops.mesh.primitive_plane_add(size=1)
     paper = bpy.context.active_object
@@ -263,8 +492,8 @@ def build():
         v.co.x *= 0.95
         v.co.y = -0.5 + v.co.y  # spans local y in [-1, 0]: grows from the slot
     paper.parent = paper_root
-    paper.data.materials.append(K.mat_plastic("paper", "paper", 0.7))
     mover = K.empty("paper_mover", (0, -0.35, 0.005), pr)
+    paper.data.materials.append(_mat_tractor_paper(mover))
     out.update(printer=pr, paper=paper, paper_mover=mover)  # their feed drivers are added in animate() (see there)
     ink = K.mat_ink("log_ink", "shadow")
     for k in range(60):  # log lines, generic (no real systems)
@@ -280,15 +509,16 @@ def build():
            rot=(0, 0, 0), parent=inv).data.offset = 0.002
     out["invoice"] = inv
     out["pile"] = []
-    for k in range(6):  # folds of paper piling up beside the strip
-        s = _box(f"pile{k}", K.mat_plastic("pile", "paper", 0.7),
-                 (2.1 + 0.32 * ((k % 3) - 1) + 0.12 * (k // 3), -0.75 - 0.2 * (k // 2), 0.02 + 0.03 * (k // 3)),
-                 (0.3, 0.2, 0.03))
+    pile_m = K.mat_matte("pile", "paper")
+    for k in range(6):  # fan-folded paper piling up beside the strip
+        s = _fanfold(f"pile{k}", pile_m, (2.1 + 0.32 * ((k % 3) - 1) + 0.12 * (k // 3), -0.75 - 0.2 * (k // 2),
+                                          0.002 + 0.03 * (k // 3)), folds=3 + k % 3)
         s.rotation_euler = (0, 0, 0.3 * ((k % 2) * 2 - 1))
         out["pile"].append(s)
 
-    # The Auditors: five stamp arms over a long table.
+    # The Auditors: five robotic stamp arms over a long table (paper-white, the Auditors' colour).
     _box("stamp_table", black, (0, 0.28, 0.15), (1.9, 0.36, 0.3), bev=0.01)
+    _box("stamp_table.trim", brass, (0, 0.098, 0.293), (1.92, 0.012, 0.016))
     stamp_ink = K.mat_ink("stamp_ink", "decal_ink")
     out["stamps"], out["stamp_prints"] = [], []
     for k in range(5):
@@ -297,13 +527,8 @@ def build():
         K.prop(root, "strike", 0.0, lo=-1.0, hi=1.0)
         L, hh = 0.45, 0.12
         pz = 0.303 + hh
-        _box(f"stamp{k}.post", brass, (0, 0.75, pz / 2), (0.05, 0.05, pz + 0.05), root)
-        pivot = K.empty(f"stamp{k}.pivot", (0, 0.75, pz), root)
-        K.drive(pivot, "rotation_euler", 0, root, "strike", "-(0.698 - 0.698 * max(x, 0) - 0.524 * min(x, 0))")
-        _box(f"stamp{k}.arm", brass, (0, -L / 2, 0.02), (0.05, L, 0.04), pivot)
-        _box(f"stamp{k}.head", K.mat_plastic("stamp_head", "lab_dark", 0.3), (0, -L, -hh / 2), (0.3, 0.13, hh), pivot,
-             bev=0.01)
-        _box(f"stamp{k}.rubber", stamp_ink, (0, -L, -hh + 0.006), (0.29, 0.12, 0.012), pivot)
+        _stamp_arm(k, root, pz, L, hh, stamp_ink, brass)
+        pivot = bpy.data.objects[f"stamp{k}.pivot"]
         _box(f"stamp{k}.pad", K.mat_plastic("stamp_pad", "paper", 0.7), (0, 0.75 - L, 0.301), (0.34, 0.17, 0.002), root)
         pt = K.text(f"stamp{k}.print", "REWARD\nHACK", 0.06, stamp_ink, loc=(0, 0.75 - L, 0.3035), rot=(0, 0, 0),
                     parent=root)
@@ -374,17 +599,9 @@ def build():
                              font="JetBrainsMono-SemiBold-flat.ttf", parent=sw) for g in range(10)])
     out["stopwatch"], out["stopwatch_digits"] = sw, cells
 
-    # Cold storage: a conveyor into a frosted freezer with a vault door.
-    _box("conveyor", black, (1.45, -1.4, 0.08), (2.0, 0.3, 0.16), bev=0.01)
-    _box("conveyor.belt", K.mat_plastic("belt", "lab_dark", 0.6), (1.45, -1.4, 0.163), (2.0, 0.26, 0.006))
-    _box("freezer", K.mat_acrylic("frost", "glass", alpha=0.75, emit=0.35), (2.95, -1.4, 0.45), (0.9, 0.9, 0.9), bev=0.03)
-    K.text("freezer.label", "COLD STORAGE", 0.09, K.mat_ink("freezer_ink", "shadow"),
-           loc=(2.95, -1.856, 0.8), parent=None).data.offset = 0.002
-    door_hinge = K.empty("vault_hinge", (2.49, -1.4 - 0.3, 0.45))
-    K.mesh_obj("vault_door", bpy.ops.mesh.primitive_cylinder_add, K.mat_metal("vault", "chrome", 0.2), door_hinge,
-               radius=0.3, depth=0.07, vertices=64, location=(0, 0.3, 0), rotation=(0, math.pi / 2, 0))
-    K.mesh_obj("vault_wheel", bpy.ops.mesh.primitive_torus_add, brass, door_hinge, major_radius=0.12,
-               minor_radius=0.015, location=(-0.045, 0.3, 0), rotation=(0, math.pi / 2, 0))
+    # Cold storage: a conveyor into a walk-in freezer through a round vault door.
+    _cold_storage(black, brass)
+    door_hinge = bpy.data.objects["vault_hinge"]
     out["vault_hinge"] = door_hinge
     # Four (six had the last two pass the door after it shut: human, C4 v2).
     out["frozen"] = [K.probe(f"frozen{k}", (0.6, -1.4, 0.166 + K.PROBE_R * 2.2), led=0.6, scale=2.2) for k in range(4)]
@@ -423,6 +640,7 @@ def animate(S, t0, t1):
         per.setdefault(k % 12, []).append(dict(e, end=min(e["end"], e["t"] + 0.2)))
     for k in range(12):
         A.key_press(S["kill_tower"], f"press_{k}", per.get(k, []), min_hold=8)
+    A.led_pulse(S["kill_tower"], "beacon", [dict(e, vel=110) for e in stabs], floor=0.1)  # flashes on every stab
 
     # The printer: feeds a step per hat/snare strike from "Traces!" on; head light flashes. (These two drivers are
     # made here, not in build(): made there, Blender flagged them invalid and never evaluated them, though a copy

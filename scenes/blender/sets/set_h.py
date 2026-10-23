@@ -116,6 +116,76 @@ def _keys(o, path, frames_values, index=0, interp="BEZIER"):
     A.write_keys(o, path, [(f, v) for f, v in frames_values], index=index, interp=interp)
 
 
+def _stamp_arm(name, loc):
+    """An auditor's stamp arm (paper white, brief colour roles): a round pedestal and turret, a column up to a chrome
+    shoulder knuckle; the arm ("{name}.arm", turned by "slam") is a white boom out to an elbow, a wrist rod down to
+    a brass stamp block with its red rubber, and a hydraulic piston from the column to the boom that follows it.
+    Same pivot, reach and head position as the grey-box arm, so the slams land where they did."""
+    s = K.empty(name, loc)
+    K.prop(s, "slam", 0.0, lo=-1.0, hi=1.0)
+    white = K.mat_plastic("stamp_white", "paper", 0.2)
+    chrome = K.mat_chrome("stamp_chrome")
+    dark = K.mat_plastic("stamp_dark", "lab_dark", 0.3)
+    K.mesh_obj(f"{name}.base", bpy.ops.mesh.primitive_cylinder_add, dark, s, radius=0.2, depth=0.08, vertices=32,
+               location=(0, 0.15, 0.04))
+    K.mesh_obj(f"{name}.turret", bpy.ops.mesh.primitive_cylinder_add, white, s, radius=0.14, depth=0.14, vertices=32,
+               location=(0, 0.15, 0.15))
+    col = K.mesh_obj(f"{name}.col", bpy.ops.mesh.primitive_cylinder_add, white, s, radius=0.075, depth=1.08,
+                     vertices=24, location=(0, 0.15, 0.76))
+    K.smooth(col)
+    for z in (0.3, 1.2):  # chrome collars
+        K.mesh_obj(f"{name}.collar{z}", bpy.ops.mesh.primitive_torus_add, chrome, s, major_radius=0.078,
+                   minor_radius=0.014, location=(0, 0.15, z))
+    K.mesh_obj(f"{name}.shoulder", bpy.ops.mesh.primitive_cylinder_add, chrome, s, radius=0.08, depth=0.2,
+               vertices=24, location=(0, 0.15, 1.3), rotation=(0, math.pi / 2, 0))
+    arm = K.empty(f"{name}.arm", (0, 0.15, 1.3), s)
+    K.drive(arm, "rotation_euler", 0, s, "slam", "-(0.5 - 0.5 * x)")
+    boom = _box(f"{name}.beam", white, arm, (0, -0.35, 0), (0.1, 0.66, 0.1))
+    K.bevel(boom, 0.025, 3)
+    K.mesh_obj(f"{name}.elbow", bpy.ops.mesh.primitive_cylinder_add, chrome, arm, radius=0.06, depth=0.14,
+               vertices=24, location=(0, -0.7, 0), rotation=(0, math.pi / 2, 0))
+    K.mesh_obj(f"{name}.wrist", bpy.ops.mesh.primitive_cylinder_add, chrome, arm, radius=0.022, depth=0.1,
+               vertices=16, location=(0, -0.7, -0.06))
+    head = _box(f"{name}.head", K.mat_metal("stamp_brass", "brass", 0.3), arm, (0, -0.7, -0.14), (0.24, 0.16, 0.1))
+    K.bevel(head, 0.012, 2)
+    _box(f"{name}.rubber", K.mat_matte("stamp_rubber", "alarm"), arm, (0, -0.7, -0.2), (0.22, 0.14, 0.03))
+    # The piston: a barrel on the column aimed at a pin under the boom, and a rod from the pin aimed back.
+    pin = K.empty(f"{name}.pin", (0, -0.3, -0.06), arm)
+    barrel = K.empty(f"{name}.barrel", (0, 0.06, 0.8), s)
+    rod = K.empty(f"{name}.rodroot", (0, 0, 0), pin)
+    for o, tgt in ((barrel, pin), (rod, barrel)):
+        c = o.constraints.new("DAMPED_TRACK")
+        c.target, c.track_axis = tgt, "TRACK_Z"
+    K.mesh_obj(f"{name}.barrel.mesh", bpy.ops.mesh.primitive_cylinder_add, dark, barrel, radius=0.03, depth=0.3,
+               vertices=16, location=(0, 0, 0.15))
+    K.mesh_obj(f"{name}.rod.mesh", bpy.ops.mesh.primitive_cylinder_add, chrome, rod, radius=0.015, depth=0.3,
+               vertices=12, location=(0, 0, 0.15))
+    return s
+
+
+def _dispenser_body(disp):
+    """The participation-ribbon dispenser: a rounded white cabinet on a dark plinth, an acrylic dome on top holding a
+    heap of amber rosettes (its stock), a chrome-bezelled slot where the ribbon comes out (local (0, -0.2, 0.5): the
+    ribbon's start in animate()), a coin plate."""
+    white = K.mat_plastic("disp", "paper", 0.2)
+    plinth = _box("dispenser.plinth", K.mat_plastic("disp_plinth", "lab_dark", 0.3), disp, (0, 0, 0.04), (0.5, 0.4, 0.08))
+    K.bevel(plinth, 0.01)
+    body = _box("dispenser.body", white, disp, (0, 0, 0.47), (0.45, 0.35, 0.78))
+    K.bevel(body, 0.05, 4)
+    K.mesh_obj("dispenser.dome", bpy.ops.mesh.primitive_uv_sphere_add, K.mat_acrylic("disp_dome", "glass", 0.3, 0.1),
+               disp, radius=0.2, location=(0, 0, 0.86)).scale = (1, 0.8, 0.75)
+    for j in range(7):  # the stock: rosettes heaped in the dome
+        a = j * 2.4
+        K.mesh_obj(f"dispenser.stock{j}", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("stock", "amber", 0.4),
+                   disp, radius=0.05, depth=0.012, vertices=16,
+                   location=(math.cos(a) * 0.08 * (j % 3) / 2, math.sin(a) * 0.06 * (j % 3) / 2, 0.88 + 0.02 * (j % 3)),
+                   rotation=(0.3 * math.sin(a), 0.3 * math.cos(a), 0))
+    _box("dispenser.slot", K.mat_plastic("slot", "shadow", 0.6), disp, (0, -0.176, 0.5), (0.3, 0.012, 0.04))
+    K.bevel(_box("dispenser.bezel", K.mat_chrome("disp_bezel"), disp, (0, -0.177, 0.5), (0.34, 0.006, 0.08)), 0.004)
+    K.mesh_obj("dispenser.coin", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("disp_coin"), disp, radius=0.05,
+               depth=0.01, vertices=24, location=(0.12, -0.177, 0.3), rotation=(math.pi / 2, 0, 0))
+
+
 # ---------------------------------------------------------------- build
 
 def build():
@@ -232,7 +302,23 @@ def build():
     links = {s: [K.mesh_obj(f"chain{s}_{k}", bpy.ops.mesh.primitive_torus_add, K.mat_chrome("chain"), None,
                             major_radius=0.035, minor_radius=0.009, location=(0, 0, 0),
                             rotation=(0, math.pi / 2 * (k % 2), 0)) for k in range(14)] for s in (-1, 1)}
-    out.update(moat=moat, bridge=bridge, chains=links, bridge_towers=towers)
+    # A sprocket on each tower's top, the chain running over it (brief: the chain is the slide): it turns as the
+    # bridge cranks ("raise", the notch count), so the links visibly feed over it.
+    sprockets = []
+    for s in (-1, 1):
+        sp = K.empty(f"bridge.sprocket{s}", (MOAT_R0 - 0.1, s * (ROAD_W / 2 + 0.1), 1.14))
+        K.drive(sp, "rotation_euler", 1, bridge, "raise", "-1.1 * x")
+        brass = K.mat_metal("sprocket", "brass", 0.3)
+        K.mesh_obj(f"bridge.sprocket{s}.disc", bpy.ops.mesh.primitive_cylinder_add, brass, sp, radius=0.07,
+                   depth=0.025, vertices=32, rotation=(math.pi / 2, 0, 0))
+        K.mesh_obj(f"bridge.sprocket{s}.hub", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("sprocket_hub"),
+                   sp, radius=0.025, depth=0.05, vertices=16, rotation=(math.pi / 2, 0, 0))
+        for j in range(12):
+            a = math.tau * j / 12
+            _box(f"bridge.sprocket{s}.tooth{j}", brass, sp, (math.cos(a) * 0.078, 0, math.sin(a) * 0.078),
+                 (0.022, 0.022, 0.018), (0, -a, 0))
+        sprockets.append(sp)
+    out.update(moat=moat, bridge=bridge, chains=links, bridge_towers=towers, bridge_sprockets=sprockets)
 
     # S49: the egress gate across the inner road: post, striped arm, sign on the post facing the front.
     gate = K.empty("gate", (GATE_X, 0, 0))
@@ -374,11 +460,12 @@ def build():
         K.prop(h, "honk", 0.0, lo=-1.0, hi=1.0)
         tilt = K.empty(f"horn{k}.tilt", (0, 0, 0), h)
         K.drive(tilt, "rotation_euler", 0, h, "honk", "-0.45 * x")  # contact = a nod down
-        _box(f"horn{k}.body", K.mat_plastic("horncam", "lab", 0.25), tilt, (0, 0.08, 0), (0.18, 0.4, 0.18))
-        K.mesh_obj(f"horn{k}.lens", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("hornlens", "lens", 0.02),
-                   tilt, radius=0.07, depth=0.06, location=(0, 0.3, 0), rotation=(math.pi / 2, 0, 0))
-        K.mesh_obj(f"horn{k}.rec", bpy.ops.mesh.primitive_uv_sphere_add, K.mat_emission("hornrec", "alarm", 30.0),
-                   tilt, radius=0.02, location=(0.06, 0.25, 0.08))
+        # The kit's CCTV camera, its knuckle on the pole top, lens toward the cube (+Y): the kit's lens looks along
+        # its -Y, so it is turned half round. Its own mount arm is dropped (the pole is the mount).
+        cs = 1.3
+        cam, _, _ = K.security_camera(f"horn{k}.cam", (0, 0, 0.2 * cs), parent=tilt, scale=cs)
+        cam.rotation_euler = (0, 0, math.pi)
+        bpy.data.objects.remove(bpy.data.objects[f"horn{k}.cam.arm"])
         heads.append(h)
     out.update(horns=horns, horn_heads=heads)
 
@@ -393,8 +480,7 @@ def build():
     disp.rotation_euler = (0, 0, math.radians(-45))
     disp.scale = (0.5, 0.5, 0.5)
     K.prop(disp, "lever", 0.0, lo=-1.0, hi=1.0)
-    _box("dispenser.body", K.mat_plastic("disp", "lab", 0.3), disp, (0, 0, 0.45), (0.45, 0.35, 0.9))
-    _box("dispenser.slot", K.mat_plastic("slot", "shadow", 0.6), disp, (0, -0.176, 0.5), (0.3, 0.01, 0.04))
+    _dispenser_body(disp)
     lev = K.empty("dispenser.lever", (0.24, 0, 0.7), disp)
     K.drive(lev, "rotation_euler", 0, disp, "lever", "0.6 * x")
     K.mesh_obj("dispenser.lever.rod", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("lever"), lev, radius=0.015,
@@ -420,24 +506,24 @@ def build():
     paper = K.mat_matte("subpoena", "decal_film")  # off-white: paper-white bloomed out in the key light
     ink = K.mat_ink("subpoena_ink", "decal_ink")
     planes = []
+    # Each starts as a flat sheet and folds itself into the dart in flight (shape key "fold", 0 flat - 1 folded;
+    # brief: "subpoenas fold themselves into paper airplanes"): the front corners fold in to the nose, the keel drops.
+    flat = [(0.3, 0, 0), (0.3, 0.22, 0), (-0.18, 0.22, 0), (-0.18, 0, 0), (0.3, -0.22, 0), (-0.18, -0.22, 0),
+            (-0.18, 0, 0)]
+    dart = [(0.3, 0, 0), (0.27, 0.015, 0), (-0.18, 0.22, 0), (-0.14, 0, 0), (0.27, -0.015, 0), (-0.18, -0.22, 0),
+            (-0.16, 0, -0.07)]
     for k in range(7):
-        p = _poly(f"plane{k}", [(0.3, 0, 0), (-0.18, 0.22, 0), (-0.14, 0, 0), (-0.18, -0.22, 0), (-0.16, 0, -0.07)],
-                  [(0, 1, 2), (0, 2, 3), (0, 2, 4)], paper)
+        p = _poly(f"plane{k}", flat, [(0, 1, 2, 3), (0, 3, 5, 4), (0, 3, 6)], paper)
         p.data.polygons.foreach_set("use_smooth", [False] * 3)
+        p.shape_key_add(name="flat")
+        fk = p.shape_key_add(name="fold", from_mix=False)
+        for v, co in zip(fk.data, dart):
+            v.co = co
         for side, z, rot in (("top", 0.002, (0, 0, 0)), ("bottom", -0.002, (math.pi, 0, 0))):
             K.text(f"plane{k}.{side}", "SUBPOENA", 0.06, ink, loc=(0.03, 0, z), rot=rot, parent=p)
         p.scale = (2.5, 2.5, 2.5)
         planes.append(p)
-    stamps = []
-    for k in range(4):
-        s = K.empty(f"stamp{k}", (-4.6 + 0.85 * k, 3.6, 0))
-        K.prop(s, "slam", 0.0, lo=-1.0, hi=1.0)
-        _box(f"stamp{k}.col", K.mat_plastic("stampcol", "lab", 0.3), s, (0, 0.15, 0.7), (0.2, 0.2, 1.4))
-        arm = K.empty(f"stamp{k}.arm", (0, 0.15, 1.3), s)
-        K.drive(arm, "rotation_euler", 0, s, "slam", "-(0.5 - 0.5 * x)")
-        _box(f"stamp{k}.beam", K.mat_chrome("stampbeam"), arm, (0, -0.35, 0), (0.06, 0.7, 0.06))
-        _box(f"stamp{k}.head", K.mat_plastic("stamphead", "alarm", 0.3), arm, (0, -0.7, -0.15), (0.24, 0.16, 0.2))
-        stamps.append(s)
+    stamps = [_stamp_arm(f"stamp{k}", (-4.6 + 0.85 * k, 3.6, 0)) for k in range(4)]
     out.update(planes=planes, stamps=stamps)
 
     # S56: the giant printer (from G), paper with the bill coming out.
@@ -574,6 +660,8 @@ def animate(S, t0, t1):
     _pop(S["bridge"], cut("S48") - 0.02, 0.3)
     for t in S["bridge_towers"]:
         _pop(t, cut("S48") - 0.02, 0.3, axes=(2,))
+    for sp in S["bridge_sprockets"]:
+        _pop(sp, cut("S48") + 0.15, 0.3)
     notches = A.strikes(W(bass, _word("L55", "air"), cut("S49")), 0.08) or [{"t": _word("L55", "box"),
                                                                               "end": 0, "vel": 100}]
     N = len(notches)
@@ -582,7 +670,7 @@ def animate(S, t0, t1):
     L = MOAT_R1 - MOAT_R0
     hinge = Vector(S["bridge"].location)
     for s, links in S["chains"].items():
-        top = Vector((MOAT_R0 - 0.1, s * (ROAD_W / 2 + 0.1), 1.1))
+        top = Vector((MOAT_R0 - 0.1 + 0.06, s * (ROAD_W / 2 + 0.1), 1.14 + 0.05))  # off the sprocket's rim
         for k, ln in enumerate(links):
             keys = {0: [], 1: [], 2: []}
             for j in range(N + 1):
@@ -727,6 +815,9 @@ def animate(S, t0, t1):
             for kp in fc.keyframe_points:
                 kp.interpolation = "LINEAR"
         A.write_keys(p, "hide_render", [(0, 1, "CONSTANT"), (A.frame(a), 0, "CONSTANT"), (A.frame(b) + 1, 1, "CONSTANT")])
+        # Each folds from a flat sheet as it comes into frame, staggered down the V.
+        f0 = A.frame(cut("S55") + 0.15 + 0.08 * row)
+        A.write_keys(p.data.shape_keys, 'key_blocks["fold"].value', [(0, 0.0, "CONSTANT"), (f0, 0.0), (f0 + 36, 1.0)])
     bt = [e["t"] for e in W(beats, cut("S55"), cut("S56"))]
     for k, s in enumerate(S["stamps"]):
         _hide_until(s, cut("S55") - 0.02)

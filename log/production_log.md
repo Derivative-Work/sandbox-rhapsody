@@ -745,3 +745,47 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - **The security camera on the pole:** was a box. Now `sr_kit.security_camera`: a mount arm and knuckle, pan and tilt joints, a bevelled housing with a sun hood and skirts, a dark lens in a chrome ring, a red tally light. Its lens faces away from the cube. The kit camera is for sets B and H too.
 - **Anchor stills:** `scenes/blender/animatic.py --anchors` renders one still per shot at its anchor. Set A's 13, at 4K and 64 samples, are in `renders/c5/set_A/anchors/`, and `scripts/c5_sheet.py` assembles them as `renders/c5/set_A/contact_sheet.jpg`, captioned with each shot's line and the brief's visual.
 - **Next:** set A's full render (two sessions, about 3 h). In parallel, four sub-agents (forks of this session, same model) flesh out the placeholders of sets B–I from the C4 v8 audit.
+
+## 2026-10-22T22:06:04-04:00 — The vertical cut's render format (the style spec's open item)
+
+- **Decision** (the spec: "the vertical cut needs 3D rendered wider; that's set at C4"): S30–S65 render square, at 3840×3840, with the 16:9 shots' horizontal field of view.
+  - **The 16:9 main video** takes the centre 3840×2160 band, identical to the approved framing.
+  - **The 9:16 vertical cut** (2160×3840) takes a full-height slice, panned per shot to frame the card-stunt words and the `I DECLINE` sign (brief, section 9).
+  - Nothing is re-rendered; those sets cost about 1.8× per frame.
+- **Change:** `sr_kit.camera_move` sets the sensor fit to horizontal, so the horizontal field holds at any frame shape (Blender already fitted 16:9 horizontally, so approved shots are unchanged).
+- **Why:** brief, "render 3D wide enough to reframe rather than re-render".
+
+## 2026-10-22T22:16:58-04:00 — C5: placeholders fleshed out in sets B–I (four sub-agents)
+
+- **Made by:** four sub-agents (forks of this session, same model) in parallel, while set A rendered. Each edited only its own set files, kept every rig, prop, driver and timing approved at C4, checked at low res, and rendered 1080p anchor stills. I reviewed every set's stills.
+- **B:** the corner camera is the kit security camera, with the same swivel and staging (S17 checked). The work lights hang on wires.
+- **C:** four kinds of kiosk:
+  - a pastebin noticeboard with pinned pages;
+  - a request-capture mailbox with a slot and raised flag;
+  - file-drop lockers;
+  - an all-night booth with a terminal.
+
+  Each has a lit cavity, a framed sign, louvres, and a door with lock and pull. The RENTED launchpad is a saucer with thrusters, beacon posts and a framed `RENTED · LEASED UNIT · NOT YOURS` plate. The camp crates are strapped.
+- **D:** a desk (chrome legs, modesty panel, drawer pedestal), monitors on stands, an office chair (five-star base, casters, gas column, armrests), and a bolted odometer face. The pager's fall is rechecked: it clears the floor by 2.25 cm and doesn't touch the new furniture.
+- **E:**
+  - **The modem-guitar:** vents, ports, status LEDs, hinged antennas, pickups, knobs, fret inlays, fiber ferrules and tuning pegs.
+  - **The amp:** an open server rack (rails, 1U units, smoked sides) with the speaker cone still pumping.
+- **F:**
+  - **Stations:** round columns, pneumatic cylinders, rods and collars. Their stroke still ends on the crates.
+  - **The stamp press:** bracing, a hydraulic cylinder, and a flywheel that half-turns per strike.
+  - **The towers:** a plinth, cap, vent slats and grilles.
+- **G:**
+  - **The receipt printer:** a dot-matrix machine with a platen, a print-head carriage that shuttles per feed step, tractor sprockets, a fan-fold supply, and procedural sprocket holes and perforations that travel with the paper. The pile is fan-folded stacks.
+  - **The Auditors:** robotic stamp arms.
+  - **The kill-switch tower:** a plinth, pilasters, a cornice, and a red beacon that flashes on each brass stab.
+  - **Cold storage:** a slatted conveyor; an insulated freezer with a fan unit; a round doorway (its centre moved 0.45 → 0.42 m so the probes clear its edge); a vault door with a rim, bolts, a handwheel and hinge knuckles.
+- **H:**
+  - **The Auditors:** robotic stamp arms.
+  - **The ribbon dispenser:** a cabinet with an acrylic dome of rosettes and a coin plate.
+  - **The horn section:** six kit security cameras, still nodding in turn (all in frame).
+  - **The subpoenas fold themselves** (a `fold` shape key over 36 frames, staggered down the V) before flying.
+  - **The drawbridge:** a brass sprocket on each tower turns as the chain runs (the "slide").
+  - **Already in place:** the egress pellets bouncing off the gate on kick and snare.
+- **I:** moulded crates under the music box and the lead, sleeper shelves with rails and brackets, and tripod stands for the hi-hat and crash.
+- **Not done:** no geometry clip test on the new G stamp arms and freezer doorway, or on set H (visual checks only). The full renders will show it.
+- **Stills:** the sub-agents' review stills are in the scratchpad. Each set's C5 contact sheet comes from its 4K anchor stills when it renders.

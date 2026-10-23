@@ -59,6 +59,12 @@ def _box(name, mat, parent, loc, scale, bev=0.0):
     return o
 
 
+def _cyl(name, mat, parent, loc, r, depth, rot=(0, 0, 0), verts=32):
+    o = K.mesh_obj(name, bpy.ops.mesh.primitive_cylinder_add, mat, parent, radius=r, depth=depth, vertices=verts,
+                   location=loc, rotation=rot)
+    K.smooth(o)
+    return o
+
 def _flag(name, parent, loc, size, mat_pole, mat_flag, rot=(math.pi / 2, 0, 0)):
     """A flag icon: a pole and a triangular pennant, in the plane facing -Y (rot) of its root."""
     root = K.empty(name, loc, parent)
@@ -131,18 +137,23 @@ def build():
     for k, x in enumerate(STATIONS):
         st = K.empty(f"station{k}", (x, 0, 0))
         K.prop(st, "strike", 0.0, lo=-1.0, hi=1.0)
-        for sy in (-1, 1):
-            _box(f"station{k}.post{sy}", chrome, st, (0, sy * 0.5, 0.65), (0.08, 0.08, 1.3))
+        for sy in (-1, 1):  # chrome columns on base plates
+            _cyl(f"station{k}.post{sy}", chrome, st, (0, sy * 0.5, 0.65), 0.04, 1.3)
+            _box(f"station{k}.foot{sy}", dark, st, (0, sy * 0.5, 0.015), (0.2, 0.2, 0.03), 0.006)
         _box(f"station{k}.beam", dark, st, (0, 0, 1.3), (0.2, 1.1, 0.14), 0.01)
         _box(f"station{k}.lamp", teal, st, (0, -0.56, 1.3), (0.16, 0.01, 0.06))
+        _cyl(f"station{k}.cylinder", K.mat_plastic("station_cyl", "platform", 0.2), st, (0, 0, 1.47), 0.07, 0.2)
+        _cyl(f"station{k}.cap", chrome, st, (0, 0, 1.58), 0.075, 0.02)
         hd = K.empty(f"station{k}.head_root", (0, 0, 0), st)
         # The stroke ends on the crates' tops (head bottom 0.80, crate top BELT_Z + 0.32 = 0.68), so a stamp lands
         # on a crate and never goes into it (it went 0.2 m in, C4 v4).
         stroke = 0.80 - (BELT_Z + 0.32) - 0.004
         K.drive(hd, "location", 2, st, "strike", f"-{stroke:.3f} * max(x, 0) - 0.12 * min(x, 0)")
-        _box(f"station{k}.rod", chrome, hd, (0, 0, 1.05), (0.04, 0.04, 0.4))
+        _cyl(f"station{k}.rod", chrome, hd, (0, 0, 1.05), 0.022, 0.4)
+        _cyl(f"station{k}.collar", dark, hd, (0, 0, 0.9), 0.06, 0.04)
         _box(f"station{k}.head", K.mat_plastic(f"station{k}.head", "platform", 0.2), hd, (0, 0, 0.84), (0.34, 0.34, 0.08),
              0.01)
+        _box(f"station{k}.head_edge", teal, hd, (0, 0, 0.842), (0.355, 0.355, 0.012))
         heads.append(st)
     out["stations"] = heads
 
@@ -152,11 +163,25 @@ def build():
     K.prop(pr, "strike", 0.0, lo=-1.0, hi=1.0)
     for sx in (-1, 1):
         _box(f"press.post{sx}", dark, pr, (sx * 0.42, 0, 0.75), (0.14, 0.2, 1.5), 0.01)
+        _box(f"press.foot{sx}", dark, pr, (sx * 0.42, 0, 0.03), (0.3, 0.36, 0.06), 0.01)
+        for z in (0.5, 1.0):  # cross bracing between the columns
+            br = _box(f"press.brace{sx}{z}", chrome, pr, (sx * 0.42, 0.105, z), (0.02, 0.01, 0.62))
+            br.rotation_euler = (0, sx * 0.6, 0)
     _box("press.beam", dark, pr, (0, 0, 1.5), (1.0, 0.3, 0.22), 0.02)
+    _cyl("press.cylinder", K.mat_plastic("press_cyl", "copper", 0.25), pr, (0, 0, 1.75), 0.13, 0.3)
+    _cyl("press.cylinder_cap", chrome, pr, (0, 0, 1.91), 0.14, 0.03)
+    fw = K.empty("press.flywheel", (0.53, 0, 1.2), pr)  # turns with the strikes (one half-turn a strike)
+    K.drive(fw, "rotation_euler", 0, pr, "strike", "3.1416 * x")
+    K.mesh_obj("press.flywheel_rim", bpy.ops.mesh.primitive_torus_add, chrome, fw, major_radius=0.22,
+               minor_radius=0.025, rotation=(0, math.pi / 2, 0))
+    for j in range(4):
+        sp = _box(f"press.flywheel_spoke{j}", chrome, fw, (0, 0, 0), (0.02, 0.42, 0.025))
+        sp.rotation_euler = (j * math.pi / 4, 0, 0)
+    _cyl("press.flywheel_hub", dark, fw, (0, 0, 0), 0.05, 0.06, rot=(0, math.pi / 2, 0))
     _box("press.hazard", K.mat_emission("press.hazard", "amber", 4.0), pr, (0, -0.151, 1.5), (0.8, 0.01, 0.05))
     ph = K.empty("press.head_root", (0, 0, 0), pr)
     K.drive(ph, "location", 2, pr, "strike", "-0.42 * max(x, 0) - 0.15 * min(x, 0)")
-    _box("press.ram", chrome, ph, (0, 0, 1.2), (0.09, 0.09, 0.45))
+    _cyl("press.ram", chrome, ph, (0, 0, 1.2), 0.05, 0.45)
     _box("press.stamp", K.mat_plastic("press.stamp", "brass", 0.25), ph, (0, 0, 0.92), (0.36, 0.3, 0.1), 0.01)
     _box("press.table", dark, pr, (0, 0, 0.18), (0.6, 0.5, 0.36), 0.01)
     for k in range(5):
@@ -204,7 +229,16 @@ def build():
         x = -3.5 + k * 1.0
         t = K.empty(f"tower{k}", (x, 2.3, 0))
         K.prop(t, "amber", 0.0)
-        _box(f"tower{k}.body", dark, t, (0, 0, 1.1), (0.55, 0.55, 2.2), 0.02)
+        _box(f"tower{k}.body", dark, t, (0, 0, 1.12), (0.55, 0.55, 2.16), 0.02)
+        _box(f"tower{k}.plinth", chrome, t, (0, 0, 0.03), (0.6, 0.6, 0.06), 0.008)
+        _box(f"tower{k}.cap", chrome, t, (0, 0, 2.21), (0.6, 0.6, 0.04), 0.008)
+        for r in range(7):  # vent slats between the status strips
+            _box(f"tower{k}.vent{r}", K.mat_plastic("tower_vent", "shadow", 0.5), t, (0, -0.277, 0.3 + 0.3 * r),
+                 (0.44, 0.006, 0.012))
+        for sx in (-1, 1):  # side cooling grilles
+            for r in range(10):
+                _box(f"tower{k}.grille{sx}{r}", K.mat_plastic("tower_vent", "shadow", 0.5), t,
+                     (sx * 0.277, 0, 0.5 + 0.15 * r), (0.006, 0.4, 0.02))
         strip = _mat_mix_emission(f"tower{k}.strip", "platform", "amber", 8.0, t, "amber")
         for r in range(6):
             _box(f"tower{k}.led{r}", strip, t, (0, -0.28, 0.4 + 0.3 * r), (0.4, 0.01, 0.06))

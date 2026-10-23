@@ -1,4 +1,4 @@
-"""Set D, the SOC (brief, "Sets → D"): a security operations room with no one in it. Grey-box for C4.
+"""Set D, the SOC (brief, "Sets → D"): a security operations room with no one in it. C5: modelled.
 
 Contents, as the brief lists them:
 - a wall of alarm bells and siren horns, which are the drum kit: bells swing on snare and hats ("bell"), sirens
@@ -38,10 +38,21 @@ def _odometer(out):
     w = n * ODO_PITCH + 0.4
     for k, (x, z, sx, sz) in enumerate(((0, 0.34, w, 0.4), (0, -0.34, w, 0.4), (-w / 2 + 0.1, 0, 0.2, 0.3),
                                          (w / 2 - 0.1, 0, 0.2, 0.3))):
-        K.mesh_obj(f"odometer.face{k}", bpy.ops.mesh.primitive_cube_add, face, root, size=1,
-                   location=(x, -ODO_R - 0.04, z)).scale = (sx, 0.04, sz)
-    K.mesh_obj("odometer.back", bpy.ops.mesh.primitive_cube_add, face, root, size=1,
-               location=(0, 0.1, 0)).scale = (w, 0.06, 1.1)
+        o = K.mesh_obj(f"odometer.face{k}", bpy.ops.mesh.primitive_cube_add, face, root, size=1,
+                       location=(x, -ODO_R - 0.04, z))
+        o.scale = (sx, 0.04, sz)
+        K.bevel(o, 0.012)
+    back = K.mesh_obj("odometer.back", bpy.ops.mesh.primitive_cube_add, face, root, size=1, location=(0, 0.1, 0))
+    back.scale = (w, 0.06, 1.1)
+    K.bevel(back, 0.02)
+    bolt = K.mat_chrome("odo_bolt")
+    for bx in (-1, 1):  # chrome bolts at the faceplate's corners, and a chrome rim round the window
+        for bz in (-1, 1):
+            K.mesh_obj(f"odometer.bolt{bx}{bz}", bpy.ops.mesh.primitive_uv_sphere_add, bolt, root, radius=0.025,
+                       location=(bx * (w / 2 - 0.06), -ODO_R - 0.065, bz * 0.46)).scale = (1, 0.5, 1)
+    for k, (z, sx, sz) in enumerate(((0.15, w - 0.4, 0.012), (-0.15, w - 0.4, 0.012))):
+        K.mesh_obj(f"odometer.rim{k}", bpy.ops.mesh.primitive_cube_add, bolt, root, size=1,
+                   location=(0, -ODO_R - 0.062, z)).scale = (sx, 0.012, sz)
     for i in range(n):  # i = 0 is the units wheel (rightmost)
         x = (n - 1) / 2 * ODO_PITCH - i * ODO_PITCH - (0.06 if i >= 3 else 0.0)
         wheel = K.empty(f"odometer.wheel{i}", (x, 0, 0), root)
@@ -99,6 +110,85 @@ def _siren(i, loc, mats):
     return root
 
 
+def _box(name, mat, parent, loc, size, bev=0.0, rot=(0, 0, 0)):
+    o = K.mesh_obj(name, bpy.ops.mesh.primitive_cube_add, mat, parent, size=1, location=loc, rotation=rot)
+    o.scale = size
+    if bev:
+        K.bevel(o, bev)
+    return o
+
+
+def _cyl(name, mat, parent, loc, r, depth, rot=(0, 0, 0), verts=24):
+    o = K.mesh_obj(name, bpy.ops.mesh.primitive_cylinder_add, mat, parent, radius=r, depth=depth, vertices=verts,
+                   location=loc, rotation=rot)
+    K.smooth(o)
+    return o
+
+
+def _desk(mats):
+    """An operator's desk: a bevelled glossy top on chrome tube legs with a back rail and a modesty panel, a drawer
+    pedestal under the left end (the pager falls off the right end, between the legs), and two dark monitors with
+    bezels on stands, flashing ALERT."""
+    _box("desk.top", mats["dark"], None, DESK - Vector((0, 0, 0.02)), (DESK_W, 0.8, 0.04), bev=0.012)
+    _box("desk.edge", mats["chrome"], None, DESK - Vector((0, 0.401, 0.02)), (DESK_W - 0.02, 0.004, 0.012))
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            x, y = DESK.x + sx * (DESK_W / 2 - 0.06), sy * 0.33
+            _cyl(f"desk.leg{sx}{sy}", mats["chrome"], None, (x, y, (DESK.z - 0.04) / 2), 0.022, DESK.z - 0.04)
+            _cyl(f"desk.foot{sx}{sy}", mats["dark"], None, (x, y, 0.008), 0.032, 0.016)
+    _cyl("desk.rail", mats["chrome"], None, (DESK.x, 0.33, 0.18), 0.016, DESK_W - 0.12, rot=(0, math.pi / 2, 0))
+    _box("desk.modesty", mats["dark"], None, (DESK.x, 0.355, 0.5), (DESK_W - 0.16, 0.02, 0.38), bev=0.006)
+    # Drawer pedestal, left end.
+    px = DESK.x - DESK_W / 2 + 0.3
+    _box("desk.pedestal", mats["dark"], None, (px, -0.02, 0.37), (0.4, 0.66, 0.66), bev=0.01)
+    for k in range(3):
+        z = 0.15 + 0.21 * k
+        _box(f"desk.drawer{k}", mats["dark"], None, (px, -0.355, z), (0.37, 0.01, 0.19), bev=0.004)
+        _box(f"desk.handle{k}", mats["chrome"], None, (px, -0.365, z + 0.06), (0.14, 0.012, 0.012), bev=0.003)
+    screen = K.mat_emission("monitor_screen", "alarm", 0.6)
+    bezel = K.mat_plastic("monitor_bezel", "shadow", 0.15)
+    for k, x in enumerate((-0.55, 0.0)):
+        c = DESK + Vector((x, 0.25, 0.27))
+        _box(f"monitor{k}", bezel, None, c + Vector((0, 0.008, 0)), (0.52, 0.035, 0.34), bev=0.012)
+        _box(f"monitor{k}.back", bezel, None, c + Vector((0, 0.04, -0.01)), (0.3, 0.04, 0.2), bev=0.02)
+        K.mesh_obj(f"monitor{k}.screen", bpy.ops.mesh.primitive_plane_add, screen, None, size=1,
+                   location=c + Vector((0, -0.0105, 0)), rotation=(math.pi / 2, 0, 0)).scale = (0.47, 0.29, 1)
+        K.text(f"monitor{k}.text", "ALERT", 0.07, K.mat_emission(f"monitor{k}.ink", "paper", 3.0),
+               loc=c + Vector((0, -0.014, 0)))
+        _cyl(f"monitor{k}.neck", mats["chrome"], None, DESK + Vector((x, 0.3, 0.07)), 0.018, 0.14)
+        foot = _cyl(f"monitor{k}.foot", mats["chrome"], None, DESK + Vector((x, 0.28, 0.006)), 0.11, 0.012, verts=40)
+        foot.scale = (1.0, 0.65, 1.0)
+        K.mesh_obj(f"monitor{k}.led", bpy.ops.mesh.primitive_uv_sphere_add,
+                   K.mat_emission(f"monitor{k}.led", "lab_glow", 12.0), None, radius=0.005,
+                   location=c + Vector((0.23, -0.011, -0.155)))
+
+
+def _chair(mats):
+    """The empty office chair, turned a little from the desk: a five-star base on casters, a gas column in a
+    sleeve, a tilt plate, a padded seat and backrest on a chrome spine, two armrests."""
+    chair = K.empty("chair", DESK + Vector((0.75, -0.75, -0.76)))
+    chair.rotation_euler = (0, 0, math.radians(25))
+    pad = K.mat_plastic("chair_seat", "lab_dark", 0.55)
+    _cyl("chair.hub", mats["dark"], chair, (0, 0, 0.085), 0.05, 0.05)
+    for k in range(5):
+        a = k * math.tau / 5 + 0.3
+        c, s_ = math.cos(a), math.sin(a)
+        _box(f"chair.foot{k}", mats["chrome"], chair, (c * 0.16, s_ * 0.16, 0.075), (0.3, 0.045, 0.028), bev=0.008,
+             rot=(0, -0.08, a))
+        _box(f"chair.fork{k}", mats["dark"], chair, (c * 0.3, s_ * 0.3, 0.05), (0.03, 0.03, 0.04))
+        _cyl(f"chair.caster{k}", mats["dark"], chair, (c * 0.3, s_ * 0.3, 0.025), 0.025, 0.022, rot=(0, math.pi / 2, a))
+    _cyl("chair.sleeve", mats["dark"], chair, (0, 0, 0.18), 0.032, 0.16)
+    _cyl("chair.post", mats["chrome"], chair, (0, 0, 0.33), 0.022, 0.16)
+    _box("chair.plate", mats["dark"], chair, (0, 0, 0.415), (0.24, 0.24, 0.03), bev=0.006)
+    _box("chair.seat", pad, chair, (0, 0.01, 0.47), (0.5, 0.48, 0.08), bev=0.03)
+    _box("chair.spine", mats["chrome"], chair, (0, -0.25, 0.56), (0.06, 0.02, 0.26), bev=0.006, rot=(-0.12, 0, 0))
+    _box("chair.back", pad, chair, (0, -0.29, 0.88), (0.46, 0.07, 0.5), bev=0.03, rot=(-0.12, 0, 0))
+    for sx in (-1, 1):
+        _box(f"chair.arm_post{sx}", mats["chrome"], chair, (sx * 0.26, -0.02, 0.58), (0.025, 0.04, 0.2), bev=0.005)
+        _box(f"chair.arm{sx}", pad, chair, (sx * 0.26, -0.01, 0.69), (0.07, 0.28, 0.035), bev=0.012)
+    return chair
+
+
 def build():
     K.floor()
     out = {}
@@ -124,35 +214,8 @@ def build():
     out["sirens"] = sirens
 
     # The desk, its dark monitors, the empty chair, the pager.
-    K.mesh_obj("desk.top", bpy.ops.mesh.primitive_cube_add, mats["dark"], None, size=1,
-               location=DESK - Vector((0, 0, 0.02))).scale = (DESK_W, 0.8, 0.04)
-    for sx in (-1, 1):
-        for sy in (-1, 1):
-            K.mesh_obj(f"desk.leg{sx}{sy}", bpy.ops.mesh.primitive_cube_add, mats["chrome"], None, size=1,
-                       location=DESK + Vector((sx * (DESK_W / 2 - 0.05), sy * 0.35, -0.39))).scale = (0.04, 0.04, 0.74)
-    screen = K.mat_emission("monitor_screen", "alarm", 0.6)
-    for k, x in enumerate((-0.55, 0.0)):
-        K.mesh_obj(f"monitor{k}", bpy.ops.mesh.primitive_cube_add, mats["dark"], None, size=1,
-                   location=DESK + Vector((x, 0.25, 0.25))).scale = (0.5, 0.04, 0.32)
-        K.mesh_obj(f"monitor{k}.screen", bpy.ops.mesh.primitive_plane_add, screen, None, size=1,
-                   location=DESK + Vector((x, 0.228, 0.25)), rotation=(math.pi / 2, 0, 0)).scale = (0.46, 0.28, 1)
-        K.text(f"monitor{k}.text", "ALERT", 0.07, K.mat_emission(f"monitor{k}.ink", "paper", 3.0),
-               loc=DESK + Vector((x, 0.224, 0.25)))
-    chair = K.empty("chair", DESK + Vector((0.75, -0.75, -0.76)))
-    chair.rotation_euler = (0, 0, math.radians(25))
-    seat_m = K.mat_plastic("chair_seat", "lab", 0.3)
-    K.mesh_obj("chair.seat", bpy.ops.mesh.primitive_cube_add, seat_m, chair, size=1,
-               location=(0, 0, 0.48)).scale = (0.48, 0.46, 0.07)
-    K.mesh_obj("chair.back", bpy.ops.mesh.primitive_cube_add, seat_m, chair, size=1,
-               location=(0, -0.22, 0.82)).scale = (0.46, 0.06, 0.55)
-    K.mesh_obj("chair.post", bpy.ops.mesh.primitive_cylinder_add, mats["chrome"], chair, radius=0.025, depth=0.42,
-               location=(0, 0, 0.23))
-    for k in range(5):
-        a = k * math.tau / 5
-        foot = K.mesh_obj(f"chair.foot{k}", bpy.ops.mesh.primitive_cube_add, mats["chrome"], chair, size=1,
-                          location=(math.cos(a) * 0.15, math.sin(a) * 0.15, 0.04), rotation=(0, 0, a))
-        foot.scale = (0.3, 0.03, 0.03)
-    out["chair"] = chair
+    _desk(mats)
+    out["chair"] = _chair(mats)
     pager = K.empty("pager", DESK + PAGER0)
     K.prop(pager, "walk", 0.0, lo=0.0, hi=1000.0)
     K.prop(pager, "buzz", 0.0)

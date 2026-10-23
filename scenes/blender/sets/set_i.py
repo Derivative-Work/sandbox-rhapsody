@@ -69,6 +69,32 @@ def _flag(name, parent, loc, size, mat_pole, mat_flag, rot=(math.pi / 2, 0, 0), 
     return root
 
 
+def _crate(name, loc, size):
+    """A moulded plastic crate (was a plain box): a bevelled body with two raised ribs round its sides and a rim at
+    the top. Same footprint and height, so what stands on it stays put."""
+    body = _box(name, K.mat_plastic(f"{name}.body", "lab", 0.3), None, loc, size, 0.01)
+    rib = K.mat_plastic(f"{name}.rib", "decal_film", 0.25)  # a shade off the body: moulding, not stripes
+    x, y, z = loc
+    w, d, h = size
+    for j, f in enumerate((0.3, 0.62)):
+        _box(f"{name}.rib{j}", rib, None, (x, y, z - h / 2 + f * h), (w + 0.008, d + 0.008, 0.012 * (1 + w)), 0.002)
+    _box(f"{name}.rim", rib, None, (x, y, z + h / 2 - 0.006), (w + 0.012, d + 0.012, 0.012), 0.003)
+    return body
+
+
+def _shelf(name, x, z, sx):
+    """A chrome wall shelf: the board, a round front rail, and gusset brackets to the wall every metre."""
+    chrome = K.mat_metal("shelf", "chrome", 0.25)
+    _box(name, chrome, None, (x, 0.75, z - 0.012), (0.4, 4.0, 0.024))
+    rail = K.mesh_obj(f"{name}.rail", bpy.ops.mesh.primitive_cylinder_add, K.mat_chrome("shelf_rail"), None,
+                      radius=0.01, depth=4.0, vertices=12, location=(x - sx * 0.2, 0.75, z + 0.01),
+                      rotation=(math.pi / 2, 0, 0))
+    K.smooth(rail)
+    for j in range(5):
+        g = _box(f"{name}.gusset{j}", chrome, None, (x + sx * 0.1, -1.2 + j * 0.98, z - 0.1), (0.2, 0.02, 0.16))
+        g.rotation_euler = (0, sx * 0.6, 0)
+
+
 def _cymbal(name, loc, r, height, hat=False):
     """A cymbal machine on a stand (grey-box). Crash: a brass disc tilted on its stand; "bell" (sr_anim.bell) rocks
     it. Hi-hat: two discs; "strike" (sr_anim.striker) drops the top disc onto the bottom one (0 open, -1 lifted,
@@ -80,8 +106,18 @@ def _cymbal(name, loc, r, height, hat=False):
     brass = K.mat_plastic(f"{name}.brass", "brass", 0.25)
     K.mesh_obj(f"{name}.stand", bpy.ops.mesh.primitive_cylinder_add, chrome, root, radius=0.012, depth=height,
                location=(0, 0, height / 2))
-    K.mesh_obj(f"{name}.foot", bpy.ops.mesh.primitive_cylinder_add, chrome, root, radius=0.12, depth=0.012,
-               location=(0, 0, 0.006))
+    for j in range(3):  # a tripod: three splayed legs from a collar low on the stand
+        a = math.tau * j / 3 + 0.5
+        leg = K.mesh_obj(f"{name}.leg{j}", bpy.ops.mesh.primitive_cylinder_add, chrome, root, radius=0.008,
+                         depth=0.24, vertices=8, location=(math.cos(a) * 0.075, math.sin(a) * 0.075, 0.09))
+        leg.rotation_euler = (math.sin(a) * 0.95, -math.cos(a) * 0.95, 0)  # top end in at the collar
+        K.mesh_obj(f"{name}.foot{j}", bpy.ops.mesh.primitive_uv_sphere_add, K.mat_plastic(f"{name}.feet", "shadow"),
+                   root, radius=0.014, segments=8, ring_count=4,
+                   location=(math.cos(a) * 0.17, math.sin(a) * 0.17, 0.014))
+    K.mesh_obj(f"{name}.collar", bpy.ops.mesh.primitive_cylinder_add, chrome, root, radius=0.02, depth=0.04,
+               vertices=16, location=(0, 0, 0.18))
+    K.mesh_obj(f"{name}.clamp", bpy.ops.mesh.primitive_cylinder_add, chrome, root, radius=0.018, depth=0.05,
+               vertices=16, location=(0, 0, height - 0.06))
     rim_m = K.mat_emission(f"{name}.rim", "amber", 50.0, root, "flash", floor=0.0)
 
     def disc(nm, parent, z, flip=False):
@@ -155,8 +191,7 @@ def build():
     for side, sx in enumerate((-1, 1)):
         for tier, z in enumerate(SHELF_Z):
             x = sx * (SIDE_X - 0.25)
-            _box(f"shelf{side}_{tier}", K.mat_metal("shelf", "chrome", 0.25), None, (x, 0.75, z - 0.012),
-                 (0.4, 4.0, 0.024))
+            _shelf(f"shelf{side}_{tier}", x, z, sx)
             for k in range(PER_ROW):
                 p = K.probe(f"sleeper{side}_{tier}_{k}", (x, -1.0 + 0.38 * k, z + K.PROBE_R * 2), led_role="lab_glow",
                             led=0.1, scale=2.0)
@@ -168,13 +203,12 @@ def build():
     out["sleepers"] = sleepers
 
     # The music box on a crate in the middle, under the light.
-    _box("mb_crate", K.mat_plastic("mb_crate", "lab", 0.3), None, (0, 0, 0.13), (0.42, 0.34, 0.26), 0.01)
+    _crate("mb_crate", (0, 0, 0.13), (0.42, 0.34, 0.26))
     mb = K.music_box("musicbox", (0, 0, 0.26), scale=2.4)
     bpy.data.objects["musicbox.axle"].animation_data.drivers[0].driver.expression = "0.5236 * x"  # 1/12 turn a note
     out["musicbox"] = mb
     # The lead probe beside it on a low crate, holding the flag in its folded right arm.
-    _box("lead_crate", K.mat_plastic("lead_crate", "lab", 0.3), None, (LEAD.x, LEAD.y + 0.02, LEAD_CRATE / 2),
-         (0.17, 0.13, LEAD_CRATE), 0.008)
+    _crate("lead_crate", (LEAD.x, LEAD.y + 0.02, LEAD_CRATE / 2), (0.17, 0.13, LEAD_CRATE))
     lead = K.probe("lead", LEAD, led=0.6, scale=2.0)
     lead.rotation_euler = (0, 0, math.radians(-25))
     lead["arm_r"] = 0.0

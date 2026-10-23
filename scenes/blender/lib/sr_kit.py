@@ -976,6 +976,8 @@ def camera_move(name, keys, fps=None):
     fps = fps or LOOK["fps"]
     tgt = empty(f"{name}.target")
     cd = bpy.data.cameras.new(name)
+    cd.sensor_fit = "HORIZONTAL"  # the horizontal field holds at any frame shape: a square render for the
+    # vertical cut (S30-S65) has the 16:9 framing as its centre band
     cd.clip_start, cd.clip_end = 0.01, 800
     cam = link(bpy.data.objects.new(name, cd))
     c = cam.constraints.new("TRACK_TO")
