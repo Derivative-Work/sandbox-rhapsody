@@ -879,3 +879,11 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Checks:** S44 before and after (rim, frame and wheel now smooth); S16's boxes unchanged; invalid drivers after rebind: 0.
 - **Renders:** set A's re-render had started on the old kit; stopped at about 10 minutes and restarted with every set (`renders/c5/queue4.log`).
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-23T10:17:39-04:00 — C5 set A re-rendered (review fixes, placeholder pass, smooth kit)
+
+- **Render:** 13 shots, 5,352 frames at 3840×2160, Eevee 64 samples, two sessions: 05:39–09:08 (3 h 29 min). Packed to FFV1 (`renders/c5/set_A/frames/<shot>.mkv`), every shot bit-exact against its PNGs (framemd5); 304 GB free.
+- **Reel:** `renders/c5/set_A/set_A.mp4` (88.6 s); contact sheet `renders/c5/set_A/contact_sheet.jpg`.
+- **Spot check** (frames from the packs): S07 voice rings leave the singer's lens; S08 POV rings fill the frame; S10 probe faces its way, smooth grommet; S21 E-stop socket with the red head beside it, rotate arrows legible.
+- **Queue:** set B done 10:12 (64 min), set C rendering.
+- **Next:** the human reviews set A (C5, R1).
