@@ -977,3 +977,14 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Set F** (re-render 03:47–04:12, reel 04:20, packed bit-exact): S27 checked with a single-frame spike count over the open crate's interior against the superseded render. In the old render, frames 0–25 jumped frame to frame (flicker); in the new one they rise and fall smoothly with the crate's motion. A 6-frame crop shows the inner walls and lip stable.
 - **Superseded** outputs: reels and contact sheets in `archive/renders/`; `frames_superseded_c5-notes` and `anchors_superseded_c5-notes` set aside for the human to delete.
 - **Queue:** set G re-render started 04:23 (queue7).
+
+## 2026-10-24T06:05:50-04:00 — C5 set H: SAFE STOP clear of the flag, a real rosette, plane text hidden with its planes, the jail's spreadsheet
+
+- **The notes** (human, R1): "SAFE STOP" hidden by the flag; the ribbon didn't read as a ribbon; the SUBPOENA text outlived its planes; the LIABILITY jail didn't read as holding a spreadsheet.
+- **S54 camera:** from above the flag (eye ~0.6 m up, aim 0.12 m, lens 22→24 mm). The sign clears the flag's top, and sign, probe and ribbon all sit inside the 16:9 band.
+- **Ribbon:** a prize rosette: pleated amber ruffle (28 pleats), a white inner pleat ring, a white centre button in a brass bezel with the +0.5, two striped tails with notched ends.
+- **Plane text:** the SUBPOENA prints were children of each plane, and hide_render doesn't reach children; they're now keyed with their plane (as set C's straps). S57's wide shot checked: no stray text.
+- **Spreadsheet:** a formula bar (fx =SUM(DAMAGES)), grey column letters A–F and row numbers 1–5, a dollar figure in every cell (monospace), the cells filling red behind their figures as before.
+- **Checks:** stills of S54, S55, S57 and S58 at 2160².
+- **Render:** set H re-render queued after set G.
+- **Why:** human feedback, R1 (human interventions).

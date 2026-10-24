@@ -550,12 +550,35 @@ def build():
     _sign("dispenser.sign", "SAFE STOP", 0.06, 0.4, 0.1, disp, (0, -0.177, 0.78))
     rib = K.empty("ribbon", (0, 0, 0))
     rib_s = 0.4  # probe-sized (a tennis ball, sr_kit.PROBE_R)
-    K.mesh_obj("ribbon.rosette", bpy.ops.mesh.primitive_cylinder_add, K.mat_plastic("rosette", "amber", 0.4), rib,
-               radius=0.09, depth=0.015, vertices=24, rotation=(math.pi / 2, 0, 0))
-    for s in (-1, 1):
-        _box(f"ribbon.tail{s}", K.mat_plastic("rosette_tail", "amber", 0.4), rib, (s * 0.035, 0, -0.12),
-             (0.04, 0.008, 0.14), (0, s * 0.25, 0))
-    K.text("ribbon.text", "+0.5", 0.07, K.mat_ink("ribbon_ink", "shadow"), loc=(0, -0.009, 0),
+    # A prize rosette (human, C5 set H: "the ribbon needs more details so that it reads like a ribbon"; it was a
+    # flat disc with two bars): a pleated amber ruffle with a white inner pleat ring, a white centre button in a brass
+    # bezel carrying the +0.5, and two striped tails with notched ends hanging behind. Faces -Y, as the disc did.
+    amber_m, white_m = K.mat_plastic("rosette", "amber", 0.4), K.mat_plastic("rosette_white", "paper", 0.5)
+    for name, mat, r0, r1, y, n in (("ribbon.ruffle", amber_m, 0.07, 0.115, 0.004, 28),
+                                    ("ribbon.pleats", white_m, 0.05, 0.078, -0.003, 22)):
+        verts, faces = [], []
+        for i in range(2 * n):
+            a = math.pi * i / n
+            ca, sa = math.cos(a), math.sin(a)
+            verts += [(r0 * ca, y, r0 * sa), (r1 * ca, y + (0.009 if i % 2 else -0.009), r1 * sa)]
+        for i in range(2 * n):
+            j = (i + 1) % (2 * n)
+            faces.append((2 * i, 2 * i + 1, 2 * j + 1, 2 * j))
+        _poly(name, verts, faces, mat, rib)
+    K.mesh_obj("ribbon.button", bpy.ops.mesh.primitive_cylinder_add, white_m, rib, radius=0.052, depth=0.014,
+               vertices=48, location=(0, -0.008, 0), rotation=(math.pi / 2, 0, 0))
+    K.mesh_obj("ribbon.bezel", bpy.ops.mesh.primitive_torus_add, K.mat_metal("rosette_brass", "brass", 0.25), rib,
+               major_radius=0.053, minor_radius=0.006, location=(0, -0.012, 0),
+               rotation=(math.pi / 2, 0, 0))
+    w, L, nt = 0.055, 0.17, 0.03
+    for sx in (-1, 1):
+        tail = K.empty(f"ribbon.tail{sx}", (sx * 0.03, 0.012, -0.04), rib)
+        tail.rotation_euler = (0, sx * 0.3, 0)
+        _poly(f"ribbon.tail{sx}.band", [(-w / 2, 0, 0), (w / 2, 0, 0), (w / 2, 0.006, -L), (0, 0.006, -L + nt),
+                                        (-w / 2, 0.006, -L)], [(0, 1, 2, 3, 4)], amber_m, tail)
+        _poly(f"ribbon.tail{sx}.stripe", [(-0.008, -0.001, 0), (0.008, -0.001, 0), (0.008, 0.005, -L + nt * 0.7),
+                                          (-0.008, 0.005, -L + nt * 0.7)], [(0, 1, 2, 3)], white_m, tail)
+    K.text("ribbon.text", "+0.5", 0.04, K.mat_ink("ribbon_ink", "shadow"), loc=(0, -0.016, 0),
            parent=rib)
     rib["size"] = rib_s
     out.update(honest=hp, flag=flag, dispenser=disp, ribbon=rib)
@@ -708,19 +731,44 @@ def build():
     # S58: the spreadsheet behind bars, facing +X, left of the cube.
     ss = K.empty("sheet", (-5.4, 0.3, 0))
     ss.rotation_euler = (0, 0, math.pi / 2)
+    # Laid out as a spreadsheet (human, C5 set H: the jail "is not reading as containing a spreadsheet"; it was a
+    # bare grid): a formula bar, grey column letters and row numbers, dollar figures in every cell; the cells fill
+    # red behind their figures.
     _box("sheet.panel", K.mat_plastic("sheetpanel", "paper", 0.5), ss, (0, 0.03, 1.2), (2.6, 0.05, 1.7))
     cell_red = K.mat_emission("cell_red", "alarm", 5.0)
     grid = K.mat_plastic("grid", "shadow", 0.5)
+    head = K.mat_matte("sheethead", "lab")
+    ink = K.mat_ink("sheet_ink", "shadow")
+    mono = "JetBrainsMono-SemiBold-flat.ttf"
+    X0, XR, XL, ZB, ZH, ZT, RH = -1.26, -1.06, 1.26, 0.41, 1.66, 1.82, 0.25
+    CW = (XL - XR) / 6
+    _box("sheet.fbar", K.mat_matte("sheetfbar", "paper"), ss, (0, -0.006, 1.93), (2.52, 0.01, 0.16))
+    _box("sheet.fbar.box", grid, ss, (X0 + 0.1, -0.012, 1.93), (0.012, 0.004, 0.16))
+    K.text("sheet.fx", "fx", 0.08, ink, loc=(X0 + 0.04, -0.016, 1.93), font="InstrumentSerif-Italic.ttf",
+           align="LEFT", parent=ss)
+    K.text("sheet.formula", "=SUM(DAMAGES)", 0.08, ink, loc=(X0 + 0.16, -0.016, 1.93), font=mono, align="LEFT",
+           parent=ss)
+    _box("sheet.colhead", head, ss, ((X0 + XL) / 2, -0.006, (ZH + ZT) / 2), (XL - X0, 0.01, ZT - ZH))
+    _box("sheet.rowhead", head, ss, ((X0 + XR) / 2, -0.006, (ZB + ZH) / 2), (XR - X0, 0.01, ZH - ZB))
+    for c in range(6):
+        K.text(f"sheet.col{c}", "ABCDEF"[c], 0.08, ink, loc=(XR + CW * (c + 0.5), -0.016, (ZH + ZT) / 2), font=mono,
+               parent=ss)
+    figures = ["$4.2M", "$310K", "$18M", "$95K", "$2.7M", "$1.1M", "$640K", "$12M", "$7.5M", "$880K", "$3.3M",
+               "$56K", "$27M", "$1.9M", "$450K", "$9.8M", "$210K", "$6.1M", "$73K", "$15M", "$5.4M", "$990K",
+               "$31M", "$2.2M", "$140K", "$8.6M", "$47M", "$360K", "$4.9M", "#REF!"]
     cells = []
     for r in range(5):
+        z = ZH - RH * (r + 0.5)
+        K.text(f"sheet.row{r}", str(r + 1), 0.08, ink, loc=((X0 + XR) / 2, -0.016, z), font=mono, parent=ss)
         for c in range(6):
-            x, z = -1.05 + 0.42 * c, 0.6 + 0.3 * (4 - r) + 0.05
-            cell = _box(f"sheet.cell{r}{c}", cell_red, ss, (x, -0.0, z), (0.38, 0.01, 0.26))
-            cells.append(cell)
-    for c in range(7):
-        _box(f"sheet.vline{c}", grid, ss, (-1.26 + 0.42 * c, -0.01, 1.2), (0.012, 0.004, 1.55))
-    for r in range(6):
-        _box(f"sheet.hline{r}", grid, ss, (0, -0.01, 0.5 + 0.3 * r), (2.55, 0.004, 0.012))
+            x = XR + CW * (c + 0.5)
+            cells.append(_box(f"sheet.cell{r}{c}", cell_red, ss, (x, -0.0, z), (CW - 0.02, 0.01, RH - 0.03)))
+            K.text(f"sheet.fig{r}{c}", figures[6 * r + c], 0.075, ink, loc=(x + CW / 2 - 0.04, -0.016, z), font=mono,
+                   align="RIGHT", parent=ss)
+    for x in [X0, XR] + [XR + CW * c for c in range(1, 7)]:
+        _box(f"sheet.vline{x:.2f}", grid, ss, (x, -0.012, (ZB + ZT) / 2), (0.01, 0.004, ZT - ZB))
+    for z in [ZB + RH * r for r in range(6)] + [ZT]:
+        _box(f"sheet.hline{z:.2f}", grid, ss, ((X0 + XL) / 2, -0.012, z), (XL - X0, 0.004, 0.01))
     # A full cell (human, C4 v2: "more enclosed, particularly around the sides"): bars on the front and both sides, a
     # barred top, a back wall and a floor slab; the sheet inside, legible through the front bars.
     bar_m, rail_m = K.mat_chrome("jailbar"), K.mat_chrome("jailrail")
@@ -961,7 +1009,10 @@ def animate(S, t0, t1):
         for fc in A._fcurve(p, "location", 0), A._fcurve(p, "location", 1), A._fcurve(p, "location", 2):
             for kp in fc.keyframe_points:
                 kp.interpolation = "LINEAR"
-        A.write_keys(p, "hide_render", [(0, 1, "CONSTANT"), (A.frame(a), 0, "CONSTANT"), (A.frame(b) + 1, 1, "CONSTANT")])
+        # The SUBPOENA prints too: hide_render doesn't reach children (human, C5 set H: the text outlived its plane).
+        for x in [p] + list(p.children):
+            A.write_keys(x, "hide_render", [(0, 1, "CONSTANT"), (A.frame(a), 0, "CONSTANT"),
+                                            (A.frame(b) + 1, 1, "CONSTANT")])
         # Each folds from a flat sheet as it comes into frame, staggered down the V.
         f0 = A.frame(cut("S55") + 0.15 + 0.08 * row)
         A.write_keys(p.data.shape_keys, 'key_blocks["fold"].value', [(0, 0.0, "CONSTANT"), (f0, 0.0), (f0 + 36, 1.0)])
@@ -1031,7 +1082,9 @@ CAMERAS = {
     "S51": [(0.0, _v(0.6, -4.3, 0.8), _v(0.0, -2.55, 0.35), 32), (1.0, _v(0.3, -3.9, 0.6), _v(0.0, -2.55, 0.35), 32)],
     "S52": [(0.0, _v(0.3, -0.15, 1.8), _v(0.0, -4.6, 0.95), 24), (1.0, _v(0.1, -0.3, 1.75), _v(0.0, -4.6, 0.95), 24)],
     "S53": [(0.0, _v(2.08, -2.45, 0.2), _v(1.86, -1.75, 0.17), 30), (1.0, _v(2.03, -2.3, 0.19), _v(1.86, -1.75, 0.17), 32)],
-    "S54": [(0.0, _v(1.68, -2.35, 0.22), _v(2.0, -1.6, 0.1), 30), (1.0, _v(1.74, -2.2, 0.2), _v(2.0, -1.6, 0.1), 32)],
+    # From above the flag (human, C5 set H: the flag hid "SAFE STOP"): the sign clears the flag's top, and it sits
+    # inside the 16:9 band.
+    "S54": [(0.0, _v(1.58, -2.34, 0.6), _v(2.02, -1.6, 0.12), 22), (1.0, _v(1.63, -2.24, 0.55), _v(2.02, -1.6, 0.12), 24)],
     # A little above the formation, so the printed wings face the lens; the stamp arms march in behind.
     "S55": [(0.0, _v(1.2, -7.6, 3.9), _v(-1.2, 0.0, 1.7), 24), (1.0, _v(0.4, -7.1, 4.0), _v(-0.9, 0.2, 1.8), 24)],
     "S56": [(0.0, _v(1.7, 1.2, 1.8), _v(-0.2, 2.3, 0.5), 30), (1.0, _v(1.5, 1.3, 1.6), _v(-0.2, 2.3, 0.45), 32)],

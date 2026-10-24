@@ -311,3 +311,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** "these aren't reading as the same probes (or even probes at all) -- likely due to the difference in reflectivity between these and the protagonist probe. is this intentional".
+
+## 2026-10-24T06:05:50-04:00 — R1: set H notes
+
+- "the "SAFE STOP" text is obscured by the flag -- re-angle this so that it's visible. the ribbon needs more details so that it reads like a ribbon. the "SUBPEONA" text sticks around longer than the planes they flew in on. the "LIABILITY" jail is not reading as containing a spreadsheet."
+- Rule R1 (review feedback). Acted on in the production log entry of the same time.
