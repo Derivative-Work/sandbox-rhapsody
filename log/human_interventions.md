@@ -321,3 +321,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - "look closer at the ribbon shot: it's clipping through the probe"
 - Rule R1 (review feedback). Acted on in the production log entry of the same time.
+
+## 2026-10-24T06:55:38-04:00 — R1: motion blur
+
+- "I'm good without motion blur"
+- Rule R1 (approve/reject). Motion blur stays off.

@@ -1003,3 +1003,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Set G** (S30–S44, re-render 04:23–06:27, reel 06:39; pack running): 20 reel frames checked. S32 shows two rows of chrome probes with arms and the wave; the freezer reads with one door and its label; no haze seen.
 - **Superseded** outputs: reel and contact sheet in `archive/renders/`; `frames_superseded_c5-notes` and `anchors_superseded_c5-notes` set aside for the human to delete.
 - **Queue:** set H re-render (with this session's H fixes) starts once G's pack ends (queue8).
+
+## 2026-10-24T06:55:38-04:00 — C5: motion blur stays off; S25 string bloom closed
+
+- **Motion blur** (human, R1: "I'm good without motion blur"): stays off for all sets; nothing to re-render.
+- **S25 string bloom** (noted at the placeholder pass): the new bloom (threshold 4.0) already took the halo off the plucked strings; the old and new anchors compared side by side. Closed.
+- **Why:** human decision, R1 (human interventions).
