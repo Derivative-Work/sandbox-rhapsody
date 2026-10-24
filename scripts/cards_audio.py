@@ -1,7 +1,8 @@
 """Audio under the fact card and end card (human, C6): a new bounce from the stems, from 3:58 to the end with the
-lead vocal muted, run through the music-deslop post-filter, as the master was.
+vocals muted until "zero", run through the music-deslop post-filter, as the master was.
 
-1. Bounce: every stem except `Vocals` (the lead), summed as Suno exported them (their sum is the mix; step 2),
+1. Bounce: every stem, with both vocal stems (`Vocals`, the lead, and `Backing Vocals`) gated shut until the
+   "…zero." where the choir comes in (MUTED_UNTIL), summed as Suno exported them (their sum is the mix; step 2),
    from START_S minus a PREROLL_S of context for the model, to the stems' end (323.0 s).
 2. Post-filter: music-deslop M6f 10k, `--source suno --no-fallback --strength 1.0` (the master's chain,
    audio/master/REPORT.md), run from its own checkout and venv.
@@ -25,7 +26,13 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import ending_audio as E  # noqa: E402
 
 STEMS = ROOT / "audio/stems"
-MUTED = {"Vocals"}
+MUTED = set()  # stems muted for the whole bounce (none since the vocals return on "zero")
+# Stems muted until a song time (human, C6: the lead muted, "keep the background vocals muted until 'zero' as well",
+# "also bring back the main vocals at that point too"). Both are silent there (backing from 294.5 s, the lead at its
+# -88 dB floor from 296.1 s) until "…zero." at 297.17 s (attacks from 296.95 s), so the gate opens inside that
+# silence with a short fade: the entry is each stem's own attack.
+MUTED_UNTIL = {"Vocals": 296.75, "Backing Vocals": 296.75}
+GATE_FADE_S = 0.02
 START_S = 237.8818  # 3:58 (human), snapped to the downbeat there: S54's cut
 PREROLL_S = 4.0
 END_S = 333.0  # the release has decayed about 60 dB by here
@@ -42,6 +49,11 @@ def bounce():
     mix, sr = None, None
     for p in names:
         y, sr = sf.read(p, start=int(round(a * 48000)), always_2d=True)
+        until = MUTED_UNTIL.get(p.stem.split("(")[-1].rstrip(")"))
+        if until is not None:
+            k, f = int(round((until - a) * sr)), int(GATE_FADE_S * sr)
+            y[:k] = 0
+            y[k:k + f] *= np.linspace(0, 1, f)[:, None]
         mix = y if mix is None else mix + y
     RAW.parent.mkdir(parents=True, exist_ok=True)
     sf.write(RAW, mix, sr, subtype="FLOAT")
@@ -88,7 +100,7 @@ def main():
     stems, sr = bounce()
     cmd = deslop()
     dur, peak = finish(sr)
-    info = {"stems": stems, "muted": sorted(MUTED), "start_song_s": START_S, "preroll_s": PREROLL_S,
+    info = {"stems": stems, "muted": sorted(MUTED), "muted_until_s": MUTED_UNTIL, "gate_fade_s": GATE_FADE_S, "start_song_s": START_S, "preroll_s": PREROLL_S,
             "end_song_s": END_S, "duration_s": round(dur, 4), "peak_dbfs": round(peak, 2),
             "postfilter": " ".join(cmd[2:]), "postfilter_repo": str(DESLOP),
             "postfilter_commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=DESLOP, capture_output=True,

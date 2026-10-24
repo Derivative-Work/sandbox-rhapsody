@@ -1118,3 +1118,16 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Preview:** a 1080p card-section preview, using set H's superseded plates for S50, S51 and S55 (warned; set H is re-rendering). Checked: legibility over the dimmed footage, the title on the choir's word, the grouped credits. Fix from the check: fact 8's backdrop ran from S37 into S38's stands, so it now plays S37 twice.
 - **Main overlay:** re-rendering with the new card timing.
 - **Why:** human request, R1 (human interventions).
+
+## 2026-10-24T08:42:21-04:00 — C6 card bounce: both vocal stems gated until "zero", then back
+
+- **The notes** (human, R1): "keep the background vocals muted until 'zero' as well", then "also bring back the main vocals at that point too".
+- **Gate:** `Vocals` and `Backing Vocals` are both shut until 296.75 s (`MUTED_UNTIL`, 20 ms fade), then play. Measured in 50 ms windows, both are silent there: the backing stem is digitally silent from 294.5 s, the lead sits at its −88 dB floor from 296.1 s, and both attack from 296.95 s into "…zero." at 297.17 s. So the gate cuts nothing audible, and the entry is each stem's own attack.
+- **Bounce:** re-run through the same post-filter chain. Superseded bounces are in `archive/audio/` (`*_superseded_backing-unmuted` from the first bounce, `*_superseded_lead-muted-to-end` from the backing-only gate).
+- **Level, RMS against the master over the same spans:**
+  - With the vocals in, the stem sum peaks at +2.62 dBFS in the coda, so the post-filter's clip protection scales the whole bounce down 2.7 dB.
+  - Facts −25.6 dB (master −18.9: no vocals, plus the scaling); "zero" entry −18.7 (−19.0); coda −16.2 (−14.1).
+  - Suno's mix was limited; the raw stem sum isn't.
+  - Left as is (stems straight through the post-filter, as asked); a gentle limiter before the post-filter is offered to bring the coda level with the master.
+- **Backdrop and preview:** rebuilding with the new audio and fact 8's backdrop fix.
+- **Why:** human feedback, R1 (human interventions).
