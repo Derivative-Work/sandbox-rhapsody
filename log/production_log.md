@@ -1217,3 +1217,11 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Found** (agent, testing short 1's first 6 s): S29's reward-meter HUD showed over short 1's held S30 frame. During a short's lead-in, the previous shot is still "on" on the song timeline. The meter also collided with the opening label.
 - **Fix** (`overlays/overlay.html` `drawHud`): in a short, the HUD draws only from the short's first shot (`plate_from`) on. Short 1's overlay re-rendered; re-test clean (label and the first caption only). The other shorts' lead-ins (S44, S52) have no HUD.
 - **Short path checked:** lead-in hold, opening label, role captions, 9:16 crop of the square plates.
+
+## 2026-10-24T12:34:30-04:00 — C6: dissolve tails rendered; dissolve test; final assembly started
+
+- **Tails** (`scripts/render_tails.sh`, 10:57–12:32): 41 tails for the dissolves' outgoing shots, sets A, B, C, D, H and I, at each set's longest tail (A 54, B 51, C 50, D 50, H 27, I 56 frames), 64 samples. Each is packed as `renders/c5/set_<S>/frames/<shot>_tail.mkv`, and every pack checked bit-exact against its frames. Log: `renders/c5/tails.log`.
+- **Test** (1080p, 14–50 s; joins S01→S02 to S06→S07): the incoming shot comes up from the cut, and the outgoing one keeps moving under it from its tail; captions hold through. Tags BT.709, AAC present.
+- **Main overlay:** re-rendered with the final cues: 25,294 frames, 501 s. The end card counts 56 human interventions (`overlays/cues.json`, `deliverables/sandbox_rhapsody.srt`).
+- **Housekeeping:** the superseded card bounces in `archive/audio/` (logged earlier) are now committed (JSON) and hashed (WAV) in the manifest.
+- **Started:** `scripts/assemble.py main` at 3840×2160, then the four shorts (`renders/c6_assemble.log`).

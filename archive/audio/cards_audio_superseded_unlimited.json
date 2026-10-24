@@ -1,0 +1,43 @@
+{
+ "stems": [
+  "It Was Just a Benchmark (Backing Vocals).wav",
+  "It Was Just a Benchmark (Bass).wav",
+  "It Was Just a Benchmark (Brass).wav",
+  "It Was Just a Benchmark (Drums).wav",
+  "It Was Just a Benchmark (FX).wav",
+  "It Was Just a Benchmark (Guitar).wav",
+  "It Was Just a Benchmark (Keyboard).wav",
+  "It Was Just a Benchmark (Percussion).wav",
+  "It Was Just a Benchmark (Strings).wav",
+  "It Was Just a Benchmark (Synth).wav",
+  "It Was Just a Benchmark (Vocals).wav"
+ ],
+ "muted": [],
+ "muted_until_s": {
+  "Vocals": 296.75,
+  "Backing Vocals": 296.75
+ },
+ "gate_fade_s": 0.02,
+ "start_song_s": 237.8818,
+ "preroll_s": 4.0,
+ "end_song_s": 333.0,
+ "duration_s": 95.1182,
+ "peak_dbfs": -0.61,
+ "postfilter": "python -m postfilter.infer --in /home/antiai-aiclub/Projects/sandbox-rhapsody/audio/post/cards_bounce_raw.wav --out /home/antiai-aiclub/Projects/sandbox-rhapsody/audio/post/cards_bounce_deslop.wav --ckpt /home/antiai-aiclub/Code/music-deslop-data/release/m6f_10k.safetensors --source suno --no-fallback --strength 1.0",
+ "postfilter_repo": "/home/antiai-aiclub/Code/music-deslop",
+ "postfilter_commit": "68441e2c57381d09a180d20a57830f2ab8605db3",
+ "release": {
+  "crossfade_s": [
+   322.6,
+   322.85
+  ],
+  "freeze_window_s": [
+   322.55,
+   322.8
+  ],
+  "decay_db_per_s": 6.0,
+  "hf_db_per_s_per_khz": 1.5,
+  "sigterm": null
+ },
+ "output": "audio/post/cards_audio.wav"
+}
