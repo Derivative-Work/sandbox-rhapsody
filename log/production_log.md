@@ -1053,3 +1053,18 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Lesson:** the first check, without the posts, over-corrected two facts that the posts support. The secondary sources were narrower, not contradictory.
 - **Overlays:** cues rebuilt (48 human interventions, counted at build); main and vertical overlay tracks re-rendering.
 - **Why:** human retrieval, R4 (human interventions); brief section 9.
+
+## 2026-10-24T08:02:46-04:00 — C6: upload metadata (METADATA.md)
+
+- **The request** (human, R1): write the title, description, tags and so on for the video and the vertical cut, in `METADATA.md`, for upload time.
+- **Main video:**
+  - Title: recommended plus two alternatives, without company names; the description names them only in the sourced facts, as the fact card does.
+  - Description (3,612 of 5,000 characters): the on-screen satire label first; how it was made and the logged human interventions with the repo link; an Animusic homage line (not affiliated); chapters from the timing map's cuts; the fact card's nine facts with their sources and URLs; the end card's credits; the license and a no-affiliation line.
+  - Tags: 366 of 500 characters.
+  - Settings: Music; not for kids; altered/synthetic content disclosed; the SRT uploaded; Standard License, because YouTube's only CC option is CC BY, which would drop NC-SA; the S41 thumbnail; end-screen placement clear of the credits.
+- **Vertical:** a Shorts title and description linking the main video, tags, and a short facts paragraph for when the fact card is dropped.
+- **Found:**
+  - As briefed (S30–S65 + S66), the vertical runs 4:00, over the 3:00 Shorts limit. Without S66 it is 2:51. This is a human decision, listed at the top of the file with three options.
+  - The vertical starts at S30, so it never shows the S01 "AI-generated satire" label the brief wants at the start; its overlay needs that label whichever option is chosen.
+  - The vertical needs its own SRT timed from S30.
+- **Why:** human request, R1.

@@ -342,3 +342,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - The agent's fetches of https://openai.com/index/hugging-face-model-evaluation-security-incident/ and https://openai.com/index/hugging-face-incident-and-the-road-ahead/ returned HTTP 403. The human asked for the links ("give me the openai links so I can retrieve them for you") and saved both as PDF and HTML in ~/Downloads ("both posts retrieved and placed in ~/Downloads as both PDF and HTML -- read and archive whichever works best for you").
 - Rule R4 (interfaces the agent can't reach). The agent read and archived the PDFs (`reference/sources.tsv`).
+
+## 2026-10-24T08:02:46-04:00 — R1: upload metadata
+
+- "write up the title, description, tags, etc. for the video and vertical cut for YouTube and put them in METADATA.md for me to find when it's time to upload"
+- Rule R1 (direction). Upload itself will be R4.
