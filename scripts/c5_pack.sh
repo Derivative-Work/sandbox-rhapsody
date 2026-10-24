@@ -11,9 +11,11 @@ cd "$(dirname "$0")/.."
 fr="renders/c5/set_${1^^}/frames"
 for d in "$fr"/*/; do
   sid=$(basename "$d")
-  first=$(ls "$d" | grep -m1 -o '^f_[0-9]*' | cut -c3-)
-  n=$(ls "$d" | grep -c '^f_[0-9]*\.png$')
-  last=$(ls "$d" | grep -o '^f_[0-9]*' | tail -1 | cut -c3-)
+  # frame numbers sorted as numbers: by name, f_10000 sorts before f_9999 (set G's S33 stopped the pack there)
+  nums=$(ls "$d" | grep -o '^f_[0-9]*\.png$' | cut -c3- | cut -d. -f1 | sort -n)
+  first=$(head -1 <<< "$nums")
+  n=$(wc -l <<< "$nums")
+  last=$(tail -1 <<< "$nums")
   [ $((10#$last - 10#$first + 1)) -eq "$n" ] || { echo "$sid: frames not contiguous ($first..$last, $n)"; exit 1; }
   ffmpeg -loglevel error -y -framerate 60 -start_number "$first" -i "$d/f_%04d.png" -c:v ffv1 -level 3 -g 1 \
     -slices 24 -slicecrc 1 -pix_fmt bgr0 "$fr/$sid.mkv"

@@ -924,3 +924,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Fix** (`set_f.py`): the lip's inner edge stands 4 mm in from the walls (inner 0.452 m). The same six frames: the sliver is gone, leaving the steady shadow line under the lip.
 - **Re-render:** the queued C job now re-renders C and F once the main queue ends (`renders/c5/queue6.log`), then their reels and packs. Their current reels, contact sheets, frames and anchors are set aside first as `_superseded_c5-notes` (this replaces the `_superseded_straps` naming in the previous entry; nothing had been moved yet).
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-23T21:45:03-04:00 — C5: frame packing past frame 9999
+
+- **Failure:** the follower stopped while packing set G at S33: "frames not contiguous (10000..9999, 106)". S33 runs from frame 9943 to 10048; `c5_pack.sh` took the first and last frame from the directory listing sorted by name, where f_10000 comes before f_9943. The check refused the pack and kept the PNGs; nothing was lost.
+- **Fix** (`scripts/c5_pack.sh`): frame numbers sorted as numbers. S33 now reads 9943..10048, 106 frames. `c5_reel.py` builds names from frame numbers and was not affected; set G's reel was written before the pack.
+- **Resumed:** set G's remaining shots pack now, then the follower picks up H and I (`renders/c5/queue5.log`). Every later set has frames past 9999.
