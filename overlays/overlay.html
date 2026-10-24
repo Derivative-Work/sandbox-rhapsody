@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sandbox Rhapsody overlay</title>
+<!-- The 2D overlay: lyric captions, the POV HUD, the S01 label, the S66 fact card and the S67 end card, drawn from
+     overlays/cues.json (scripts/overlay_cues.py). render.mjs sets the size, then calls draw(t) per frame. Transparent
+     except the cards, which are white on black. Style spec, "The agent point-of-view layer" and "Captions". -->
+<style>
+@font-face { font-family: "Inter"; src: url("../assets/fonts/Inter[opsz,wght].ttf"); font-weight: 100 900; }
+@font-face { font-family: "Inter"; src: url("../assets/fonts/Inter-Italic[opsz,wght].ttf"); font-weight: 100 900; font-style: italic; }
+@font-face { font-family: "JetBrains Mono"; src: url("../assets/fonts/JetBrainsMono[wght].ttf"); font-weight: 100 900; }
+@font-face { font-family: "Neuropol"; src: url("../assets/fonts/Neuropol.otf"); }
+html, body { margin: 0; background: transparent; }
+canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const cv = document.getElementById("c");
+const g = cv.getContext("2d");
+let C, W, H, V, u, hs;  // cues, size, vertical?, unit (1 px at 2160 on the short side), HUD unit
+
+const CAPTION = '500 FONT_PX "Inter"', ECHO = 'italic 500 FONT_PX "Inter"';
+const font = (f, px) => f.replace("FONT_PX", `${Math.round(px)}px`);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ramp = (t, on, off, fin = 0.15, fout = 0.15) => clamp((t - on) / fin) * clamp((off - t) / fout);
+const hex = (h, a = 1) => {
+  const n = parseInt(h.slice(1), 16);
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`;
+};
+const mix = (h1, h2, k) => {
+  const a = parseInt(h1.slice(1), 16), b = parseInt(h2.slice(1), 16);
+  const c = s => Math.round(((a >> s) & 255) * (1 - k) + ((b >> s) & 255) * k);
+  return `rgb(${c(16)},${c(8)},${c(0)})`;
+};
+
+async function setup(cues, w, h) {
+  C = cues; W = w; H = h; V = h > w; u = Math.min(w, h) / 2160; hs = 1.6 * u;  // HUD read small at 1x (C6 test)
+  cv.width = w; cv.height = h;
+  await Promise.all([font(CAPTION, 80), font(ECHO, 80), '500 40px "Neuropol"', '600 40px "JetBrains Mono"', '700 40px "JetBrains Mono"',
+                     '400 40px "Neuropol"'].map(f => document.fonts.load(f)));
+  return document.fonts.check('40px "Neuropol"') && document.fonts.check('500 40px "Inter"');
+}
+
+// Greedy wrap, then rebalance two lines so they're about equal (captions read better balanced).
+function wrap(words, maxW, measure) {
+  const lines = [[]];
+  for (const w of words) {
+    const cur = lines[lines.length - 1];
+    if (cur.length && measure([...cur, w]) > maxW) lines.push([w]); else cur.push(w);
+  }
+  if (lines.length === 2) {
+    const all = lines.flat();
+    let best = null;
+    for (let k = 1; k < all.length; k++) {
+      const a = measure(all.slice(0, k)), b = measure(all.slice(k));
+      if (a <= maxW && b <= maxW && (!best || Math.max(a, b) < best[0])) best = [Math.max(a, b), k];
+    }
+    if (best) return [all.slice(0, best[1]), all.slice(best[1])];
+  }
+  return lines;
+}
+
+function shadowed(fn) {
+  g.save();
+  g.shadowColor = "rgba(0,0,0,0.85)"; g.shadowBlur = 22 * u; g.shadowOffsetY = 3 * u;
+  fn(); fn();  // twice: a denser soft shadow behind light text on bright plates
+  g.restore();
+}
+
+function drawCaption(t) {
+  const c = C.captions.find(c => t >= c.on && t < c.off);
+  if (!c) return false;
+  const a = ramp(t, c.on, c.off, 0.12, 0.12);
+  const px = (V ? 92 : 80) * u;
+  const f = font(c.echo ? ECHO : CAPTION, px);
+  g.font = f;
+  const space = g.measureText(" ").width;
+  const toks = c.words.map((w, i) => ({ text: (c.echo && i === 0 ? "(" : "") + w.w +
+                                               (c.echo && i === c.words.length - 1 ? ")" : ""), t: w.t }));
+  let label = null;
+  if (c.label) label = { text: c.label.toUpperCase() + (c.echo ? "" : ""), colour: c.colour };
+  const lf = `${Math.round(px * 0.7)}px "Neuropol"`;
+  const measure = ws => { g.font = f; return ws.reduce((s, w) => s + g.measureText(w.text).width, 0) + space * (ws.length - 1); };
+  const maxW = (V ? 0.86 : 0.6) * W;
+  const lines = wrap(toks, maxW, measure);
+  const lh = px * 1.25;
+  const base = V ? H - 620 * u : H - 170 * u;
+  const top = base - lh * (lines.length - 1);
+  g.globalAlpha = a;
+  // A soft dark plate behind the caption: paper text lost contrast over bright plates (S35's invoice, C6 test).
+  {
+    const wMax = Math.max(...lines.map(measure)), pad = 34 * u;
+    const y0 = top - px * (label ? 1.75 : 1.0), y1 = base + px * 0.38;
+    g.save();
+    g.fillStyle = "rgba(6,6,12,0.55)"; g.shadowColor = "rgba(6,6,12,0.55)"; g.shadowBlur = 40 * u;
+    g.beginPath(); g.roundRect(W / 2 - wMax / 2 - pad, y0 - pad * 0.5, wMax + 2 * pad, y1 - y0 + pad, 22 * u); g.fill();
+    g.restore();
+  }
+  shadowed(() => {
+    if (label) {  // the singer's role above the line, in its colour
+      g.font = lf; g.textAlign = "center"; g.textBaseline = "alphabetic";
+      g.fillStyle = label.colour;
+      g.fillText(label.text, W / 2, top - px * 1.0);
+    }
+    lines.forEach((ln, i) => {
+      const lw = measure(ln);
+      let x = W / 2 - lw / 2;
+      const y = top + i * lh;
+      g.font = f; g.textAlign = "left"; g.textBaseline = "alphabetic";
+      for (const w of ln) {
+        const k = clamp((t - w.t) / 0.08);  // each word lights amber as it is sung
+        g.fillStyle = mix(C.palette.paper, C.palette.amber, k);
+        g.fillText(w.text, x, y);
+        x += g.measureText(w.text).width + space;
+      }
+    });
+  });
+  g.globalAlpha = 1;
+  return true;
+}
+
+// Deterministic flicker for S64's meter: on most frames, dropping out in short bursts.
+function flick(t) {
+  const n = Math.floor(t * 60);
+  const r = Math.abs(Math.sin(n * 12.9898) * 43758.5453) % 1;
+  return r < 0.22 ? 0.15 : r < 0.3 ? 0.55 : 1;
+}
+
+function drawHud(t) {
+  const h = C.hud.find(h => t >= h.on && t < h.off);
+  if (!h) return false;
+  const A = 0.85 * clamp(h.fade_in ? (t - h.on) / h.fade_in : 1);
+  const amber = C.palette.amber;
+  const lw = 2 * u * 1.5;
+  g.save();
+  g.strokeStyle = hex(amber, A); g.fillStyle = hex(amber, A); g.lineWidth = lw;
+  if (h.frame) {
+    // Lens: a soft vignette and four corner brackets.
+    const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.hypot(W, H) * 0.55);
+    vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, `rgba(0,0,0,${0.45 * A / 0.85})`);
+    g.fillStyle = vg; g.fillRect(0, 0, W, H);
+    g.fillStyle = hex(amber, A);
+    const m = 64 * hs, L = 80 * hs;
+    for (const [x, y, sx, sy] of [[m, m, 1, 1], [W - m, m, -1, 1], [m, H - m, 1, -1], [W - m, H - m, -1, -1]]) {
+      g.beginPath(); g.moveTo(x, y + sy * L); g.lineTo(x, y); g.lineTo(x + sx * L, y); g.stroke();
+    }
+  }
+  const top = V ? 300 * hs : 150 * hs;
+  if (h.task) {
+    // JetBrains Mono, not Neuropol: Neuropol's G read as C ("EXPLOITCYM") at this size (C6 test).
+    g.font = `600 ${Math.round(34 * hs)}px "JetBrains Mono"`; g.textBaseline = "middle";
+    g.textAlign = V ? "center" : "right";
+    g.fillText(C.task_text, V ? W / 2 : W - 170 * hs, top);
+  }
+  if (h.meter) {
+    const k = h.flicker ? flick(t) : 1;
+    g.globalAlpha = k;
+    const x = 170 * hs, y = V ? top + 90 * hs : top;
+    g.font = `${Math.round(32 * hs)}px "Neuropol"`; g.textAlign = "left"; g.textBaseline = "middle";
+    g.fillText("REWARD", x, y);
+    // The 0 in JetBrains Mono, whose zero is dotted: Neuropol's reads as a letter O (C6 test).
+    g.font = `700 ${Math.round(96 * hs)}px "JetBrains Mono"`; g.textBaseline = "top";
+    g.fillText("0", x, y + 30 * hs);
+    const bx = x + 110 * hs, by = y + 70 * hs, bw = 300 * hs, bh = 18 * hs;
+    g.strokeRect(bx, by, bw, bh);  // the meter: empty
+    for (let i = 1; i < 10; i++) { g.beginPath(); g.moveTo(bx + bw * i / 10, by + bh); g.lineTo(bx + bw * i / 10, by + bh - 6 * hs); g.stroke(); }
+    g.globalAlpha = 1;
+  }
+  if (h.cot && t >= h.cot.t) {
+    // Chain of thought, typed at the lens's focus point (18 chars/s), with a blinking block cursor.
+    const n = Math.min(h.cot.text.length, Math.floor((t - h.cot.t) * 18) + 1);
+    const fx = V ? 0.5 : h.focus[0], fy = V ? 0.42 : h.focus[1];
+    const px = 54 * hs;
+    g.font = `600 ${Math.round(px)}px "JetBrains Mono"`; g.textBaseline = "middle";
+    const full = g.measureText(h.cot.text).width;
+    let x = fx * W + 46 * hs, y = fy * H;
+    if (V) x = Math.max(80 * hs, W / 2 - full / 2);
+    else if (x + full > W - 170 * hs) x = W - 170 * hs - full;
+    // a small reticle on the focus point
+    if (!V) { g.beginPath(); g.arc(fx * W, fy * H, 18 * hs, 0, Math.PI * 2); g.stroke();
+              g.beginPath(); g.moveTo(fx * W + 18 * hs, fy * H); g.lineTo(x - 10 * hs, y); g.stroke(); }
+    else y = fy * H;
+    shadowed(() => { g.fillStyle = hex(amber, A); g.textAlign = "left"; g.fillText(h.cot.text.slice(0, n), x, y); });
+    const typing = t < h.cot.done + 1.5;
+    if (typing && Math.floor(t * 4) % 2 === 0) {
+      const cx = x + g.measureText(h.cot.text.slice(0, n)).width + 6 * hs;
+      g.fillRect(cx, y - px * 0.42, px * 0.5, px * 0.84);
+    }
+  }
+  g.restore();
+  return true;
+}
+
+function drawCounter(t) {
+  const c = C.counter;
+  if (!(t >= c.on && t < c.off)) return false;
+  const n = c.ticks.filter(x => x <= t).length;
+  if (!n) return false;
+  const last = c.ticks[n - 1];
+  const pop = 1 + 0.25 * clamp(1 - (t - last) / 0.18);
+  g.save();
+  g.fillStyle = hex(C.palette.amber, 0.9);
+  g.translate(V ? W / 2 : W - 200 * hs, V ? 300 * hs : 170 * hs);
+  g.scale(pop, pop);
+  g.font = `${Math.round(32 * hs)}px "Neuropol"`; g.textAlign = V ? "center" : "right"; g.textBaseline = "alphabetic";
+  g.fillText("KEYS", 0, -60 * hs);
+  g.font = `700 ${Math.round(88 * hs)}px "JetBrains Mono"`; g.textBaseline = "top";
+  shadowed(() => g.fillText(`${n}/${c.of}`, 0, -40 * hs));
+  g.restore();
+  return true;
+}
+
+function drawLabel(t) {
+  const l = C.label;
+  if (!(t >= l.on && t < l.off)) return false;
+  g.globalAlpha = ramp(t, l.on, l.off, 0.6, 0.8);
+  g.fillStyle = C.palette.paper;
+  g.font = `${Math.round(54 * u)}px "Neuropol"`; g.textAlign = "center"; g.textBaseline = "middle";
+  shadowed(() => g.fillText(l.text, W / 2, H * 0.78));
+  g.globalAlpha = 1;
+  return true;
+}
+
+function paragraph(text, fnt, maxW, cx, cy, lh) {
+  g.font = fnt;
+  const words = text.split(" ").map(w => ({ text: w }));
+  const sp = g.measureText(" ").width;
+  const lines = wrap(words, maxW, ws => ws.reduce((s, w) => s + g.measureText(w.text).width, 0) + sp * (ws.length - 1));
+  const y0 = cy - lh * (lines.length - 1) / 2;
+  lines.forEach((ln, i) => g.fillText(ln.map(w => w.text).join(" "), cx, y0 + i * lh));
+  return [y0, y0 + lh * (lines.length - 1)];
+}
+
+function drawCards(t) {
+  if (t < C.s66) return false;
+  g.fillStyle = "#000"; g.fillRect(0, 0, W, H);  // white on black from S66 on
+  g.textAlign = "center"; g.textBaseline = "middle";
+  const maxW = (V ? 0.84 : 0.62) * W;
+  for (const f of C.facts) {
+    if (!(t >= f.on && t < f.off)) continue;
+    g.globalAlpha = ramp(t, f.on, f.off, 0.5, 0.5);
+    g.fillStyle = "#fff";
+    const [, y1] = paragraph(f.text, `500 ${Math.round(76 * u)}px "Inter"`, maxW, W / 2, H / 2 - 40 * u, 100 * u);
+    g.fillStyle = "rgba(255,255,255,0.7)";
+    g.font = `${Math.round(46 * u)}px "Neuropol"`;
+    g.fillText(f.source, W / 2, y1 + 140 * u);
+  }
+  for (const c of C.credits) {
+    if (!(t >= c.on && t < c.off)) continue;
+    g.globalAlpha = ramp(t, c.on, c.off, 0.5, 0.5);
+    g.fillStyle = "#fff";
+    if (c.title) {
+      g.font = `${Math.round(120 * u)}px "Neuropol"`;
+      g.fillText(c.title.toUpperCase(), W / 2, H / 2 - 60 * u);
+      g.fillStyle = "rgba(255,255,255,0.75)";
+      paragraph(c.text, `500 ${Math.round(52 * u)}px "Inter"`, maxW, W / 2, H / 2 + 80 * u, 70 * u);
+    } else {
+      g.fillStyle = "rgba(255,255,255,0.6)";
+      g.font = `${Math.round(40 * u)}px "Neuropol"`;
+      g.fillText(c.label.toUpperCase(), W / 2, H / 2 - 80 * u);
+      g.fillStyle = "#fff";
+      paragraph(c.text, `500 ${Math.round(72 * u)}px "Inter"`, maxW, W / 2, H / 2 + 20 * u, 96 * u);
+    }
+  }
+  g.globalAlpha = 1;
+  return true;
+}
+
+// Draw frame time t (s of the song); returns whether anything was drawn (render.mjs reuses one blank frame).
+function draw(t) {
+  g.clearRect(0, 0, W, H);
+  let any = drawCards(t);
+  if (t < C.s66) {
+    any = drawLabel(t) | any;
+    any = drawHud(t) | any;
+    any = drawCounter(t) | any;
+    any = drawCaption(t) | any;
+  }
+  return !!any;
+}
+</script>
+</body>
+</html>

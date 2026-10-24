@@ -331,3 +331,9 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - "render just that one frame now so you can check it before all of H renders"
 - Rule R1 (review direction). Acted on in the production log entry of the same time.
+
+## 2026-10-24T07:27:34-04:00 — R1: start C6 overlays; Neuropol
+
+- "while it renders, get started on the HUD, captions, and end cards. I'm thinking of using the Neuropol typeface where it makes sense (https://www.dafont.com/neuropol.font) which appears to be public domain"
+- "(make sure to credit it anyway)"
+- Rule R1 (direction). The typeface is a human suggestion. The agent checked its license and decided where it fits; it is credited on the end card at the human's request.

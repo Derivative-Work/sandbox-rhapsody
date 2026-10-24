@@ -1,0 +1,9 @@
+Neuropol (Typodermic Fonts), version 3.100, by Ray Larabie.
+Downloaded 2026-10-24 from https://www.dafont.com/neuropol.font (archive sha256 09f718f685f43e310542ea39d4b843548710cfb8e9b3148c8624da16178c5006; it holds only Neuropol.otf).
+
+The font's own name table (license, nameID 13):
+
+This font has been released under a no rights reserved Creative Commons Zero license.  Please do not ask permission to do anything with these fonts. Whatever you want to do with this font, the answer will be yes. Please read about the CC0 Public Domain license before contacting me. https://creativecommons.org/publicdomain/zero/1.0/ To the extent possible under law, Raymond Larabie has waived all copyright and related or neighboring rights to this font. This work is published from Japan.
+
+
+License URL (nameID 14): https://creativecommons.org/publicdomain/zero/1.0/

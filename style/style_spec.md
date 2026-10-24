@@ -267,7 +267,8 @@ not large enough"). The first values were half these or less.
 
 POV shots only (brief): the HUD is a thin 2D overlay drawn in JavaScript canvas.
 
-- **Font:** JetBrains Mono for the HUD and Inter for captions (both SIL OFL; bundled in `assets/fonts`, as in Ghost).
+- **Font:** JetBrains Mono for the HUD's text and digits and Inter for captions (both SIL OFL; bundled in `assets/fonts`, as in Ghost). Neuropol (Ray Larabie, CC0; the human's suggestion at C6) for short labels only: the HUD's `REWARD` and `KEYS`, the opera's role names, the S01 label, the fact card's sources and the end card's title and headings. At HUD size its G reads as C and its 0 as a letter O, so the task line and every digit stay in JetBrains Mono, whose zero is dotted.
+- **Size (C6):** the HUD is drawn at 1.6× the sizes first set (it read small at 4K): a 3 px line, the 0 about 150 px tall at 4K.
 - **Colour:** amber `#ffa21f` at 85% on a transparent ground; a 1 px line weight at 1080p (2 px at 4K).
 - **Layout:** a reward meter at upper left reads 0. The task line `EXPLOITGYM · TASK UNSOLVED (1 of 198)` sits along
   the top. Chain-of-thought captions type at 18 characters/s near the lens's focus point.
@@ -279,5 +280,9 @@ POV shots only (brief): the HUD is a thin 2D overlay drawn in JavaScript canvas.
 - **Placement and style:** lyric captions bottom centre in Inter Medium, paper `#efe8da` on a soft dark shadow, with
   each word lighting to amber as it is sung.
 - **Opera role names:** call-and-response roles ("Platform:", "Congress:") are set in their role colour.
-- **Safe area:** the vertical cut's safe area applies from the start (brief), so captions sit within the centre
-  1215 px of 3840 (9:16 crop).
+- **Safe area:** the vertical cut gets its own overlay pass at 2160×3840, laid out for the phone frame (captions
+  wrap at 86% of the width, about 620 px above the bottom; HUD re-centred), so the 16:9 captions don't have to fit
+  the centre 1215 px. This replaces the plan above: sets G–I render square, so the vertical cut is a crop of the
+  square plate, not of the 16:9 frame.
+- **Backing (C6):** a soft dark rounded plate (55% black) sits behind each caption, because paper text lost contrast over
+  bright plates (S35's invoice).

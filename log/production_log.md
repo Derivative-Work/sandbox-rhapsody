@@ -1015,3 +1015,28 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Found** (agent, on the human's request to render S52's anchor frame on its own before set H's re-render): a hard white disc in the bottom right of S52. Ray-cast through the pixel: through the new cube's glass front, onto the mirror floor, and the reflected ray runs back along the key light's direction (-7.7, -11.2, 11.5): the floor's reflection of the key, which only S52's downward angle catches.
 - **Fix:** the key's specular is keyed to 0 for S52 only (constant keys at the S52 and S53 cuts); diffuse light is unchanged. Stills at 0.1, 5 and 10 s: the disc is gone, and the cameras and key rack are lit as before.
 - **Render:** in set H's queued re-render (not started yet).
+
+## 2026-10-24T07:27:34-04:00 — C6 started: overlay pipeline (captions, HUD, S01 label, fact card, end card), Neuropol, fact-card source check
+
+- **The request** (human, R1): start the HUD, captions and end cards while set H renders. Use Neuropol "where it makes sense" ("appears to be public domain"), and "make sure to credit it anyway".
+- **Neuropol:** downloaded from dafont into an isolated folder. The archive (sha256 09f718f6…) holds only `Neuropol.otf` v3.100. Its name table says CC0 ("no rights reserved Creative Commons Zero license … Raymond Larabie has waived all copyright"). Vendored as `assets/fonts/Neuropol.otf` with `Neuropol-CC0.txt` (the embedded license, verbatim); both added to `SHA256SUMS`.
+- **Where Neuropol goes:** short labels only: the HUD's REWARD and KEYS, the opera's role names, the S01 label, the fact sources and the end card's title and headings. Two test passes showed its G reading as C ("EXPLOITCYM") and its 0 as a letter O, so the task line and all digits use JetBrains Mono (dotted zero). Inter stays for captions and card text. Recorded in `style/style_spec.md`.
+- **Pipeline:**
+  - `scripts/overlay_cues.py` turns the timing map and `overlays/cards.json` into `overlays/cues.json` and `deliverables/sandbox_rhapsody.srt`.
+  - Captions: 80 lines; each word lights amber at its aligned start, and opera roles show in their colour. Lines never share the screen (checked: no overlaps).
+  - HUD on S04, S08, S28, S41, S60 and S64 (meter, task line, typed thoughts at 18 chars/s, lens brackets and vignette), S09's task line and S29's meter. S64's meter flickers.
+  - S13's key counter ticks on set C's 14 pickup notes (`set_c.pickup_events`, run without Blender).
+  - Cards: one fact or credit at a time, reading time at 3.5 words/s + 1.5 s.
+  - `overlays/overlay.html` draws a frame on a canvas. `overlays/render.mjs` (Puppeteer, `--no-sandbox` as the other scripts here) renders FFV1 bgra .mkv tracks: main 3840×2160 for the whole video, vertical 2160×3840 from S30 to the end of S66. `--at` gives PNG stills.
+- **Test passes** (composited over the C5 plate frames at the same song times): the HUD read small, so it went to 1.6×; captions lost contrast over bright plates (S35's invoice), so they got a 55% dark backing plate; the fact sources were enlarged; the Neuropol digits and G were swapped as above.
+- **Vertical safe area:** the vertical cut gets its own overlay pass laid out for 9:16, instead of fitting 16:9 captions into the centre 1215 px (style spec updated). Sets G–I render square, so the vertical cut crops the square plate.
+- **Fact card (S66) source check, 2026-10-24** (`docs/fact_check.md`): a research sub-agent re-opened every source and quoted it verbatim.
+  - **Unreachable:** OpenAI's two blog posts returned 403. Their facts are confirmed from OpenAI's technical report and METR/Redwood's report instead.
+  - **Corrected:** "some declined" became one agent; "gained nothing" was cut (no source says it); the 700 figure is credited to METR/Redwood (OpenAI's report gives no count); item 2's wording follows the report.
+  - **Kill Switch Act:** still in subcommittee.
+  - **Result:** nine facts, each under 30 words with its source.
+  - **Open (R4):** the human could open the two OpenAI posts in a browser to credit them directly.
+- **End card (S67):** title, words, music (Suno V6, take c85b4241), mastering (M6f 10k, strength 1.0), animation and edit, seeds, human interventions (counted from the log at build time: 46), the rotary phone (lobstor, CC BY 4.0), the typefaces (Neuropol CC0, the three OFL faces), the repo and the licenses. `docs/credits.md` now lists the typefaces.
+- **Timing:** S66 starts at 326.45 s; facts run to 396.3 s; S67 ends at 441.1 s.
+- **Rendering:** the full main and vertical overlay tracks are running (`renders/overlays/`).
+- **Why:** human request, R1; brief sections 7 (HUD, captions) and 9 (fact card, end card).
