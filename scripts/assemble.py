@@ -56,6 +56,8 @@ def shot_at(f):
     return k, SHOTS[k]
 
 
+DEC_THREADS = ["-threads", "2", "-filter_threads", "2"]  # FFV1 frame threads otherwise buffer ~2 GB of 4K per decoder
+
 class Pack:
     """Sequential reader of one packed shot (or tail), cropped to the format; reopens on a jump back."""
 
@@ -63,6 +65,7 @@ class Pack:
         self.path, self.w, self.h = path, w, h
         self.start = int(Path(path[:-4] + ".start").read_text().split()[0])
         self.p, self.next, self.cache = None, None, {}
+        self.keep = 90 if Path(path).stem == "S22" else 2  # S22's rewind reads two beats back; 4K frames are 25 MB
 
     def frame(self, f):
         if f in self.cache:
@@ -75,7 +78,7 @@ class Pack:
                 raise RuntimeError(f"{self.path}: no frame {f}")
             a = np.frombuffer(buf, np.uint8).reshape(self.h, self.w, 3)
             self.cache[self.next] = a
-            self.cache.pop(self.next - 90, None)  # keep the last 1.5 s: S22's rewind reads two beats back
+            self.cache.pop(self.next - self.keep, None)
             self.next += 1
         return self.cache[f]
 
@@ -84,7 +87,7 @@ class Pack:
             self.p.kill()
         self.cache.clear()
         crop = f"crop={self.cw}:{self.ch}:(iw-{self.cw})/2:(ih-{self.ch})/2,scale={self.w}:{self.h}:flags=lanczos"
-        self.p = subprocess.Popen(["ffmpeg", "-v", "quiet", "-ss", f"{(f - self.start) / FPS:.6f}", "-i", self.path,
+        self.p = subprocess.Popen(["ffmpeg", "-v", "quiet", *DEC_THREADS, "-ss", f"{(f - self.start) / FPS:.6f}", "-i", self.path,
                                    "-vf", crop, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
                                   stdout=subprocess.PIPE, bufsize=1 << 26)
         self.next = f
@@ -143,8 +146,11 @@ class Plates:
 
     def picture(self, f):
         k, s = shot_at(f)
-        img = self.shot_frame(s["id"], f)
         j = JOIN_IN.get(s["id"])
+        live = {s["id"], j["from"] if j else None}
+        for name in [n for n in self.packs if n.removesuffix("_tail") not in live]:
+            self.packs.pop(name).close()  # one decoder per live shot, not one per shot so far
+        img = self.shot_frame(s["id"], f)
         if j and j["kind"] == "dissolve" and f - s["cut_frame"] < j["frames"]:
             u = (f - s["cut_frame"] + 0.5) / j["frames"]
             u = u * u * (3 - 2 * u)
@@ -156,13 +162,13 @@ class Plates:
 class Overlay(Pack):
     def __init__(self, path, w, h, t0):
         self.path, self.w, self.h, self.t0 = path, w, h, t0
-        self.p, self.next, self.cache = None, None, {}
+        self.p, self.next, self.cache, self.keep = None, None, {}, 2
 
     def _open(self, f):
         if self.p:
             self.p.kill()
         self.cache.clear()
-        self.p = subprocess.Popen(["ffmpeg", "-v", "quiet", "-ss", f"{f / FPS - self.t0:.6f}", "-i", self.path, "-vf",
+        self.p = subprocess.Popen(["ffmpeg", "-v", "quiet", *DEC_THREADS, "-ss", f"{f / FPS - self.t0:.6f}", "-i", self.path, "-vf",
                                    f"scale={self.w}:{self.h}", "-f", "rawvideo", "-pix_fmt", "rgba", "-"],
                                   stdout=subprocess.PIPE, bufsize=1 << 26)
         self.next = f

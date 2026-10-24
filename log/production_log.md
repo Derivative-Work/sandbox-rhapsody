@@ -1225,3 +1225,19 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Main overlay:** re-rendered with the final cues: 25,294 frames, 501 s. The end card counts 56 human interventions (`overlays/cues.json`, `deliverables/sandbox_rhapsody.srt`).
 - **Housekeeping:** the superseded card bounces in `archive/audio/` (logged earlier) are now committed (JSON) and hashed (WAV) in the manifest.
 - **Started:** `scripts/assemble.py main` at 3840×2160, then the four shorts (`renders/c6_assemble.log`).
+
+## 2026-10-24T12:59:23-04:00 — C6 assembler: bounded memory at 4K (technical fix)
+
+- **Failure:** the first 4K run (6 jobs) was stopped by Claude Code because the machine was critically low on memory; nothing was written. A re-run at 3 jobs, approved by the human, reached 34 of 38 GB in 30 s; the agent stopped it.
+- **Cause** (agent, from per-process RSS):
+  - each FFV1 decoder used about 2 GB, buffering 4K frames across one frame thread per core;
+  - each pack cached 90 frames (about 2.2 GB at 4K), a cache only S22's rewind needs;
+  - packs stayed open once their shot was over.
+- **Fix** (`scripts/assemble.py`):
+  - decoders run with 2 threads and 2 filter threads;
+  - the 90-frame cache is kept for S22 only, 2 frames for everything else;
+  - a pack is closed once its shot is neither on screen nor dissolving out.
+- **Checks:**
+  - 118–128 s at 720p (S22's rewind, the S22→S23 join): frame hashes identical to the previous assembler;
+  - 14–44 s at 4K, 3 jobs, across six dissolves: peak +14 GB.
+- **Next:** the full main and four shorts at `--jobs 3`.
