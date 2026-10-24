@@ -9,7 +9,11 @@ The overlay renderer (overlays/render.mjs) only draws what this file lists, so t
   check is logged).
 Also writes the SRT that ships beside the video (brief, deliverables).
 
-Usage: .venv/bin/python -I scripts/overlay_cues.py  ->  overlays/cues.json, deliverables/sandbox_rhapsody.srt
+The vertical shorts (cards.json "shorts") get their spans, an opening satire label each, and an SRT each, timed
+from the short's first frame.
+
+Usage: .venv/bin/python -I scripts/overlay_cues.py
+       ->  overlays/cues.json, deliverables/sandbox_rhapsody.srt, deliverables/shorts/<id>.srt
 """
 import json
 import sys
@@ -108,13 +112,13 @@ def interventions():
     return sum(1 for ln in (ROOT / "log/human_interventions.md").read_text().splitlines() if ln.startswith("## "))
 
 
-def srt(caps, facts, credits):
-    def ts(t):
-        ms = round(t * 1000)
-        return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
+def ts(t):
+    ms = round(t * 1000)
+    return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
+
+
+def caption_rows(caps):
     rows = []
-    lab = CARDS["label"]
-    rows.append((lab["on"], lab["off"], lab["text"]))
     for c in caps:
         text = " ".join(w["w"] for w in c["words"])
         if c["echo"]:
@@ -122,11 +126,52 @@ def srt(caps, facts, credits):
         if c["label"]:
             text = f"{c['label']}: {text}"
         rows.append((c["on"], c["off"], text))
+    return rows
+
+
+def write_srt(path, rows):
+    path.write_text("\n".join(f"{k + 1}\n{ts(a)} --> {ts(b)}\n{t}\n" for k, (a, b, t) in enumerate(rows)))
+
+
+def srt(caps, facts, credits):
+    lab = CARDS["label"]
+    rows = [(lab["on"], lab["off"], lab["text"])] + caption_rows(caps)
     for f in facts:
         rows.append((f["on"], f["off"], f"{f['text']}\n({f['source']})"))
     for c in credits:
         rows.append((c["on"], c["off"], (c["label"] + ": " if c.get("label") else "") + c["text"]))
-    return "\n".join(f"{k + 1}\n{ts(a)} --> {ts(b)}\n{t}\n" for k, (a, b, t) in enumerate(rows))
+    return rows
+
+
+def shorts(caps):
+    """Each short's span in song time, its label window, and its SRT (captions clipped to the span, re-timed from
+    its first frame, the label first).
+
+    A short never cuts into a sung line: it opens 0.3 s before the first word of the first line that ends inside it (or as
+    soon as the line before has ended, if that's later),
+    and closes before the next line's first word. Where the opening falls before the first shot's cut (three
+    lines start ahead of their shot), the edit holds that shot's first frame for `freeze_s` (stops and freezes are
+    made in the edit, not asked of a renderer)."""
+    out = []
+    (ROOT / "deliverables/shorts").mkdir(parents=True, exist_ok=True)
+    la, lb = CARDS["short_label_s"]
+    lines = TM["lines"]
+    for sh in CARDS["shorts"]:
+        c0, c1 = cut(sh["from"]), cut(sh["to"]) - sh.get("to_trim_s", 0.0)
+        k = next(i for i, ln in enumerate(lines) if ln["end"] > c0)
+        first, prev_end = lines[k], lines[k - 1]["end"] if k else 0.0
+        nxt = next((ln for ln in lines if ln["start"] >= c0 and ln["start"] < c1 + 1 and ln["end"] > c1), None)
+        a = min(c0, max(first["start"] - 0.3, prev_end))  # never into the previous line's last word
+        b = min(c1, nxt["start"] - 0.05) if nxt else c1
+        out.append({"id": sh["id"], "title": sh["title"], "from": round(a, 3), "to": round(b, 3),
+                    "plate_from": round(c0, 3), "freeze_s": round(c0 - a, 3),
+                    "label_on": round(a + la, 3), "label_off": round(a + lb, 3)})
+        rows = [(la, lb, CARDS["label"]["text"])]
+        for on, off, text in caption_rows(caps):
+            if off > a and on < b:
+                rows.append((max(on, a) - a, min(off, b) - a, text))
+        write_srt(ROOT / f"deliverables/shorts/{sh['id']}.srt", sorted(rows))
+    return out
 
 
 def main():
@@ -141,13 +186,15 @@ def main():
         "palette": {k: P[k] for k in ("amber", "paper", "void")},
         "label": CARDS["label"], "captions": caps, "hud": hud(), "task_text": CARDS["hud"]["task"],
         "counter": {"on": round(cut("S13"), 3), "off": round(cut("S14"), 3), "ticks": key_pickups(), "of": 14},
-        "facts": facts, "credits": credits,
+        "facts": facts, "credits": credits, "shorts": shorts(caps),
     }
     (ROOT / "overlays/cues.json").write_text(json.dumps(cues, indent=1, ensure_ascii=False) + "\n")
     (ROOT / "deliverables").mkdir(exist_ok=True)
-    (ROOT / "deliverables/sandbox_rhapsody.srt").write_text(srt(caps, facts, credits))
+    write_srt(ROOT / "deliverables/sandbox_rhapsody.srt", srt(caps, facts, credits))
     print(f"cues: {len(caps)} captions, {len(cues['hud'])} HUD shots, {len(facts)} facts, {len(credits)} credits; "
           f"S67 at {s67:.2f} s, end {end:.2f} s; {n} human interventions")
+    for sh in cues["shorts"]:
+        print(f"short {sh['id']}: {sh['from']:.2f}-{sh['to']:.2f} s ({sh['to'] - sh['from']:.2f} s), freeze {sh['freeze_s']:.2f} s")
 
 
 if __name__ == "__main__":

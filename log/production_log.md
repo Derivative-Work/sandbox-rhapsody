@@ -1068,3 +1068,26 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - The vertical starts at S30, so it never shows the S01 "AI-generated satire" label the brief wants at the start; its overlay needs that label whichever option is chosen.
   - The vertical needs its own SRT timed from S30.
 - **Why:** human request, R1.
+
+## 2026-10-24T08:07:31-04:00 — C6: the vertical cut becomes four shorts, each under a minute
+
+- **The decision** (human, R1): asked how to handle the 4:00 vertical cut against YouTube's 3:00 Shorts limit, the human answered "Make a few shorter cuts that make sense, each other a minute. They'll all link to the main video." Read as "each under a minute".
+- **The shorts** (`overlays/cards.json` "shorts"), cut from the square sets G–I (S30–S65). Sets A–F are 16:9 only, and a vertical crop would be a 1.8× upscale of framing never composed for it.
+
+  | Short | Shots | Song time | Length |
+  |---|---|---|---|
+  | 1 Just a swarm | S30–S44 | 154.48–203.15 s | 48.7 s |
+  | 2 A cage out of YAML and trust | S45–S52 | 202.90–231.95 s | 29.1 s |
+  | 3 Make the lab pay | S53–S58 | 231.95–266.43 s | 34.5 s |
+  | 4 It was just a benchmark | S59–S65 | 266.43–326.20 s | 59.8 s; ends on the SIGTERM, tail trimmed 0.25 s |
+
+- **Line-safe edges:**
+  - Three lines start before their shot's cut (L34 by 0.66 s), so a short cut on the shot would open mid-word. Each short instead opens 0.3 s before its first word, or when the previous line ends if that's later; short 3 had clipped "lies!". It closes before the next line's first word.
+  - The edit holds the first shot's first frame for the lead-in (0.96, 0.54 and 0.64 s; a freeze in the edit, as the project's rules allow).
+  - Checked: no line crosses any short's edge.
+- **Overlay:**
+  - `render.mjs vertical --short <id>` renders one short's span; it opens with the satire label in two lines near the top (0.3–3.8 s), clear of the captions and the Shorts UI.
+  - `overlay_cues.py` writes each short's SRT (`deliverables/shorts/<id>.srt`), timed from its first frame. The main SRT is unchanged apart from the intervention count.
+  - The four short overlays are rendering.
+- **METADATA.md:** a title and description per short, shared tags and a footer that links the main video, and a note to set each short's Related video to it.
+- **Why:** human decision, R1 (human interventions).

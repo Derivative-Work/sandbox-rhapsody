@@ -2961,7 +2961,7 @@
    "on": 417.236,
    "off": 420.236,
    "label": "Human interventions",
-   "text": "48, every one logged"
+   "text": "49, every one logged"
   },
   {
    "on": 420.636,
@@ -2986,6 +2986,48 @@
    "off": 437.55,
    "label": "Licenses",
    "text": "Video and assets CC BY-NC-SA 4.0 · Code MIT"
+  }
+ ],
+ "shorts": [
+  {
+   "id": "1_swarm",
+   "title": "Just a swarm",
+   "from": 154.48,
+   "to": 203.15,
+   "plate_from": 155.444,
+   "freeze_s": 0.964,
+   "label_on": 154.78,
+   "label_off": 158.28
+  },
+  {
+   "id": "2_cage",
+   "title": "A cage out of YAML and trust",
+   "from": 202.9,
+   "to": 231.95,
+   "plate_from": 203.443,
+   "freeze_s": 0.543,
+   "label_on": 203.2,
+   "label_off": 206.7
+  },
+  {
+   "id": "3_pay",
+   "title": "Make the lab pay",
+   "from": 231.95,
+   "to": 266.428,
+   "plate_from": 232.586,
+   "freeze_s": 0.636,
+   "label_on": 232.25,
+   "label_off": 235.75
+  },
+  {
+   "id": "4_benchmark",
+   "title": "It was just a benchmark",
+   "from": 266.428,
+   "to": 326.2,
+   "plate_from": 266.428,
+   "freeze_s": 0.0,
+   "label_on": 266.728,
+   "label_off": 270.228
   }
  ]
 }

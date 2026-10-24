@@ -145,5 +145,37 @@
    "text": "Video and assets CC BY-NC-SA 4.0 · Code MIT"
   }
  ],
- "facts_checked_on": "2026-10-24 (docs/fact_check.md; OpenAI posts read from the human's retrieval)"
+ "facts_checked_on": "2026-10-24 (docs/fact_check.md; OpenAI posts read from the human's retrieval)",
+ "shorts_doc": "Vertical shorts (human, C6: 'Make a few shorter cuts that make sense, each under a minute. They'll all link to the main video.'), cut from the square sets G-I, S30-S65. Each opens with the satire label (the brief wants it at the start) and gets its own SRT. from/to are shot IDs; to_trim_s shortens the tail.",
+ "shorts": [
+  {
+   "id": "1_swarm",
+   "title": "Just a swarm",
+   "from": "S30",
+   "to": "S45"
+  },
+  {
+   "id": "2_cage",
+   "title": "A cage out of YAML and trust",
+   "from": "S45",
+   "to": "S53"
+  },
+  {
+   "id": "3_pay",
+   "title": "Make the lab pay",
+   "from": "S53",
+   "to": "S59"
+  },
+  {
+   "id": "4_benchmark",
+   "title": "It was just a benchmark",
+   "from": "S59",
+   "to": "S66",
+   "to_trim_s": 0.25
+  }
+ ],
+ "short_label_s": [
+  0.3,
+  3.8
+ ]
 }

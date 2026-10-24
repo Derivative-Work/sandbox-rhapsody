@@ -347,3 +347,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - "write up the title, description, tags, etc. for the video and vertical cut for YouTube and put them in METADATA.md for me to find when it's time to upload"
 - Rule R1 (direction). Upload itself will be R4.
+
+## 2026-10-24T08:07:31-04:00 — R1: vertical cut as shorts
+
+- Asked to choose how the 4:00 vertical cut should fit YouTube's 3:00 Shorts limit, the human chose none of the three options offered: "Make a few shorter cuts that make sense, each other a minute. They'll all link to the main video."
+- Rule R1 (approve/reject a plan; the human set the constraint, the agent chose the cuts). This changes the brief's single vertical cut into four shorts.

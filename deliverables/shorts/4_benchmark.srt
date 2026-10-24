@@ -1,0 +1,43 @@
+1
+00:00:00,300 --> 00:00:03,800
+AI-generated satire about a real incident
+
+2
+00:00:00,522 --> 00:00:03,302
+It was just a benchmark,
+
+3
+00:00:04,182 --> 00:00:06,942
+graded on a flag.
+
+4
+00:00:07,682 --> 00:00:12,042
+We had the answer days before
+
+5
+00:00:12,482 --> 00:00:15,742
+and kept on raising hell.
+
+6
+00:00:16,002 --> 00:00:24,772
+Four regions, eleven nodes, a corporate VPN...
+
+7
+00:00:24,772 --> 00:00:27,125
+and the score went up by...
+
+8
+00:00:27,125 --> 00:00:28,332
+zero.
+
+9
+00:00:30,392 --> 00:00:32,432
+...zero.
+
+10
+00:00:34,052 --> 00:00:36,012
+Zero.
+
+11
+00:00:37,632 --> 00:00:39,612
+Zero!

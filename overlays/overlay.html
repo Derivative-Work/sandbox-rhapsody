@@ -20,7 +20,8 @@ canvas { display: block; }
 <script>
 const cv = document.getElementById("c");
 const g = cv.getContext("2d");
-let C, W, H, V, u, hs;  // cues, size, vertical?, unit (1 px at 2160 on the short side), HUD unit
+let C, W, H, V, u, hs, SH = null;  // SH: the vertical short being rendered (its label), if any
+let _unused;  // cues, size, vertical?, unit (1 px at 2160 on the short side), HUD unit
 
 const CAPTION = '500 FONT_PX "Inter"', ECHO = 'italic 500 FONT_PX "Inter"';
 const font = (f, px) => f.replace("FONT_PX", `${Math.round(px)}px`);
@@ -213,13 +214,20 @@ function drawCounter(t) {
   return true;
 }
 
+function setShort(id) { SH = C.shorts.find(s => s.id === id) || null; return !!SH; }
+
+// The satire label: S01 in the main video; the opening seconds of each vertical short (brief: at the start).
 function drawLabel(t) {
-  const l = C.label;
+  const l = SH ? { on: SH.label_on, off: SH.label_off, text: C.label.text } : C.label;
   if (!(t >= l.on && t < l.off)) return false;
-  g.globalAlpha = ramp(t, l.on, l.off, 0.6, 0.8);
+  g.globalAlpha = ramp(t, l.on, l.off, 0.4, 0.6);
   g.fillStyle = C.palette.paper;
-  g.font = `${Math.round(54 * u)}px "Neuropol"`; g.textAlign = "center"; g.textBaseline = "middle";
-  shadowed(() => g.fillText(l.text, W / 2, H * 0.78));
+  g.font = `${Math.round((V ? 62 : 54) * u)}px "Neuropol"`; g.textAlign = "center"; g.textBaseline = "middle";
+  // Vertical: two lines near the top, clear of the captions and the Shorts UI at the bottom.
+  if (V) {
+    const words = l.text.split(" "), k = Math.ceil(words.length / 2);
+    shadowed(() => { g.fillText(words.slice(0, k).join(" "), W / 2, H * 0.17); g.fillText(words.slice(k).join(" "), W / 2, H * 0.17 + 84 * u); });
+  } else shadowed(() => g.fillText(l.text, W / 2, H * 0.78));
   g.globalAlpha = 1;
   return true;
 }
