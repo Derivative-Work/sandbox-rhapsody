@@ -48,7 +48,7 @@ CHAPTERS
 4:26 Outro: just a benchmark
 4:59 Coda
 5:26 The facts
-6:35 Credits
+6:25 Credits
 
 WHAT ACTUALLY HAPPENED
 (The fact card at the end, with its sources. Checked against each source on 2026-10-24.)
@@ -106,7 +106,7 @@ Sandbox Rhapsody, It Was Just a Benchmark, AI music video, AI generated, AI sati
 | License | Standard YouTube License. YouTube's only Creative Commons option is CC BY, which would drop the NC-SA terms; the description states CC BY-NC-SA 4.0 instead. |
 | Thumbnail | `deliverables/thumbnail.jpg` (1920×1080): the S41 frame at the second "GO", with the crowd spelling `GO` and the lone `I DECLINE` sign in the stands (brief). The lit LEDs are given a glow so the letters read at list size. `deliverables/thumbnail_title.jpg` is the same frame with the title in Neuropol, if you'd rather. Both made by `scripts/thumbnail.py`. |
 | Chapters | From the description (first chapter at 0:00; each over 10 s). |
-| End screen | The credits run 6:35–7:20 and the end screen can cover the last 5–20 s. Keep its elements in the corners, or end it before the license line (the last credit). |
+| End screen | The credits run 6:25–7:01; the end screen can cover the last 5–20 s (from 6:41 at most). The last two cards are centred: the licenses (6:50–6:55) and the Animusic disclaimer (6:55–7:01). Keep end-screen elements in the corners so neither is covered. |
 | Comments | Open. |
 | Visibility | Unlisted for a check pass, then public. |
 

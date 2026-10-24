@@ -1268,3 +1268,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - The lit cores get a warm glow stretched vertically (σ 26 × 40 and 70 × 90 px) to bridge the tiers. The unlit hall is darkened to 38%; the sign is kept.
   - Checked at full size and at 360 px wide (YouTube's list size): `GO` and `I DECLINE` read in both.
 - **Outputs:** `deliverables/thumbnail.jpg` (clean, per the brief) and `deliverables/thumbnail_title.jpg` (the title in Neuropol along the bottom), both 1920 × 1080 JPEG, under 260 KB. `METADATA.md` points to them.
+
+## 2026-10-24T14:14:02-04:00 — METADATA: credits times corrected
+
+- **Found** (agent, while adding the thumbnail): `METADATA.md` still had the credit timing from before the cards were re-paced to the stem bounce. The credits chapter said 6:35 and the end-screen note said 6:35–7:20.
+- **Fixed** from `overlays/cues.json`: the credits start at 6:25 (385.49 s) and the video ends at 7:01.57. The end-screen note now names the last two centred cards, the licenses (6:50–6:55) and the Animusic disclaimer (6:55–7:01), and says to keep elements in the corners.
+- **Other chapters:** checked against the timing map. They sit on the shot cuts where each section changes on screen (for example, the opera at S30's cut, 2:35), and are unchanged.
