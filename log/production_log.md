@@ -1289,3 +1289,21 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - the C6 log audit;
   - the session transcript export;
   - a draft GitHub Release on the private repo, for the human to publish.
+
+## 2026-10-24T14:21:16-04:00 — Licences, README, handoff, transcript exporter; METADATA brought up to date
+
+- **Licences** (as the Ghost brief: video and assets CC BY-NC-SA 4.0, code MIT):
+  - `LICENSE` (MIT) and `LICENSES/CC-BY-NC-SA-4.0.txt`, copied from Ghost in the Machine.
+  - `LICENSE-media.md`, adapted. It covers the video, shorts, music, captions, thumbnail, renders and the production record. It excludes the code, the rotary phone source (lobstor, CC BY 4.0; our adaptation is CC BY-NC-SA with that credit), the fonts (Neuropol CC0, the three OFL faces), the Animusic videos and stills, and the fact-card sources (other publishers', never published).
+- **`README.md`:** following Ghost's:
+  - what the video is, and the satire label;
+  - downloads (release link added at publish);
+  - the making-of record, licences and credits;
+  - the mastering model's training data, the same three CC BY 4.0 datasets per music-deslop's `MODEL_CARD.md` for M6f 10k;
+  - the Animusic note.
+- **`docs/handoff.md`:** where things stand, setup (versions, `uv sync`, `npm ci`, hooks, restoring large files from the release), and the rebuild order with each step's script.
+- **`scripts/export_transcripts.sh`:** copied from Ghost (prefix-checked, never overwrites a transcript with a non-extension). Comment updated for the GitHub Release.
+- **`METADATA.md`:**
+  - the main and shorts file paths (they said "not made yet");
+  - the description's intervention count, 60, the log's at C6 approval, where it said "[48]";
+  - the "before uploading" note, which now records that the end card keeps 56.
