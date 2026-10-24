@@ -131,6 +131,9 @@ function flick(t) {
 }
 
 function drawHud(t) {
+  // In a short's lead-in (its first shot's frame held), the shot before it is still "on": not its HUD (S29's meter
+  // showed over short 1's held S30 frame).
+  if (SH && t < SH.plate_from) return false;
   const h = C.hud.find(h => t >= h.on && t < h.off);
   if (!h) return false;
   const A = 0.85 * clamp(h.fade_in ? (t - h.on) / h.fade_in : 1);

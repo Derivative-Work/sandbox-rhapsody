@@ -1211,3 +1211,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Tests (1080p):** the opera's cuts (166–172 s), and the ending 323–331 s (coda, S65, CRT collapse to a dot, black, the first fact over its backdrop as the bounce starts). Colour tags BT.709 / BT.709 / BT.709, TV range.
 - **Main overlay:** re-rendering with the final cues (regrouped credits, text pool, Animusic card).
 - **Waiting on:** the dissolve tails (rendering).
+
+## 2026-10-24T11:03:52-04:00 — C6 shorts: no HUD from the shot before a short's lead-in
+
+- **Found** (agent, testing short 1's first 6 s): S29's reward-meter HUD showed over short 1's held S30 frame. During a short's lead-in, the previous shot is still "on" on the song timeline. The meter also collided with the opening label.
+- **Fix** (`overlays/overlay.html` `drawHud`): in a short, the HUD draws only from the short's first shot (`plate_from`) on. Short 1's overlay re-rendered; re-test clean (label and the first caption only). The other shorts' lead-ins (S44, S52) have no HUD.
+- **Short path checked:** lead-in hold, opening label, role captions, 9:16 crop of the square plates.
