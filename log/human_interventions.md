@@ -296,3 +296,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** "G's 'cold storage' box also has flicker. the probe wall looks terrible up close, as shown starting at 0:05 in the cut".
+
+## 2026-10-23T22:46:53-04:00 — C5 set G: S32 direction
+
+- **Rule:** R1.
+- **What:** on S32's framing, lighting and tiers: "framing: I still want to see two rows -- it really sold the wave effect. lighting and tiers: makes sense to me. go ahead with the test stills".

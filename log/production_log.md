@@ -937,3 +937,12 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **The probe wall up close** (human, R1: S32 from 0:05 in the reel): the 700 seats were 12×6 shells with 8×4 LED bulbs (flat octagons at 4K). Each seat is now the hero probe in small: a 32×16 smooth shell, a satin bezel band and the stunt LED as a lit lens dome of the same area, so the card stunts read as before (S30, S31 checked).
 - **Build time:** 700 bmesh ops into one growing bmesh went quadratic at the new resolution (the first test stuck for 35 min at 100% CPU, located with a stack dump). The seats are now copied from one template with numpy arrays (`set_g._copies`): the set builds in 9.7 s.
 - **Not done yet:** in S32 the probes are still small and dark in a black field; lighting and framing next.
+
+## 2026-10-23T22:46:53-04:00 — C5 set G: S32 reframed on two rows, lit, tiers clad; G queued to re-render
+
+- **Framing** (human, R1: keep two rows): S32's camera moves from 1.45 m to about 1 m off rows 1 and 2, the same slow drift right; both rows fill the frame.
+- **Light:** `swarm_key`, a 1.2 m soft area light from front-left on that patch of tiers, keyed to 120 W for S32 only, so the wide card stunts keep their dark hall.
+- **Seats:** every seat is a dark cup with a brass rim on the tread (copied with `_copies`, hero seats included).
+- **Risers:** clad in matte panels, one per five seats with thin gaps. Tried `lab_dark` satin, `shadow` satin and `lab_dark` matte: the satin ones mirrored the studio lights and reflection cards (the C4 glare), and `lab_dark` matte was lighter than the shells' shadow side and lifted the wide stunt's blacks. New palette role `riser` #161b24, matte: S32 reads as a built stand, S31's hall stays dark.
+- **Queued:** set G re-renders after C and F (`renders/c5/queue7.log`); its current reel, contact sheet, frames and anchors are set aside first (`_superseded_c5-notes`).
+- **Why:** human feedback, R1 (human interventions).

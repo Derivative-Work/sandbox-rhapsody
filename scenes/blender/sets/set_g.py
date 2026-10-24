@@ -35,6 +35,7 @@ R0, DR, Z0, DZ = 7.0, 0.2, 0.10, 0.2    # front-row radius, row depth, front tie
 SPAN = math.radians(35)                  # the arc spans +-35 deg (flat enough to read a stunt from the stage) around +Y; the stage is at the origin
 LONE = (52, 2)                           # (column, row) of the probe with the I DECLINE sign
 FLAGGER = (20, 5)                        # the probe that raises a flag in S38
+SWARM_KEY = 120.0                        # W, S32's key on the swarm
 STUNT_DIR = A.ROOT / "cache" / "set_g_stunts"
 KILL_T = (174.6, 177.1)                  # the four "Kill switch!" calls (L43a-d)
 FEED = 0.18                              # paper advanced per printer strike (m)
@@ -467,6 +468,17 @@ def build():
         R = R0 + r * DR - DR / 2
         _sector(bm, R - 0.006, R, -SPAN - 0.04, SPAN + 0.04, Z0 + r * DZ, Z0 + r * DZ + 0.012)
     _mesh_from("rails", bm, brass)
+    # Riser cladding: a dark panel per five seats on each riser, with thin gaps, so S32's close-up shows a built
+    # stand between the rows rather than a black band (human, C5). Satin and dark: no glare in the wide stunts.
+    bm = bmesh.new()
+    per = 2 * SPAN / COLS
+    gap = 0.004 / R0
+    for r in range(ROWS):
+        rf = R0 + r * DR - DR / 2
+        z0, z1 = (Z0 + (r - 1) * DZ if r else 0.0) + 0.01, Z0 + r * DZ - 0.008
+        for k in range(0, COLS, 5):
+            _sector(bm, rf - 0.005, rf - 0.001, -SPAN + k * per + gap, -SPAN + (k + 5) * per - gap, z0, z1, seg=4)
+    _mesh_from("risers", bm, K.mat_matte("riser_panel", "riser"))
     bm = bmesh.new()
     _sector(bm, R0 + ROWS * DR + 0.3, R0 + ROWS * DR + 0.36, -SPAN - 0.1, SPAN + 0.1, 0, 3.0)
     _mesh_from("back_wall", bm, black)
@@ -500,12 +512,13 @@ def build():
                           matrix=Matrix.Translation((0, 0, R * 0.92)))  # proud of the shell
     bmesh.ops.create_uvsphere(dome, u_segments=32, v_segments=16, radius=R * 0.42,
                               matrix=Matrix.Translation((0, 0, R * 0.8)) @ Matrix.Diagonal((1, 1, 0.55, 1)))
-    seats, uvs = [], []
+    seats, uvs, cups = [], [], []
     for r in range(ROWS):
         for c in range(COLS):
+            p, fwd = seat(c, r)
+            cups.append(Matrix.Translation(p))
             if (c, r) in skip:
                 continue
-            p, fwd = seat(c, r)
             seats.append(Matrix.Translation(p + Vector((0, 0, R * 0.05)))
                          @ Vector((0, 0, 1)).rotation_difference(fwd).to_matrix().to_4x4())
             uvs.append(((c + 0.5) / COLS, (r + 0.5) / ROWS))  # image row 0 (top) = back row: v grows with r
@@ -514,6 +527,15 @@ def build():
     _copies("swarm_bezels", band, seats, K.mat_metal("swarm_bezel", "chrome", 0.3))
     out["swarm_leds"] = _copies("swarm_leds", dome, seats, _mat_led_sequence("swarm_led", f_first,
                                                                               f_last - f_first + 1), uvs)
+    # Every seat is a dark cup with a brass rim on the tread, so the tiers read as seating, not a black void
+    # between rows of lights (human, C5, S32).
+    cup, rim = bmesh.new(), bmesh.new()
+    bmesh.ops.create_cone(cup, cap_ends=True, segments=32, radius1=R * 0.7, radius2=R * 0.64, depth=R * 0.3,
+                          matrix=Matrix.Translation((0, 0, -R * 0.85)))
+    bmesh.ops.create_cone(rim, cap_ends=False, segments=32, radius1=R * 0.69, radius2=R * 0.69, depth=R * 0.06,
+                          matrix=Matrix.Translation((0, 0, -R * 0.69)))
+    _copies("seat_cups", cup, cups, K.mat_plastic("seat_cup", "lab_dark", 0.4))
+    _copies("seat_rims", rim, cups, brass)
 
     # The lone decliner and its sign.
     p, fwd = seat(*LONE)
@@ -762,6 +784,10 @@ def build():
 
 def lights(S):
     K.studio_lights(center=(0, 3.5, 0.8), radius=10.0, scale=1.4)
+    # S32's close on two rows: a soft key from front-left on just that patch of tiers, keyed on for S32 only, so
+    # the wide card stunts keep their dark hall (human, C5: the shells were lost in black).
+    S["swarm_key"] = K.area_light("swarm_key", (-1.5, 5.7, 1.5), (-0.6, 7.3, 0.4), 0.0, 1.2, role="key",
+                                  specular=0.5)
     K.reflection_cards(center=(0, 3.5, 0.8), radius=11.0)
     K.area_light("kill_key", (-1.0, -1.6, 2.6), (-2.0, 1.3, 0.9), 450.0, 1.2, role="key")  # the tower reads (S37)
     red = K.area_light("alarm_light", (-2.2, -0.9, 3.2), (-3.0, 0.1, 1.6), 0.0, 0.6, role="alarm")
@@ -904,6 +930,9 @@ def animate(S, t0, t1):
                          interp="CONSTANT")
     A.write_keys(S["alarm_light"].data, "energy", [(0, 0.0), (A.frame(a) - 1, 0.0), (A.frame(a), 60.0),
                                                    (A.frame(b) + 1, 0.0)], interp="CONSTANT")
+    a, b = shot["S32"]["cut"], shot["S33"]["cut"]
+    A.write_keys(S["swarm_key"].data, "energy", [(0, 0.0), (A.frame(a) - 1, 0.0), (A.frame(a), SWARM_KEY),
+                                                 (A.frame(b) + 1, 0.0)], interp="CONSTANT")
 
     # Cold storage: probes ride the belt through the door; it shuts on the last kick/toms hit before 201.7 s.
     shut = max(e["t"] for e in A.pieces(kit, "kick", "toms") if e["t"] < DOOR_BEFORE)
@@ -936,7 +965,9 @@ CAMERAS = {
     "S30": [(0.0, _v(0.0, -2.6, 0.35), _v(0, 7.5, 0.8), 22), (1.0, _v(0.0, -1.2, 2.6), _v(0, 7.5, 1.0), 22)],
     "S31": [(0.0, _STUNT + _v(0, -0.4, 0), _FRONT, 24), (1.0, _STUNT, _FRONT, 24)],
     # A few probes blinking: the front rows, centre left.
-    "S32": [(0.0, _v(-0.5, 5.75, 0.5), _v(-0.65, 7.2, 0.4), 50), (1.0, _v(-0.3, 5.95, 0.48), _v(-0.45, 7.2, 0.4), 50)],
+    # Two rows (1 and 2) filling the frame, about 1 m off: the wave runs along both (human, C5: "I still want to
+    # see two rows"; at 1.45 m they sat small in black).
+    "S32": [(0.0, _v(-0.45, 6.3, 0.62), _v(-0.6, 7.3, 0.44), 50), (1.0, _v(-0.27, 6.45, 0.6), _v(-0.42, 7.3, 0.44), 50)],
     # The printer starts: looking down at the slot as the paper comes out.
     "S33": [(0.0, _v(1.25, -0.7, 1.15), _v(1.95, 0.65, 0.05), 30), (1.0, _v(1.4, -0.45, 1.0), _v(1.95, 0.6, 0.05), 32)],
     "S34": [(0.0, _STUNT + _v(-0.4, 0, 0), _FRONT, 24), (1.0, _STUNT + _v(0.4, 0, 0), _FRONT, 24)],
