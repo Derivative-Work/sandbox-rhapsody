@@ -916,3 +916,11 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 ## 2026-10-23T19:42:17-04:00 — Every commit is pushed
 
 - **Standing instruction** (human): push each commit to `origin/main` as soon as it is made. Pushes are not logged one by one; `git log origin/main` records them.
+
+## 2026-10-23T21:11:46-04:00 — C5 set F: the crate's inside rim; F joins C's re-render
+
+- **Check of the earlier fix** (S27 in this pass): single-frame spikes are down from about 3,500 to 2,500 pixels a frame; nothing left on the crate's top rim; the rest is the belt's crates moving and render grain.
+- **The note** (human, R1): flicker inside the crate. Six consecutive frames under four settings (current; fast GI as AO only; jittered soft shadows; fast GI at full resolution with more steps) came out the same, so it was not sampling. Frame-to-frame differences showed a dark sliver under the back rim changing shape every frame: the lip's inner faces lay on the walls' inner faces (±0.23 m), coplanar in two materials.
+- **Fix** (`set_f.py`): the lip's inner edge stands 4 mm in from the walls (inner 0.452 m). The same six frames: the sliver is gone, leaving the steady shadow line under the lip.
+- **Re-render:** the queued C job now re-renders C and F once the main queue ends (`renders/c5/queue6.log`), then their reels and packs. Their current reels, contact sheets, frames and anchors are set aside first as `_superseded_c5-notes` (this replaces the `_superseded_straps` naming in the previous entry; nothing had been moved yet).
+- **Why:** human feedback, R1 (human interventions).

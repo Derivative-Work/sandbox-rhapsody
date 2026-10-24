@@ -286,3 +286,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** "Push them right away from here on out".
+
+## 2026-10-23T21:11:46-04:00 — C5 note: flicker inside set F's crate
+
+- **Rule:** R1.
+- **What:** "seeing more flicker in set F on the inside of the crate".

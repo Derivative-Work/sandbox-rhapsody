@@ -302,7 +302,8 @@ def build():
         _box(f"fb.key{k}.shaft", key_m, tr, (kx + 0.02, ky, 0.075), (0.08, 0.012, 0.01))
     # The crate walls (no bottom, no lid) on short legs above the hatch; a file icon on its front.
     # The side walls fit between the front and back, and the walls, posts and lip end at three heights (0.62, 0.622,
-    # 0.624): their tops were coplanar in two materials and the rim flickered (human, C5 set F).
+    # 0.624): their tops were coplanar in two materials and the rim flickered (human, C5 set F). The lip's inner edge
+    # stands 4 mm in from the walls' inner faces for the same reason, inside the crate.
     for nm, loc, sc in (("f", (0, -0.24, 0.42), (0.5, 0.02, 0.4)), ("b", (0, 0.24, 0.42), (0.5, 0.02, 0.4)),
                         ("l", (-0.24, 0, 0.42), (0.02, 0.46, 0.4)), ("r", (0.24, 0, 0.42), (0.02, 0.46, 0.4))):
         _box(f"fb.wall_{nm}", crate_m, fb, loc, sc, 0.004)
@@ -310,7 +311,7 @@ def build():
     for sx in (-1, 1):
         for sy in (-1, 1):
             trim.box((sx * 0.242, sy * 0.242, 0.421), (0.036, 0.036, 0.402), bev=0.008)
-    trim.frame((0, 0, 0.609), (0.52, 0.52), (0.46, 0.46), 0.03, bev=0.006)
+    trim.frame((0, 0, 0.609), (0.52, 0.52), (0.452, 0.452), 0.03, bev=0.006)
     trim.frame((0, 0, 0.23), (0.52, 0.52), (0.46, 0.46), 0.02, bev=0.004)
     P.place("fb.trim", trim.mesh("fb_trim"), parent=fb)
     P.place("fb.band", _strap_mesh(band_m, dark, 0.508, 0.508), (0, 0, 0.31), fb)
