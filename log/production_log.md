@@ -1157,3 +1157,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - The previous bounce is in `archive/audio/*_superseded_unlimited`.
 - **Seeds:** the "Seeds: 41 and up" line is gone from the end card (the brief's end-card list had it; the human removed it). The second credit group is now animation and edit, and human interventions. Cues and SRT rebuilt.
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-24T09:10:36-04:00 — C6: card-section preview v3 (limited bounce)
+
+- **The request** (human, R1): a new card preview with the limiter, to listen to.
+- **Built:** the card-section overlay rendered from S66 with the current cues (no seeds line, the Animusic card, the text pool), composited at 1080p over the existing card backdrop (fact 8 fix; S48–S55 still from set H's superseded plates), with `audio/post/cards_audio.wav` (the limited bounce) as 256 kbps AAC. 95.1 s; scratch file, not an asset.
+- **Why:** human request, R1.
