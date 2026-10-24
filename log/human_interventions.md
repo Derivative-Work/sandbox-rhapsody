@@ -352,3 +352,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - Asked to choose how the 4:00 vertical cut should fit YouTube's 3:00 Shorts limit, the human chose none of the three options offered: "Make a few shorter cuts that make sense, each other a minute. They'll all link to the main video."
 - Rule R1 (approve/reject a plan; the human set the constraint, the agent chose the cuts). This changes the brief's single vertical cut into four shorts.
+
+## 2026-10-24T08:34:44-04:00 — R1: card backdrops, a card bounce, music-timed pacing
+
+- "wow that's a lot of citations and credits, but the content and pacing roughly make sense. let's keep the audience engaged by putting a dimmed version of the part of the video where each card was mentioned behind the text. for audio, let's make a new bounce directly from the stems: start at either 3:58 or 4:28 and go to the end with the main vocals muted, and run the whole thing through the music-deslop postfilter (~/Code/music-deslop). repace the text to work with that, and time the transition to video credits (as opposed to citations) to one that makes sense in the music (like where the choir "zero" comes in or similar)"
+- Rule R1 (direction). The human chose the method (a stem bounce without the lead, post-filtered); the agent chose 3:58, the bar allocation and the turn on the choir's first "zero", and ran the post-filter itself at the human's direction.

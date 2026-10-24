@@ -89,23 +89,55 @@ IDS = [s["id"] for s in TM["shots"]]
 SHOT_NEXT = {IDS[k]: IDS[k + 1] for k in range(len(IDS) - 1)}
 
 
+def downbeats(a, b):
+    beats = TM["beats"]
+    return [beats[i] for i in TM["downbeat_beats"] if a - 0.01 <= beats[i] < b]  # B0 is a downbeat to 1 ms
+
+
 def cards():
-    """S66 then S67, one item at a time on black: fade in, hold for reading (3.5 words/s + 1.5 s, at least the
-    card's minimum), fade out."""
-    t = cut("S66") + CARDS["fact_lead_in"]
-    facts = []
+    """S66 then S67, timed to the music under them (cards.json "cards_doc"): a bounce of the song from B0, so a
+    card at song time s shows at video time V0 + s - B0.
+
+    Facts share the bars from B0 to the choir's first "zero" in proportion to their reading time (3.5 words/s +
+    1.5 s), at least two bars each, every change on a downbeat; the last fact runs up to the credits. The credits
+    start on that word; each later group starts on the coda downbeat nearest its slot, the last on the final chord.
+    Backdrops: per fact, its listed song times share the card evenly; under the credits, the video at the same
+    song time as the music, until the plates end at S66.
+    Returns facts, credits, backdrop segments (video on/off, source song time), S67's start and the end."""
+    V0, B0 = cut("S66"), CARDS["bounce_start_s"]
+    vt = lambda s: round(V0 + s - B0, 3)  # noqa: E731
+    c_on = CARDS["credits_on_s"]
+    grid = downbeats(B0, c_on)
+    nbars = len(grid) - 1
+    facts, back = [], []
     if CARDS["facts_checked"]:
-        for f in CARDS["facts"]:
-            hold = max(CARDS["fact_min_s"], len(f["text"].split()) / 3.5 + 1.5)
-            facts.append({"on": round(t, 3), "off": round(t + hold, 3), "text": f["text"], "source": f["source"]})
-            t += hold + CARDS["gap_s"]
-    s67 = t
+        need = [len(f["text"].split()) / 3.5 + 1.5 for f in CARDS["facts"]]
+        share = [n / sum(need) * nbars for n in need]
+        bars = [max(2, int(x)) for x in share]
+        for k in sorted(range(len(share)), key=lambda k: share[k] - int(share[k]), reverse=True):
+            if sum(bars) >= nbars:
+                break
+            bars[k] += 1
+        while sum(bars) > nbars:  # the minimum took bars from the rest: give them back from the longest
+            bars[bars.index(max(bars))] -= 1
+        edges = [grid[sum(bars[:k])] for k in range(len(bars))] + [c_on - 0.25]
+        for k, f in enumerate(CARDS["facts"]):
+            a, b = edges[k], edges[k + 1]
+            facts.append({"on": vt(a), "off": vt(b - 0.05), "text": f["text"], "source": f["source"],
+                          "bars": bars[k]})
+            srcs = f.get("backdrop", [])
+            for j, s in enumerate(srcs):
+                d = (b - a) / len(srcs)
+                back.append({"on": vt(a + j * d), "off": vt(a + (j + 1) * d), "src": round(s, 3)})
+    coda = downbeats(c_on, CARDS["credits_end_s"])
+    starts = [c_on - 0.25] + [min(coda, key=lambda d: abs(d - x)) for x in CARDS["credit_groups_at_downbeats"]]
+    ends = starts[1:] + [CARDS["credits_end_s"]]
     credits = []
-    for c in CARDS["credits"]:
-        hold = max(CARDS["credit_min_s"], len((c.get("label", "") + " " + c["text"]).split()) / 3.5 + 1.0)
-        credits.append({"on": round(t, 3), "off": round(t + hold, 3), **c})
-        t += hold + CARDS["gap_s"]
-    return facts, credits, round(s67, 3), round(t + CARDS["tail_s"], 3)
+    for c, a, b in zip(CARDS["credits"], starts, ends):
+        credits.append({"on": vt(a), "off": vt(b - 0.05), **c})
+    plates_end = cut("S66")
+    back.append({"on": vt(c_on - 0.25), "off": vt(plates_end), "src": round(c_on - 0.25, 3)})
+    return facts, credits, back, vt(c_on - 0.25), vt(CARDS["credits_end_s"])
 
 
 def interventions():
@@ -139,7 +171,9 @@ def srt(caps, facts, credits):
     for f in facts:
         rows.append((f["on"], f["off"], f"{f['text']}\n({f['source']})"))
     for c in credits:
-        rows.append((c["on"], c["off"], (c["label"] + ": " if c.get("label") else "") + c["text"]))
+        text = (f"{c['title']}\n{c['text']}" if c.get("title")
+                else "\n".join(f"{ln['label']}: {ln['text']}" for ln in c["lines"]))
+        rows.append((c["on"], c["off"], text))
     return rows
 
 
@@ -178,21 +212,27 @@ def main():
     caps = captions()
     n = interventions()
     for c in CARDS["credits"]:
-        c["text"] = c["text"].replace("{interventions}", str(n))
-    facts, credits, s67, end = cards()
+        for ln in c.get("lines", []):
+            ln["text"] = ln["text"].replace("{interventions}", str(n))
+    facts, credits, backdrop, s67, end = cards()
     cues = {
         "fps": TM["fps"], "end": end, "s66": cut("S66"), "s67": s67,
         "vertical_from": cut("S30"),
         "palette": {k: P[k] for k in ("amber", "paper", "void")},
         "label": CARDS["label"], "captions": caps, "hud": hud(), "task_text": CARDS["hud"]["task"],
         "counter": {"on": round(cut("S13"), 3), "off": round(cut("S14"), 3), "ticks": key_pickups(), "of": 14},
-        "facts": facts, "credits": credits, "shorts": shorts(caps),
+        "facts": facts, "credits": credits, "backdrop": backdrop, "shorts": shorts(caps),
     }
     (ROOT / "overlays/cues.json").write_text(json.dumps(cues, indent=1, ensure_ascii=False) + "\n")
     (ROOT / "deliverables").mkdir(exist_ok=True)
     write_srt(ROOT / "deliverables/sandbox_rhapsody.srt", srt(caps, facts, credits))
     print(f"cues: {len(caps)} captions, {len(cues['hud'])} HUD shots, {len(facts)} facts, {len(credits)} credits; "
           f"S67 at {s67:.2f} s, end {end:.2f} s; {n} human interventions")
+    for f in facts:
+        print(f"fact {f['on']:.2f}-{f['off']:.2f} ({f['bars']} bars, {f['off'] - f['on']:.1f} s, "
+              f"{len(f['text'].split()) / (f['off'] - f['on']):.1f} words/s)")
+    for c in credits:
+        print(f"credit {c['on']:.2f}-{c['off']:.2f} ({c['off'] - c['on']:.1f} s)")
     for sh in cues["shorts"]:
         print(f"short {sh['id']}: {sh['from']:.2f}-{sh['to']:.2f} s ({sh['to'] - sh['from']:.2f} s), freeze {sh['freeze_s']:.2f} s")
 

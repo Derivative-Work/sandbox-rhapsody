@@ -1091,3 +1091,30 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - The four short overlays are rendering.
 - **METADATA.md:** a title and description per short, shared tags and a footer that links the main video, and a note to set each short's Related video to it.
 - **Why:** human decision, R1 (human interventions).
+
+## 2026-10-24T08:34:44-04:00 — C6 cards: their own bounce (stems from 3:58, lead muted, post-filtered), music-timed pacing, dimmed backdrops
+
+- **The request** (human, R1):
+  - put a dimmed version of the part of the video each card refers to behind its text;
+  - make a new bounce from the stems, from 3:58 or 4:28 to the end with the main vocals muted, through the music-deslop post-filter;
+  - repace the cards to it, and turn over to the credits where the music makes sense (e.g. the choir's "zero").
+- **Start point:** 3:58, snapped to the downbeat at 237.88 s (S54's cut). From 4:28 only 29 s would remain before the choir: too little for nine facts.
+- **Bounce** (`scripts/cards_audio.py`; `timing/cards_audio.json`):
+  - Mix: every stem but `Vocals` (the lead), from 3:58 with a 4 s pre-roll for the model.
+  - Post-filter: music-deslop M6f 10k (`~/Code/music-deslop` at 68441e2, weights in `~/Code/music-deslop-data/release`), `--source suno --no-fallback --strength 1.0`, the master's chain. Run by the agent at the human's direction; the master's run was the human's (R4).
+  - The stem sum peaks at +1.56 dBFS, so the post-filter scaled it to −0.1 dBFS.
+  - Ending: the pre-roll is trimmed. Suno's cut-off chord gets the video's own piano release (`ending_audio.freeze_tail`) with no second SIGTERM, ringing to 333 s with a 1.5 s fade.
+  - Output: `audio/post/cards_audio.wav`, 95.1 s.
+  - Loudness: the facts stretch is −17.2 LUFS against the master's −14.5 over the same span (the lead is gone); the coda stretch is −13.9, the master's whole song −14.1. Kept: a quieter bed under the facts suits reading.
+- **Where the credits turn:** with the lead muted, the backing-vocal stem is silent from 294.5 s and enters at 297.17 s on "…zero." (L72), the choir's first "zero". The credits' title lands on that word.
+- **Pacing** (`scripts/overlay_cues.py` `cards()`, `overlays/cards.json`):
+  - Facts share the 33 bars from 3:58 to the choir in proportion to reading time, at least two bars each, changing on downbeats; 2.3–3.4 words/s. Facts 1, 2 and 9 were tightened by a few words.
+  - Credits went from 11 single cards to the title plus 4 groups (label over value, stacked), each on a coda downbeat; the last (repo and licenses) lands on the final chord (321.6 s) and rings out.
+  - The video now ends at 421.6 s (7:01.6), down from 440.
+- **Backdrops** (`scripts/cards_backdrop.py` → `renders/c6/cards_backdrop.mkv`):
+  - Per fact, the shots it refers to (cards.json `backdrop`, each noted): S10, S15, S18–S19, S30–S31, S13 + S40, S60, S33 + S35, S37 twice, and a hard-rock montage (S48, S50, S51, S55).
+  - Under the credits, the video at the same song time as the music, so the coda's machines play the credits out in sync. Black after the plates end.
+  - Each 16:9-cropped, multiplied by 0.3. The overlay now draws the cards on a transparent ground with a soft text shadow.
+- **Preview:** a 1080p card-section preview, using set H's superseded plates for S50, S51 and S55 (warned; set H is re-rendering). Checked: legibility over the dimmed footage, the title on the choir's word, the grouped credits. Fix from the check: fact 8's backdrop ran from S37 into S38's stands, so it now plays S37 twice.
+- **Main overlay:** re-rendering with the new card timing.
+- **Why:** human request, R1 (human interventions).

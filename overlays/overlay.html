@@ -244,37 +244,50 @@ function paragraph(text, fnt, maxW, cx, cy, lh) {
 
 function drawCards(t) {
   if (t < C.s66) return false;
-  g.fillStyle = "#000"; g.fillRect(0, 0, W, H);  // white on black from S66 on
+  // White on the dimmed backdrop the edit lays under S66-S67 (cards.json "cards_doc"); the text carries a soft
+  // shadow so it holds over brighter moments of the footage.
   g.textAlign = "center"; g.textBaseline = "middle";
   const maxW = (V ? 0.84 : 0.62) * W;
+  let any = false;
   for (const f of C.facts) {
     if (!(t >= f.on && t < f.off)) continue;
-    g.globalAlpha = ramp(t, f.on, f.off, 0.5, 0.5);
-    g.fillStyle = "#fff";
-    const [, y1] = paragraph(f.text, `500 ${Math.round(76 * u)}px "Inter"`, maxW, W / 2, H / 2 - 40 * u, 100 * u);
-    g.fillStyle = "rgba(255,255,255,0.7)";
-    g.font = `${Math.round(46 * u)}px "Neuropol"`;
-    g.fillText(f.source, W / 2, y1 + 140 * u);
+    any = true;
+    g.globalAlpha = ramp(t, f.on, f.off, 0.4, 0.4);
+    shadowed(() => {
+      g.fillStyle = "#fff";
+      const [, y1] = paragraph(f.text, `500 ${Math.round(76 * u)}px "Inter"`, maxW, W / 2, H / 2 - 40 * u, 100 * u);
+      g.fillStyle = "rgba(255,255,255,0.75)";
+      g.font = `${Math.round(46 * u)}px "Neuropol"`;
+      g.fillText(f.source, W / 2, y1 + 140 * u);
+    });
   }
   for (const c of C.credits) {
     if (!(t >= c.on && t < c.off)) continue;
-    g.globalAlpha = ramp(t, c.on, c.off, 0.5, 0.5);
-    g.fillStyle = "#fff";
-    if (c.title) {
-      g.font = `${Math.round(120 * u)}px "Neuropol"`;
-      g.fillText(c.title.toUpperCase(), W / 2, H / 2 - 60 * u);
-      g.fillStyle = "rgba(255,255,255,0.75)";
-      paragraph(c.text, `500 ${Math.round(52 * u)}px "Inter"`, maxW, W / 2, H / 2 + 80 * u, 70 * u);
-    } else {
-      g.fillStyle = "rgba(255,255,255,0.6)";
-      g.font = `${Math.round(40 * u)}px "Neuropol"`;
-      g.fillText(c.label.toUpperCase(), W / 2, H / 2 - 80 * u);
-      g.fillStyle = "#fff";
-      paragraph(c.text, `500 ${Math.round(72 * u)}px "Inter"`, maxW, W / 2, H / 2 + 20 * u, 96 * u);
-    }
+    any = true;
+    g.globalAlpha = ramp(t, c.on, c.off, 0.4, 0.4);
+    shadowed(() => {
+      if (c.title) {
+        g.fillStyle = "#fff";
+        g.font = `${Math.round(120 * u)}px "Neuropol"`;
+        g.fillText(c.title.toUpperCase(), W / 2, H / 2 - 60 * u);
+        g.fillStyle = "rgba(255,255,255,0.8)";
+        paragraph(c.text, `500 ${Math.round(52 * u)}px "Inter"`, maxW, W / 2, H / 2 + 80 * u, 70 * u);
+        return;
+      }
+      // A group: label over value, stacked and centred as a block.
+      const step = 210 * u, y0 = H / 2 - step * (c.lines.length - 1) / 2;
+      c.lines.forEach((ln, i) => {
+        const y = y0 + i * step;
+        g.fillStyle = "rgba(255,255,255,0.7)";
+        g.font = `${Math.round(38 * u)}px "Neuropol"`;
+        g.fillText(ln.label.toUpperCase(), W / 2, y - 52 * u);
+        g.fillStyle = "#fff";
+        paragraph(ln.text, `500 ${Math.round(64 * u)}px "Inter"`, maxW * 1.15, W / 2, y + 16 * u, 82 * u);
+      });
+    });
   }
   g.globalAlpha = 1;
-  return true;
+  return any;
 }
 
 // Draw frame time t (s of the song); returns whether anything was drawn (render.mjs reuses one blank frame).
