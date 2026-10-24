@@ -997,3 +997,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Check:** a BVH overlap test of every ribbon part against the probe's shell, arms, fingers and flag, every 3rd frame through S54: 5 clipping pairs before, none after. Stills at 6, 8, 14 and 20 s.
 - **Render:** in set H's queued re-render.
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-24T06:50:39-04:00 — C5 set G re-rendered (freezer, S32 swarm)
+
+- **Set G** (S30–S44, re-render 04:23–06:27, reel 06:39; pack running): 20 reel frames checked. S32 shows two rows of chrome probes with arms and the wave; the freezer reads with one door and its label; no haze seen.
+- **Superseded** outputs: reel and contact sheet in `archive/renders/`; `frames_superseded_c5-notes` and `anchors_superseded_c5-notes` set aside for the human to delete.
+- **Queue:** set H re-render (with this session's H fixes) starts once G's pack ends (queue8).
