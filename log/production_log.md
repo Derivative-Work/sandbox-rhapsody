@@ -960,3 +960,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Templates in the hero's frame** (lens on -Y, up +Z) and turned per seat to face the stage, so the arms hang the right way.
 - **Render:** picked up by set G's queued re-render.
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-24T03:07:08-04:00 — C5 sets H and I rendered (new bloom)
+
+- **Set H** (S45–S58, 3840×3840): rendered 21:25–00:06, reel `renders/c5/set_H/set_H.mp4` (63 s), contact sheet, frames packed bit-exact to FFV1. Spot-check of 20 reel frames: dashboard flip, vault dial, the +0.5 ribbon, THE LAB bill and the cells turning red all read; no flicker or haze seen. Contact-sheet anchors for S47, S52 and S56 still land before their action (known; the reel is the review copy).
+- **Set I** (S59–S65, 3840×3840): rendered 00:06–03:06; reel and pack running.
+- **Queue:** sets C and F re-render started 03:06 (queue6), set G after them (queue7).
