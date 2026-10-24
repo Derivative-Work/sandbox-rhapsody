@@ -1169,3 +1169,15 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - The human approved card-section preview v3: the stem bounce with the vocals gated until "zero" and the limiter, the music-timed fact and credit pacing, the dimmed backdrops with the text pool, and the Animusic closing card.
 - **Remaining for the section:** the 4K backdrop once set H's packs land (S48–S55), then the final assembly.
 - **Why:** human approval, R1 (human interventions).
+
+## 2026-10-24T10:12:12-04:00 — C5 set H re-rendered (SAFE STOP, rosette, plane text, spreadsheet, S52 reflection)
+
+- **Set H** (S45–S58, 3840×3840): rendered 07:07–09:55, reel `renders/c5/set_H/set_H.mp4` (63 s) at 09:55; frames packing.
+- **Reel check:**
+  - S52: no key-light disc in the floor.
+  - S54: SAFE STOP readable above the flag, and the rosette in front of the probe, clear of it.
+  - S55: the planes with SUBPOENA.
+  - S56 and S57: no stray SUBPOENA text.
+  - S58: the spreadsheet (formula bar, letters, row numbers, figures) behind bars.
+- **Superseded:** the previous reel and contact sheet are in `archive/renders/`; `frames_superseded_c5-notes` and `anchors_superseded_c5-notes` are set aside for the human to delete.
+- **Next:** once packed, the 4K card backdrop with H's new plates (S48–S55), then the final assembly.
