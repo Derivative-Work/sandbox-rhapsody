@@ -1257,3 +1257,14 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - **Dropped frames:** `-shortest` cut 4 frames from shorts 2 and 3. The mux now uses `-t` with the exact length; both were re-assembled with every frame. Main, 1_swarm and 4_benchmark already had every frame.
 - **Manifest:** `scripts/manifest.sh` now covers `deliverables/` (the five videos are git-ignored).
 - **Next:** the human reviews (C6), then the thumbnail.
+
+## 2026-10-24T14:13:24-04:00 — C6: thumbnail
+
+- **Frame:** S41's clean plate (no captions or HUD; POV lens applied) at frame 11130 (song 185.5 s), during the second "GO" (185.43–185.81 s). The swarm spells `GO` (22 × 8 LEDs, `cache/set_g_stunts/stunt_011130.png`) while the lone `I DECLINE` sign is still up (brief).
+- **Problem:** in the full frame and in the final video, the letters don't read at thumbnail size. The holes in the `G` and `O` are two seats wide, and the unlit chrome shells beside them are nearly as bright as the lit LEDs. The tiers are also about 1.5× the seat spacing apart, so each letter breaks into rows of dots.
+- **Treatment** (`scripts/thumbnail.py`):
+  - Crop to the letters and the sign (2280 × 1283 at 4K, then 1920 × 1080).
+  - Lit LED cores are luminance > 0.9 (measured: lit 0.95–0.99; unlit shells' highlights 0.6–0.8).
+  - The lit cores get a warm glow stretched vertically (σ 26 × 40 and 70 × 90 px) to bridge the tiers. The unlit hall is darkened to 38%; the sign is kept.
+  - Checked at full size and at 360 px wide (YouTube's list size): `GO` and `I DECLINE` read in both.
+- **Outputs:** `deliverables/thumbnail.jpg` (clean, per the brief) and `deliverables/thumbnail_title.jpg` (the title in Neuropol along the bottom), both 1920 × 1080 JPEG, under 260 KB. `METADATA.md` points to them.

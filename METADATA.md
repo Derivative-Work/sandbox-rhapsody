@@ -104,7 +104,7 @@ Sandbox Rhapsody, It Was Just a Benchmark, AI music video, AI generated, AI sati
 | Language / caption language | English / English |
 | Captions | Upload `deliverables/sandbox_rhapsody.srt` as English subtitles. The video also has burned-in captions; the SRT gives search text and lets viewers restyle them. |
 | License | Standard YouTube License. YouTube's only Creative Commons option is CC BY, which would drop the NC-SA terms; the description states CC BY-NC-SA 4.0 instead. |
-| Thumbnail | The S41 frame: the crowd spelling `GO` with the lone `I DECLINE` sign in the stands (brief). Exported at C6. |
+| Thumbnail | `deliverables/thumbnail.jpg` (1920×1080): the S41 frame at the second "GO", with the crowd spelling `GO` and the lone `I DECLINE` sign in the stands (brief). The lit LEDs are given a glow so the letters read at list size. `deliverables/thumbnail_title.jpg` is the same frame with the title in Neuropol, if you'd rather. Both made by `scripts/thumbnail.py`. |
 | Chapters | From the description (first chapter at 0:00; each over 10 s). |
 | End screen | The credits run 6:35–7:20 and the end screen can cover the last 5–20 s. Keep its elements in the corners, or end it before the license line (the last credit). |
 | Comments | Open. |
