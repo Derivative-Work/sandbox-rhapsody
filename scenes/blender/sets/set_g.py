@@ -965,9 +965,10 @@ CAMERAS = {
     "S30": [(0.0, _v(0.0, -2.6, 0.35), _v(0, 7.5, 0.8), 22), (1.0, _v(0.0, -1.2, 2.6), _v(0, 7.5, 1.0), 22)],
     "S31": [(0.0, _STUNT + _v(0, -0.4, 0), _FRONT, 24), (1.0, _STUNT, _FRONT, 24)],
     # A few probes blinking: the front rows, centre left.
-    # Two rows (1 and 2) filling the frame, about 1 m off: the wave runs along both (human, C5: "I still want to
-    # see two rows"; at 1.45 m they sat small in black).
-    "S32": [(0.0, _v(-0.45, 6.3, 0.62), _v(-0.6, 7.3, 0.44), 50), (1.0, _v(-0.27, 6.45, 0.6), _v(-0.42, 7.3, 0.44), 50)],
+    # Two rows (1 and 2) filling the frame, about 1.2 m off, both rows' rails and cups in: the wave runs along both
+    # (human, C5: "I still want to see two rows"; at 1.45 m they sat small in black, at 1 m the lower rail was cut:
+    # "I want to be able to see the bottom of both visible shelves").
+    "S32": [(0.0, _v(-0.47, 6.1, 0.62), _v(-0.6, 7.3, 0.41), 50), (1.0, _v(-0.29, 6.25, 0.6), _v(-0.42, 7.3, 0.41), 50)],
     # The printer starts: looking down at the slot as the paper comes out.
     "S33": [(0.0, _v(1.25, -0.7, 1.15), _v(1.95, 0.65, 0.05), 30), (1.0, _v(1.4, -0.45, 1.0), _v(1.95, 0.6, 0.05), 32)],
     "S34": [(0.0, _STUNT + _v(-0.4, 0, 0), _FRONT, 24), (1.0, _STUNT + _v(0.4, 0, 0), _FRONT, 24)],

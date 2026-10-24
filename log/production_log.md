@@ -946,3 +946,8 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Risers:** clad in matte panels, one per five seats with thin gaps. Tried `lab_dark` satin, `shadow` satin and `lab_dark` matte: the satin ones mirrored the studio lights and reflection cards (the C4 glare), and `lab_dark` matte was lighter than the shells' shadow side and lifted the wide stunt's blacks. New palette role `riser` #161b24, matte: S32 reads as a built stand, S31's hall stays dark.
 - **Queued:** set G re-renders after C and F (`renders/c5/queue7.log`); its current reel, contact sheet, frames and anchors are set aside first (`_superseded_c5-notes`).
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-23T22:51:27-04:00 — C5 set G: S32 at 1.2 m
+
+- **Framing** (human, R1): the camera moves back from about 1 m to 1.2 m and aims 3 cm lower. Stills at 0.2, 2.0 and 4.0 s into S32: both rows' cups and brass rails are in frame throughout, a strip of riser below the lower rail.
+- **Render:** picked up by set G's queued re-render (not started yet).

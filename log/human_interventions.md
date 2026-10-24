@@ -301,3 +301,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** on S32's framing, lighting and tiers: "framing: I still want to see two rows -- it really sold the wave effect. lighting and tiers: makes sense to me. go ahead with the test stills".
+
+## 2026-10-23T22:51:27-04:00 — C5 set G: S32 a little wider
+
+- **Rule:** R1.
+- **What:** "that's a smidge too close -- I want to be able to see the bottom of both visible shelves".
