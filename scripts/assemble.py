@@ -161,14 +161,15 @@ class Plates:
 
 class Overlay(Pack):
     def __init__(self, path, w, h, t0):
-        self.path, self.w, self.h, self.t0 = path, w, h, t0
+        self.path, self.w, self.h = path, w, h
+        self.f0 = round(t0 * FPS)  # the track's first frame, as overlays/render.mjs numbers it (t0 may fall between frames)
         self.p, self.next, self.cache, self.keep = None, None, {}, 2
 
     def _open(self, f):
         if self.p:
             self.p.kill()
         self.cache.clear()
-        self.p = subprocess.Popen(["ffmpeg", "-v", "quiet", *DEC_THREADS, "-ss", f"{f / FPS - self.t0:.6f}", "-i", self.path, "-vf",
+        self.p = subprocess.Popen(["ffmpeg", "-v", "quiet", *DEC_THREADS, "-ss", f"{(f - self.f0) / FPS:.6f}", "-i", self.path, "-vf",
                                    f"scale={self.w}:{self.h}", "-f", "rawvideo", "-pix_fmt", "rgba", "-"],
                                   stdout=subprocess.PIPE, bufsize=1 << 26)
         self.next = f
@@ -177,6 +178,8 @@ class Overlay(Pack):
         if self.p is None or f != self.next:
             self._open(f)
         buf = self.p.stdout.read(self.w * self.h * 4)
+        if len(buf) < self.w * self.h * 4:
+            raise RuntimeError(f"{self.path}: no frame {f} (track frame {f - self.f0})")
         self.next += 1
         return np.frombuffer(buf, np.uint8).reshape(self.h, self.w, 4)
 
@@ -242,6 +245,8 @@ def main():
     cfg["size"] = size
     tmp = Path(out + ".parts")
     tmp.mkdir(parents=True, exist_ok=True)
+    for p in tmp.glob("chunk*.mkv"):  # an interrupted run's chunks
+        p.unlink()
     cfg["tmp"] = str(tmp)
     F0, F1 = round(a * FPS), round(b * FPS)
     n = -(-(F1 - F0) // jobs)
@@ -267,7 +272,7 @@ def main():
                     # BT.709 primaries, transfer and matrix in the bitstream's VUI (the concat lost two of the three)
                     "-bsf:v", "hevc_metadata=colour_primaries=1:transfer_characteristics=1:matrix_coefficients=1",
                     "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709",
-                    "-c:a", "aac", "-b:a", "320k", "-ar", "48000", "-movflags", "+faststart", "-shortest", out],
+                    "-c:a", "aac", "-b:a", "320k", "-ar", "48000", "-movflags", "+faststart", "-t", f"{(F1 - F0) / FPS:.6f}", out],  # not -shortest: it dropped 4 frames
                    check=True)
     for p in parts:
         Path(p).unlink()

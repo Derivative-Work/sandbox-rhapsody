@@ -1241,3 +1241,19 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - 118–128 s at 720p (S22's rewind, the S22→S23 join): frame hashes identical to the previous assembler;
   - 14–44 s at 4K, 3 jobs, across six dissolves: peak +14 GB.
 - **Next:** the full main and four shorts at `--jobs 3`.
+
+## 2026-10-24T14:03:54-04:00 — C6: final main video and four shorts assembled
+
+- **Main** (`deliverables/sandbox_rhapsody_main.mp4`, 2.7 GB): 3840×2160, 60 fps, 25,294 frames (7:01.57), HEVC (NVENC, CQ 16), AAC 320k, BT.709 tagged. Loudness −13.9 LUFS integrated. Rendered in 33.5 min at 3 jobs; memory peaked about 21 GB.
+- **Spot checks (main):** the S01 fade-up and label; an intro dissolve; S22; the hard rock; the S53 subpoenas; the coda; both fact-card kinds over their dimmed backdrops; the title card; the Animusic card.
+- **Shorts** (`deliverables/shorts/`), 2160×3840, BT.709, AAC:
+  - 1_swarm: 2,920 frames, 48.67 s;
+  - 2_cage: 1,743 frames, 29.05 s;
+  - 3_pay: 2,069 frames, 34.48 s;
+  - 4_benchmark: 3,586 frames, 59.77 s.
+- **Fixes along the way** (`scripts/assemble.py`):
+  - **Stale chunks:** chunks left by the interrupted 6-job run blocked the cleanup, so the shorts never started. Leftover chunks are now cleared when a run starts.
+  - **Overlay seek:** the overlay was read from the short's start time (154.48 s for short 1, between frames). The renderer numbers tracks from `round(t0 × fps)`, so short 1's overlay was one frame late and its last chunk ran out. The reader now seeks by that frame; a short read raises a clear error. Main is unaffected (its overlay and backdrop start on whole frames).
+  - **Dropped frames:** `-shortest` cut 4 frames from shorts 2 and 3. The mux now uses `-t` with the exact length; both were re-assembled with every frame. Main, 1_swarm and 4_benchmark already had every frame.
+- **Manifest:** `scripts/manifest.sh` now covers `deliverables/` (the five videos are git-ignored).
+- **Next:** the human reviews (C6), then the thumbnail.

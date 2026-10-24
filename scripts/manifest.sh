@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 # reference/stills is not published (other creators' frames); reference/stills.tsv (in git) lists each one's
 # source video and time instead (scripts/stills_index.py).
-dirs=(audio renders takes transcripts archive assets/models/rotary_phone_src)
+dirs=(audio renders takes transcripts archive deliverables assets/models/rotary_phone_src)
 existing=()
 for d in "${dirs[@]}"; do [ -d "$d" ] && existing+=("$d"); done
 # Frame sequences (plates, overlay frames, assembled sequences) are never archived (brief): they regenerate from
