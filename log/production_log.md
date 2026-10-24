@@ -1196,3 +1196,18 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - `scripts/render_tails.sh` renders each set's outgoing shots at the set's longest tail (A 54, B 51, C 50, D 50, H 27, I 56 frames; about 1,950 frames), two sessions per set, then packs them with `c5_pack.sh` (`frames/<shot>_tail.mkv`, bit-exact).
   - Running.
 - **Why:** human decision, R1 (human interventions); style spec "Joins".
+
+## 2026-10-24T11:01:23-04:00 — C6: the final assembler
+
+- **`scripts/assemble.py main|short:<id>`** renders the 60 fps timeline frame by frame:
+  - **Plates:** from the C5 packs, square sets centre-cropped to the format. S01 fades up over 3 s; S22's rewind and S65's CRT collapse come from `edit_fx` (shared with the animatic).
+  - **Lens:** POV shots get the style spec's lens barrel (2.5%, corners fixed).
+  - **Joins:** dissolves from the cut per `timing/joins.json`, smoothstepped, with the outgoing shot from its tail pack.
+  - **Cards:** from S66 the 4K card backdrop.
+  - **Overlay:** alpha-composited over everything.
+  - **Shorts:** each one's span, its lead-in holding the first shot's first frame, and its own overlay.
+  - **Encode:** parallel chunks through NVENC HEVC (CQ 16, 60 Mb/s main), BT.709 tagged in the bitstream (`hevc_metadata`; the concat had dropped transfer and primaries), concatenated, muxed with AAC 320k.
+  - **Audio:** the final song audio up to S66, then the card bounce (main); the song audio over a short's span (shorts).
+- **Tests (1080p):** the opera's cuts (166–172 s), and the ending 323–331 s (coda, S65, CRT collapse to a dot, black, the first fact over its backdrop as the bounce starts). Colour tags BT.709 / BT.709 / BT.709, TV range.
+- **Main overlay:** re-rendering with the final cues (regrouped credits, text pool, Animusic card).
+- **Waiting on:** the dissolve tails (rendering).
