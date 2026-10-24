@@ -1138,3 +1138,10 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Card:** a last credit, "INSPIRED BY ANIMUSIC / Not made by or affiliated with Animusic", 415.57–421.52 s. It splits the final chord's release with the repo-and-licenses card, which keeps the chord's downbeat (410.18 s). There are no beats after 321.6 s, so its start isn't snapped (cards.json `credit_free_starts`, 327.0 s of song time).
 - **Descriptions:** the same line added to the main description's credits and to the shorts' shared footer (METADATA.md).
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-24T08:49:52-04:00 — C6 cards: a feathered dark pool behind the text
+
+- **Found** (agent, checking the rebuilt card preview, which has the new audio and fact 8's backdrop fix): over bright footage, the 30% backdrop still left the text busy, worst on S35's white invoice under fact 7.
+- **Fix** (`overlays/overlay.html` `drawCards`): a feathered dark ellipse behind each card's text (60% black at the centre to 0 at the edge, 0.84 W × 0.35 H), fading in and out with its card. It darkens only where the words sit; the rest of the footage stays at 30%. Checked on fact 7's frame: clean.
+- **Next:** the final 4K backdrop and card render wait for set H's packs (S48–S55 come from superseded plates in previews).
+- **Why:** legibility (brief; style spec captions); agent finding.

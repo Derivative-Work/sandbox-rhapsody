@@ -249,6 +249,19 @@ function drawCards(t) {
   g.textAlign = "center"; g.textBaseline = "middle";
   const maxW = (V ? 0.84 : 0.62) * W;
   let any = false;
+  // A feathered dark pool behind the text, fading with the card: the 30% backdrop still left bright footage (S35's
+  // white invoice) busy under white type (C6 preview).
+  const pool = a => {
+    if (a <= 0) return;
+    g.save();
+    g.globalAlpha = a;
+    g.translate(W / 2, H / 2); g.scale(1, 0.42);
+    const r = W * 0.42, gr = g.createRadialGradient(0, 0, 0, 0, 0, r);
+    gr.addColorStop(0, "rgba(0,0,0,0.6)"); gr.addColorStop(0.55, "rgba(0,0,0,0.45)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = gr; g.fillRect(-r, -r, 2 * r, 2 * r);
+    g.restore();
+  };
+  for (const x of [...C.facts, ...C.credits]) if (t >= x.on && t < x.off) pool(ramp(t, x.on, x.off, 0.4, 0.4));
   for (const f of C.facts) {
     if (!(t >= f.on && t < f.off)) continue;
     any = true;
