@@ -970,3 +970,10 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 ## 2026-10-24T03:59:58-04:00 — C5 set I reel and pack
 
 - **Set I** (S59–S65): reel `renders/c5/set_I/set_I.mp4` (60 s), frames packed bit-exact to FFV1 (03:59; 138 GB free). Spot-check of 20 reel frames: score board reads 461 before the flip to 0, the wire-graph, drum pads and the piano close-ups all read; no flicker or haze seen.
+
+## 2026-10-24T04:25:52-04:00 — C5 sets C and F re-rendered (S24 straps, F inner lip)
+
+- **Set C** (re-render 03:06–03:47, reel 04:14): six S24 frames checked, the hidden camp crates' straps no longer show, so the "mirror" over the stage is gone.
+- **Set F** (re-render 03:47–04:12, reel 04:20, packed bit-exact): S27 checked with a single-frame spike count over the open crate's interior against the superseded render. In the old render, frames 0–25 jumped frame to frame (flicker); in the new one they rise and fall smoothly with the crate's motion. A 6-frame crop shows the inner walls and lip stable.
+- **Superseded** outputs: reels and contact sheets in `archive/renders/`; `frames_superseded_c5-notes` and `anchors_superseded_c5-notes` set aside for the human to delete.
+- **Queue:** set G re-render started 04:23 (queue7).
