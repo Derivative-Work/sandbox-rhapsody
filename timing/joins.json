@@ -1,0 +1,708 @@
+{
+ "rule": "A join dissolves when both shots are in the intro, ballad, hard rock or outro, and is a hard cut everywhere else:\ninto and through the opera, into and out of the solo and the coda, and into S65's SIGTERM. A dissolve starts on\nthe cut and lasts DISSOLVE_BEATS of the beat there (2 in the slow sections, 1 in the hard rock), the incoming shot\non time from its first frame and the outgoing shot running on under it, from its tail render\n(animatic.py --tail; its plate already runs one frame past its end).",
+ "joins": [
+  {
+   "from": "S01",
+   "to": "S02",
+   "at_s": 15.6567,
+   "at_frame": 939,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 54
+  },
+  {
+   "from": "S02",
+   "to": "S03",
+   "at_s": 22.9192,
+   "at_frame": 1375,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 54
+  },
+  {
+   "from": "S03",
+   "to": "S04",
+   "at_s": 26.5516,
+   "at_frame": 1593,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 54
+  },
+  {
+   "from": "S04",
+   "to": "S05",
+   "at_s": 30.1834,
+   "at_frame": 1811,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 55
+  },
+  {
+   "from": "S05",
+   "to": "S06",
+   "at_s": 33.8166,
+   "at_frame": 2029,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 55
+  },
+  {
+   "from": "S06",
+   "to": "S07",
+   "at_s": 45.3764,
+   "at_frame": 2723,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 52
+  },
+  {
+   "from": "S07",
+   "to": "S08",
+   "at_s": 52.2619,
+   "at_frame": 3136,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 52
+  },
+  {
+   "from": "S08",
+   "to": "S09",
+   "at_s": 59.133,
+   "at_frame": 3548,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 51
+  },
+  {
+   "from": "S09",
+   "to": "S10",
+   "at_s": 65.9869,
+   "at_frame": 3959,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 52
+  },
+  {
+   "from": "S10",
+   "to": "S11",
+   "at_s": 74.8498,
+   "at_frame": 4491,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 52
+  },
+  {
+   "from": "S11",
+   "to": "S12",
+   "at_s": 78.2998,
+   "at_frame": 4698,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 52
+  },
+  {
+   "from": "S12",
+   "to": "S13",
+   "at_s": 81.7349,
+   "at_frame": 4904,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 52
+  },
+  {
+   "from": "S13",
+   "to": "S14",
+   "at_s": 85.1667,
+   "at_frame": 5110,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 51
+  },
+  {
+   "from": "S14",
+   "to": "S15",
+   "at_s": 88.5917,
+   "at_frame": 5316,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 51
+  },
+  {
+   "from": "S15",
+   "to": "S16",
+   "at_s": 95.4487,
+   "at_frame": 5727,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 51
+  },
+  {
+   "from": "S16",
+   "to": "S17",
+   "at_s": 98.88,
+   "at_frame": 5933,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 51
+  },
+  {
+   "from": "S17",
+   "to": "S18",
+   "at_s": 104.0172,
+   "at_frame": 6241,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 52
+  },
+  {
+   "from": "S18",
+   "to": "S19",
+   "at_s": 107.4516,
+   "at_frame": 6447,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 51
+  },
+  {
+   "from": "S19",
+   "to": "S20",
+   "at_s": 110.8778,
+   "at_frame": 6653,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 51
+  },
+  {
+   "from": "S20",
+   "to": "S21",
+   "at_s": 114.306,
+   "at_frame": 6858,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 51
+  },
+  {
+   "from": "S21",
+   "to": "S22",
+   "at_s": 117.7339,
+   "at_frame": 7064,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 51
+  },
+  {
+   "from": "S22",
+   "to": "S23",
+   "at_s": 124.5924,
+   "at_frame": 7476,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 52
+  },
+  {
+   "from": "S23",
+   "to": "S24",
+   "at_s": 131.4462,
+   "at_frame": 7887,
+   "kind": "cut"
+  },
+  {
+   "from": "S24",
+   "to": "S25",
+   "at_s": 138.3014,
+   "at_frame": 8298,
+   "kind": "cut"
+  },
+  {
+   "from": "S25",
+   "to": "S26",
+   "at_s": 143.4461,
+   "at_frame": 8607,
+   "kind": "cut"
+  },
+  {
+   "from": "S26",
+   "to": "S27",
+   "at_s": 146.8747,
+   "at_frame": 8812,
+   "kind": "cut"
+  },
+  {
+   "from": "S27",
+   "to": "S28",
+   "at_s": 150.302,
+   "at_frame": 9018,
+   "kind": "cut"
+  },
+  {
+   "from": "S28",
+   "to": "S29",
+   "at_s": 152.0159,
+   "at_frame": 9121,
+   "kind": "cut"
+  },
+  {
+   "from": "S29",
+   "to": "S30",
+   "at_s": 155.4436,
+   "at_frame": 9327,
+   "kind": "cut"
+  },
+  {
+   "from": "S30",
+   "to": "S31",
+   "at_s": 157.1573,
+   "at_frame": 9429,
+   "kind": "cut"
+  },
+  {
+   "from": "S31",
+   "to": "S32",
+   "at_s": 160.5855,
+   "at_frame": 9635,
+   "kind": "cut"
+  },
+  {
+   "from": "S32",
+   "to": "S33",
+   "at_s": 165.7289,
+   "at_frame": 9944,
+   "kind": "cut"
+  },
+  {
+   "from": "S33",
+   "to": "S34",
+   "at_s": 167.444,
+   "at_frame": 10047,
+   "kind": "cut"
+  },
+  {
+   "from": "S34",
+   "to": "S35",
+   "at_s": 169.1587,
+   "at_frame": 10150,
+   "kind": "cut"
+  },
+  {
+   "from": "S35",
+   "to": "S36",
+   "at_s": 172.5874,
+   "at_frame": 10355,
+   "kind": "cut"
+  },
+  {
+   "from": "S36",
+   "to": "S37",
+   "at_s": 174.3011,
+   "at_frame": 10458,
+   "kind": "cut"
+  },
+  {
+   "from": "S37",
+   "to": "S38",
+   "at_s": 177.7297,
+   "at_frame": 10664,
+   "kind": "cut"
+  },
+  {
+   "from": "S38",
+   "to": "S39",
+   "at_s": 179.4445,
+   "at_frame": 10767,
+   "kind": "cut"
+  },
+  {
+   "from": "S39",
+   "to": "S40",
+   "at_s": 182.8726,
+   "at_frame": 10972,
+   "kind": "cut"
+  },
+  {
+   "from": "S40",
+   "to": "S41",
+   "at_s": 184.5865,
+   "at_frame": 11075,
+   "kind": "cut"
+  },
+  {
+   "from": "S41",
+   "to": "S42",
+   "at_s": 188.0165,
+   "at_frame": 11281,
+   "kind": "cut"
+  },
+  {
+   "from": "S42",
+   "to": "S43",
+   "at_s": 193.1587,
+   "at_frame": 11590,
+   "kind": "cut"
+  },
+  {
+   "from": "S43",
+   "to": "S44",
+   "at_s": 196.5868,
+   "at_frame": 11795,
+   "kind": "cut"
+  },
+  {
+   "from": "S44",
+   "to": "S45",
+   "at_s": 203.443,
+   "at_frame": 12207,
+   "kind": "cut"
+  },
+  {
+   "from": "S45",
+   "to": "S46",
+   "at_s": 206.8771,
+   "at_frame": 12413,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S46",
+   "to": "S47",
+   "at_s": 213.7247,
+   "at_frame": 12823,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S47",
+   "to": "S48",
+   "at_s": 217.1548,
+   "at_frame": 13029,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S48",
+   "to": "S49",
+   "at_s": 218.8685,
+   "at_frame": 13132,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S49",
+   "to": "S50",
+   "at_s": 220.5833,
+   "at_frame": 13235,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S50",
+   "to": "S51",
+   "at_s": 224.0125,
+   "at_frame": 13441,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S51",
+   "to": "S52",
+   "at_s": 227.4389,
+   "at_frame": 13646,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S52",
+   "to": "S53",
+   "at_s": 232.5863,
+   "at_frame": 13955,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S53",
+   "to": "S54",
+   "at_s": 237.8803,
+   "at_frame": 14273,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 27
+  },
+  {
+   "from": "S54",
+   "to": "S55",
+   "at_s": 248.3676,
+   "at_frame": 14902,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S55",
+   "to": "S56",
+   "at_s": 251.8172,
+   "at_frame": 15109,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S56",
+   "to": "S57",
+   "at_s": 253.5386,
+   "at_frame": 15212,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S57",
+   "to": "S58",
+   "at_s": 258.6996,
+   "at_frame": 15522,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 26
+  },
+  {
+   "from": "S58",
+   "to": "S59",
+   "at_s": 266.4278,
+   "at_frame": 15986,
+   "kind": "dissolve",
+   "beats": 1,
+   "frames": 28
+  },
+  {
+   "from": "S59",
+   "to": "S60",
+   "at_s": 273.8509,
+   "at_frame": 16431,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 56
+  },
+  {
+   "from": "S60",
+   "to": "S61",
+   "at_s": 283.2855,
+   "at_frame": 16997,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 57
+  },
+  {
+   "from": "S61",
+   "to": "S62",
+   "at_s": 290.7767,
+   "at_frame": 17447,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 55
+  },
+  {
+   "from": "S62",
+   "to": "S63",
+   "at_s": 292.5966,
+   "at_frame": 17556,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 54
+  },
+  {
+   "from": "S63",
+   "to": "S64",
+   "at_s": 296.2478,
+   "at_frame": 17775,
+   "kind": "dissolve",
+   "beats": 2,
+   "frames": 56
+  },
+  {
+   "from": "S64",
+   "to": "S64b",
+   "at_s": 299.9436,
+   "at_frame": 17997,
+   "kind": "cut"
+  },
+  {
+   "from": "S64b",
+   "to": "S65",
+   "at_s": 325.5,
+   "at_frame": 19530,
+   "kind": "cut"
+  }
+ ],
+ "tails": {
+  "S01": {
+   "set": "A",
+   "frames": 53
+  },
+  "S02": {
+   "set": "A",
+   "frames": 53
+  },
+  "S03": {
+   "set": "A",
+   "frames": 53
+  },
+  "S04": {
+   "set": "A",
+   "frames": 54
+  },
+  "S05": {
+   "set": "A",
+   "frames": 54
+  },
+  "S06": {
+   "set": "A",
+   "frames": 51
+  },
+  "S07": {
+   "set": "A",
+   "frames": 51
+  },
+  "S08": {
+   "set": "A",
+   "frames": 50
+  },
+  "S09": {
+   "set": "A",
+   "frames": 51
+  },
+  "S10": {
+   "set": "A",
+   "frames": 51
+  },
+  "S11": {
+   "set": "B",
+   "frames": 51
+  },
+  "S12": {
+   "set": "B",
+   "frames": 51
+  },
+  "S13": {
+   "set": "C",
+   "frames": 50
+  },
+  "S14": {
+   "set": "C",
+   "frames": 50
+  },
+  "S15": {
+   "set": "B",
+   "frames": 50
+  },
+  "S16": {
+   "set": "B",
+   "frames": 50
+  },
+  "S17": {
+   "set": "B",
+   "frames": 51
+  },
+  "S18": {
+   "set": "D",
+   "frames": 50
+  },
+  "S19": {
+   "set": "D",
+   "frames": 50
+  },
+  "S20": {
+   "set": "A",
+   "frames": 50
+  },
+  "S21": {
+   "set": "A",
+   "frames": 50
+  },
+  "S22": {
+   "set": "B",
+   "frames": 51
+  },
+  "S45": {
+   "set": "H",
+   "frames": 25
+  },
+  "S46": {
+   "set": "H",
+   "frames": 25
+  },
+  "S47": {
+   "set": "H",
+   "frames": 25
+  },
+  "S48": {
+   "set": "H",
+   "frames": 25
+  },
+  "S49": {
+   "set": "H",
+   "frames": 25
+  },
+  "S50": {
+   "set": "H",
+   "frames": 25
+  },
+  "S51": {
+   "set": "H",
+   "frames": 25
+  },
+  "S52": {
+   "set": "H",
+   "frames": 25
+  },
+  "S53": {
+   "set": "H",
+   "frames": 26
+  },
+  "S54": {
+   "set": "H",
+   "frames": 25
+  },
+  "S55": {
+   "set": "H",
+   "frames": 25
+  },
+  "S56": {
+   "set": "H",
+   "frames": 25
+  },
+  "S57": {
+   "set": "H",
+   "frames": 25
+  },
+  "S58": {
+   "set": "H",
+   "frames": 27
+  },
+  "S59": {
+   "set": "I",
+   "frames": 55
+  },
+  "S60": {
+   "set": "I",
+   "frames": 56
+  },
+  "S61": {
+   "set": "I",
+   "frames": 54
+  },
+  "S62": {
+   "set": "I",
+   "frames": 53
+  },
+  "S63": {
+   "set": "I",
+   "frames": 55
+  }
+ }
+}

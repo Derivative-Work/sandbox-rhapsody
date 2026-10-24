@@ -1181,3 +1181,18 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - S58: the spreadsheet (formula bar, letters, row numbers, figures) behind bars.
 - **Superseded:** the previous reel and contact sheet are in `archive/renders/`; `frames_superseded_c5-notes` and `anchors_superseded_c5-notes` are set aside for the human to delete.
 - **Next:** once packed, the 4K card backdrop with H's new plates (S48–S55), then the final assembly.
+
+## 2026-10-24T10:57:35-04:00 — C6: 4K card backdrop; dissolve tails for the final's joins
+
+- **4K card backdrop:** `renders/c6/cards_backdrop.mkv` (3840×2160 FFV1, 95.1 s, 16 segments, every plate current, no superseded fallback). The 1080p preview backdrop is kept as `cards_backdrop_preview1080.mkv`.
+- **Found:** the C5 packs have one frame of handle either side of each cut. The style spec's 1–2 beat dissolves need 25–56 frames of overlap.
+- **Decision** (human, R1): of the options offered (dissolve from the cut / hard cuts / centred dissolves), "Dissolve from the cut".
+- **Joins** (`scripts/joins.py` → `timing/joins.json`):
+  - Rule: a dissolve where both shots are in the intro, ballad, hard rock or outro; a hard cut elsewhere (into and through the opera, into and out of the solo and the coda, into S65's SIGTERM).
+  - Length: 2 beats in the slow sections, 1 in the hard rock, starting on the cut; the incoming shot is on time from its first frame.
+  - Count: 65 joins, 41 dissolves and 24 cuts.
+- **Tails:**
+  - `animatic.py --tail N` renders only the N frames after a shot's plate into `frames/<shot>_tail/`. Cameras ease out to a stop on their last key, so holding past it continues the move.
+  - `scripts/render_tails.sh` renders each set's outgoing shots at the set's longest tail (A 54, B 51, C 50, D 50, H 27, I 56 frames; about 1,950 frames), two sessions per set, then packs them with `c5_pack.sh` (`frames/<shot>_tail.mkv`, bit-exact).
+  - Running.
+- **Why:** human decision, R1 (human interventions); style spec "Joins".

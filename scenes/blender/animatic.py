@@ -3,10 +3,12 @@ Set column, first set listed) at its final timing, low-res, one PNG sequence per
 
 A shot's camera comes from the set module's CAMERAS[shot] = [(u, eye, target, lens), ...] with u the fraction of the
 shot (0 = cut, 1 = next cut), or a list of such moves for cuts inside the shot; shots without one get a slow push-in on the set's centre, flagged in the run's report.
-Plates run one frame past the shot's end on each side, so the edit can dissolve.
+Plates run one frame past the shot's end on each side. --tail N renders only the N frames after a shot's plate
+(its end + 2 onward) into <out>/<shot>_tail/: the outgoing shot's picture under a dissolve that starts on the cut
+(human, C6). Cameras ease out to a stop on their last key, so holding past it continues the move.
 
 Usage: blender -b --factory-startup --python scenes/blender/animatic.py -- SET [shot ...] [--size 640x360]
-       [--samples 8] [--step 1] [--out DIR] [--anchors] [--at S1,S2,...]
+       [--samples 8] [--step 1] [--out DIR] [--anchors] [--at S1,S2,...] [--tail N]
   -> renders/animatic/plates/<shot>/f_<frame>.png  (frame numbers are the 60 fps timeline's)
   --anchors: one still per shot at its anchor (C5's contact sheets) -> <out>/<shot>.png
   --at: stills at these times, in seconds from each shot's cut (checks) -> <out>/<shot>_<s>.png
@@ -27,7 +29,8 @@ import sr_anim as A  # noqa: E402
 import sr_kit as K  # noqa: E402
 
 args = sys.argv[sys.argv.index("--") + 1:]
-opts = {"--size": "640x360", "--samples": "8", "--step": "1", "--at": "", "--out": str(ROOT / "renders" / "animatic" / "plates")}
+opts = {"--size": "640x360", "--samples": "8", "--step": "1", "--at": "", "--tail": "0",
+        "--out": str(ROOT / "renders" / "animatic" / "plates")}
 pos = []
 i = 0
 while i < len(args):
@@ -122,8 +125,11 @@ for s in mine:
         report.append(f"{sid}: anchor frame {f}")
         continue
     scene.frame_start, scene.frame_end = A.frame(a) - 1, A.frame(b) + 1
-    scene.frame_step = int(opts["--step"])
     out = Path(opts["--out"]) / sid
+    if int(opts["--tail"]):  # only the frames after the plate, for a dissolve from the cut
+        scene.frame_start, scene.frame_end = A.frame(b) + 2, A.frame(b) + 1 + int(opts["--tail"])
+        out = Path(opts["--out"]) / f"{sid}_tail"
+    scene.frame_step = int(opts["--step"])
     out.mkdir(parents=True, exist_ok=True)
     scene.render.filepath = str(out / "f_")
     scene.render.image_settings.file_format = "PNG"

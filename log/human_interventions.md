@@ -378,3 +378,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - "end card preview is good to me" (card-section preview v3: limited bounce, fact and credit pacing, backdrops, text pool, Animusic card).
 - Rule R1 (approve).
+
+## 2026-10-24T10:57:35-04:00 — R1: joins
+
+- Asked how shots should join given one frame of render overlap (dissolve from the cut with about a beat of extra tail rendered / hard cuts throughout / centred dissolves), the human chose "Dissolve from the cut (Recommended)".
+- Rule R1 (approve a plan).
