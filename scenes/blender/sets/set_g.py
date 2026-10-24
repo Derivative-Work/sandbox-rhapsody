@@ -23,6 +23,7 @@ import math
 
 import bmesh
 import bpy
+import numpy as np
 from mathutils import Matrix, Vector
 
 import sr_anim as A
@@ -66,6 +67,35 @@ def _mesh_from(name, bm, mat):
     me = bpy.data.meshes.new(name)
     bm.to_mesh(me)
     bm.free()
+    o = K.link(bpy.data.objects.new(name, me))
+    o.data.materials.append(mat)
+    return o
+
+
+def _copies(name, template, mats, mat, uvs=None):
+    """One object holding a copy of the `template` bmesh at each 4x4 matrix in `mats`, smooth-shaded; `uvs` gives
+    each copy one UV for all its loops. Built as arrays: 700 bmesh ops into one growing bmesh took quadratic time
+    once the probes had 32x16 shells."""
+    tv = np.array([v.co[:] for v in template.verts], np.float32)
+    faces = [[v.index for v in f.verts] for f in template.faces]
+    template.free()
+    loops = np.array([i for f in faces for i in f], np.int32)
+    starts = np.cumsum([0] + [len(f) for f in faces[:-1]]).astype(np.int32)
+    m = np.array([np.array(M) for M in mats], np.float32)
+    n, nv, nl = len(m), len(tv), len(loops)
+    co = np.einsum("nij,vj->nvi", m[:, :3, :3], tv) + m[:, None, :3, 3]
+    me = bpy.data.meshes.new(name)
+    me.vertices.add(n * nv)
+    me.vertices.foreach_set("co", co.ravel())
+    me.loops.add(n * nl)
+    me.loops.foreach_set("vertex_index", (loops[None, :] + nv * np.arange(n)[:, None]).ravel())
+    me.polygons.add(n * len(faces))
+    me.polygons.foreach_set("loop_start", (starts[None, :] + nl * np.arange(n)[:, None]).ravel())
+    me.update(calc_edges=True)
+    me.polygons.foreach_set("use_smooth", np.ones(len(me.polygons), bool))
+    if uvs is not None:
+        me.uv_layers.new(name="UVMap").data.foreach_set("uv", np.repeat(np.asarray(uvs, np.float32), nl, 0).ravel())
+    me.validate()
     o = K.link(bpy.data.objects.new(name, me))
     o.data.materials.append(mat)
     return o
@@ -236,8 +266,10 @@ def _cold_storage(black, brass):
         for cy, sy in ((y0, 1), (y1, -1)):
             tr.box((cx + sx * 0.022, cy - sy * 0.003, 0.45), (0.05, 0.006, 0.9), bev=0.002)
             tr.box((cx - sx * 0.003, cy + sy * 0.022, 0.45), (0.006, 0.05, 0.9), bev=0.002)
-    tr.frame((2.95, -1.4, 0.04), (0.912, 0.912), (0.88, 0.88), 0.08, m=1, bev=0.004)
-    tr.frame((2.95, -1.4, 0.89), (0.912, 0.912), (0.88, 0.88), 0.02, bev=0.003)
+    # The plinth and capping stand 3 mm proud of the corner guards: flush, their faces met the guards' in two
+    # materials and the corners flickered (human, C5 set G).
+    tr.frame((2.95, -1.4, 0.04), (0.918, 0.918), (0.88, 0.88), 0.08, m=1, bev=0.004)
+    tr.frame((2.95, -1.4, 0.89), (0.918, 0.918), (0.88, 0.88), 0.02, bev=0.003)
     for x in (2.8, 3.1):  # front panel seams
         tr.box((x, y0 - 0.002, 0.45), (0.008, 0.004, 0.8), m=1)
     for y in (-1.7, -1.4, -1.1):  # side (+X) panel seams
@@ -457,29 +489,31 @@ def build():
 
     # The swarm: 700 bodies in one mesh, 700 LEDs in another (UV = the seat's texel in the stunt bitmap).
     skip = {LONE, FLAGGER}
-    bm_b, bm_l = bmesh.new(), bmesh.new()
-    uv = bm_l.loops.layers.uv.new("UVMap")
+    # Each seat is the hero probe in small (sr_kit.probe): a smooth shell, a satin bezel band, and the stunt LED as
+    # its lens, a lit dome in the bezel. The 12x6 shells and 8x4 LED bulbs read as lumps and octagons in S32's
+    # close-up (human, C5: "the probe wall looks terrible up close"). The lit area is the old LED's, so the card
+    # stunts read as before. Templates are built once about the origin, lens on +Z, and copied to every seat.
+    R = K.PROBE_R
+    shell, band, dome = bmesh.new(), bmesh.new(), bmesh.new()
+    bmesh.ops.create_uvsphere(shell, u_segments=32, v_segments=16, radius=R)
+    bmesh.ops.create_cone(band, cap_ends=False, segments=32, radius1=R * 0.47, radius2=R * 0.44, depth=R * 0.14,
+                          matrix=Matrix.Translation((0, 0, R * 0.92)))  # proud of the shell
+    bmesh.ops.create_uvsphere(dome, u_segments=32, v_segments=16, radius=R * 0.42,
+                              matrix=Matrix.Translation((0, 0, R * 0.8)) @ Matrix.Diagonal((1, 1, 0.55, 1)))
+    seats, uvs = [], []
     for r in range(ROWS):
         for c in range(COLS):
             if (c, r) in skip:
                 continue
             p, fwd = seat(c, r)
-            bmesh.ops.create_uvsphere(bm_b, u_segments=12, v_segments=6, radius=K.PROBE_R,
-                                      matrix=Matrix.Translation(p))
-            res = bmesh.ops.create_uvsphere(bm_l, u_segments=8, v_segments=4, radius=K.PROBE_R * 0.42,
-                                            matrix=Matrix.Translation(p + fwd * K.PROBE_R * 0.8
-                                                                      + Vector((0, 0, K.PROBE_R * 0.1))))
-            u, v = (c + 0.5) / COLS, (r + 0.5) / ROWS  # image row 0 (top) = back row: v grows with r
-            faces = {f for vert in res["verts"] for f in vert.link_faces}
-            for f in faces:
-                for lp in f.loops:
-                    lp[uv].uv = (u, v)
+            seats.append(Matrix.Translation(p + Vector((0, 0, R * 0.05)))
+                         @ Vector((0, 0, 1)).rotation_difference(fwd).to_matrix().to_4x4())
+            uvs.append(((c + 0.5) / COLS, (r + 0.5) / ROWS))  # image row 0 (top) = back row: v grows with r
     # Satin, not chrome: 700 chrome shells sparkled with highlights between the LEDs and blurred the card stunts.
-    bodies = _mesh_from("swarm_bodies", bm_b, K.mat_metal("swarm_shell", "probe", 0.45))
-    for p in bodies.data.polygons:
-        p.use_smooth = True
-    out["swarm_leds"] = _mesh_from("swarm_leds", bm_l, _mat_led_sequence("swarm_led", f_first,
-                                                                          f_last - f_first + 1))
+    _copies("swarm_bodies", shell, seats, K.mat_metal("swarm_shell", "probe", 0.45))
+    _copies("swarm_bezels", band, seats, K.mat_metal("swarm_bezel", "chrome", 0.3))
+    out["swarm_leds"] = _copies("swarm_leds", dome, seats, _mat_led_sequence("swarm_led", f_first,
+                                                                              f_last - f_first + 1), uvs)
 
     # The lone decliner and its sign.
     p, fwd = seat(*LONE)

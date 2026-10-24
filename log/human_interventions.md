@@ -291,3 +291,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** "seeing more flicker in set F on the inside of the crate".
+
+## 2026-10-23T22:00:00-04:00 — C5 notes on set G: cold storage flicker, the probe wall up close
+
+- **Rule:** R1.
+- **What:** "G's 'cold storage' box also has flicker. the probe wall looks terrible up close, as shown starting at 0:05 in the cut".

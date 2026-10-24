@@ -930,3 +930,10 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Failure:** the follower stopped while packing set G at S33: "frames not contiguous (10000..9999, 106)". S33 runs from frame 9943 to 10048; `c5_pack.sh` took the first and last frame from the directory listing sorted by name, where f_10000 comes before f_9943. The check refused the pack and kept the PNGs; nothing was lost.
 - **Fix** (`scripts/c5_pack.sh`): frame numbers sorted as numbers. S33 now reads 9943..10048, 106 frames. `c5_reel.py` builds names from frame numbers and was not affected; set G's reel was written before the pack.
 - **Resumed:** set G's remaining shots pack now, then the follower picks up H and I (`renders/c5/queue5.log`). Every later set has frames past 9999.
+
+## 2026-10-23T22:34:37-04:00 — C5 set G: freezer corners; swarm probes rebuilt (first pass)
+
+- **Cold storage flicker** (human, R1): mapped over S44. The hot spots were the cabinet's corners at the bottom 8 cm and top 2 cm: the kick plinth and capping (outer 0.912 m) put their faces exactly on the corner guards' outer faces (±0.456 m), in two materials. Both now stand 3 mm proud (0.918 m). Six consecutive frames: one-frame spikes at the corners 39 → 0 (top) and 302 → 0 (bottom).
+- **The probe wall up close** (human, R1: S32 from 0:05 in the reel): the 700 seats were 12×6 shells with 8×4 LED bulbs (flat octagons at 4K). Each seat is now the hero probe in small: a 32×16 smooth shell, a satin bezel band and the stunt LED as a lit lens dome of the same area, so the card stunts read as before (S30, S31 checked).
+- **Build time:** 700 bmesh ops into one growing bmesh went quadratic at the new resolution (the first test stuck for 35 min at 100% CPU, located with a stack dump). The seats are now copied from one template with numpy arrays (`set_g._copies`): the set builds in 9.7 s.
+- **Not done yet:** in S32 the probes are still small and dark in a black field; lighting and framing next.
