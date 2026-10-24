@@ -24,7 +24,7 @@ import math
 import bmesh
 import bpy
 import numpy as np
-from mathutils import Matrix, Vector
+from mathutils import Euler, Matrix, Vector
 
 import sr_anim as A
 import props_fg as P
@@ -36,6 +36,7 @@ SPAN = math.radians(35)                  # the arc spans +-35 deg (flat enough t
 LONE = (52, 2)                           # (column, row) of the probe with the I DECLINE sign
 FLAGGER = (20, 5)                        # the probe that raises a flag in S38
 SWARM_KEY = 120.0                        # W, S32's key on the swarm
+SWARM_SATIN = 0.45                       # the swarm shells' roughness outside S32's close-up
 STUNT_DIR = A.ROOT / "cache" / "set_g_stunts"
 KILL_T = (174.6, 177.1)                  # the four "Kill switch!" calls (L43a-d)
 FEED = 0.18                              # paper advanced per printer strike (m)
@@ -501,17 +502,28 @@ def build():
 
     # The swarm: 700 bodies in one mesh, 700 LEDs in another (UV = the seat's texel in the stunt bitmap).
     skip = {LONE, FLAGGER}
-    # Each seat is the hero probe in small (sr_kit.probe): a smooth shell, a satin bezel band, and the stunt LED as
-    # its lens, a lit dome in the bezel. The 12x6 shells and 8x4 LED bulbs read as lumps and octagons in S32's
-    # close-up (human, C5: "the probe wall looks terrible up close"). The lit area is the old LED's, so the card
-    # stunts read as before. Templates are built once about the origin, lens on +Z, and copied to every seat.
+    # Each seat is the hero probe in small (sr_kit.probe): a smooth shell, a bezel band, the stunt LED as its lens (a
+    # lit dome in the bezel), and two arms folded forward, hands in its lap. The 12x6 shells and 8x4 LED bulbs read as
+    # lumps and octagons in S32's close-up (human, C5: "the probe wall looks terrible up close"; then "these aren't
+    # reading as the same probes"). The lit area is the old LED's, so the card stunts read as before. Templates are
+    # built once in the hero's frame (lens on -Y, up +Z) and copied to every seat, turned to face the stage.
     R = K.PROBE_R
-    shell, band, dome = bmesh.new(), bmesh.new(), bmesh.new()
+    to_y = Matrix.Rotation(math.pi / 2, 4, "X")  # a primitive's +Z axis onto -Y, the lens axis
+    shell, band, dome, arms = bmesh.new(), bmesh.new(), bmesh.new(), bmesh.new()
     bmesh.ops.create_uvsphere(shell, u_segments=32, v_segments=16, radius=R)
     bmesh.ops.create_cone(band, cap_ends=False, segments=32, radius1=R * 0.47, radius2=R * 0.44, depth=R * 0.14,
-                          matrix=Matrix.Translation((0, 0, R * 0.92)))  # proud of the shell
+                          matrix=Matrix.Translation((0, -R * 0.92, R * 0.05)) @ to_y)  # proud of the shell
     bmesh.ops.create_uvsphere(dome, u_segments=32, v_segments=16, radius=R * 0.42,
-                              matrix=Matrix.Translation((0, 0, R * 0.8)) @ Matrix.Diagonal((1, 1, 0.55, 1)))
+                              matrix=Matrix.Translation((0, -R * 0.8, R * 0.05)) @ to_y
+                              @ Matrix.Diagonal((1, 1, 0.55, 1)))
+    for sx in (-1, 1):  # the hero's arm rods, reaching forward and down, forearms level: hands in the lap
+        sh = Matrix.Translation((sx * R * 0.92, 0, -R * 0.1)) @ Euler((-1.0, sx * 0.2, 0)).to_matrix().to_4x4()
+        el = sh @ Matrix.Translation((0, 0, -R * 1.1)) @ Matrix.Rotation(-0.57, 4, "X")
+        bmesh.ops.create_cone(arms, cap_ends=True, segments=12, radius1=R * 0.045, radius2=R * 0.045,
+                              depth=R * 1.1, matrix=sh @ Matrix.Translation((0, 0, -R * 0.55)))
+        bmesh.ops.create_uvsphere(arms, u_segments=12, v_segments=8, radius=R * 0.07, matrix=el)
+        bmesh.ops.create_cone(arms, cap_ends=True, segments=12, radius1=R * 0.035, radius2=R * 0.035,
+                              depth=R * 0.9, matrix=el @ Matrix.Translation((0, 0, -R * 0.45)))
     seats, uvs, cups = [], [], []
     for r in range(ROWS):
         for c in range(COLS):
@@ -519,12 +531,16 @@ def build():
             cups.append(Matrix.Translation(p))
             if (c, r) in skip:
                 continue
-            seats.append(Matrix.Translation(p + Vector((0, 0, R * 0.05)))
-                         @ Vector((0, 0, 1)).rotation_difference(fwd).to_matrix().to_4x4())
+            seats.append(Matrix.Translation(p) @ Matrix.Rotation(math.atan2(fwd.x, -fwd.y), 4, "Z"))
             uvs.append(((c + 0.5) / COLS, (r + 0.5) / ROWS))  # image row 0 (top) = back row: v grows with r
-    # Satin, not chrome: 700 chrome shells sparkled with highlights between the LEDs and blurred the card stunts.
-    _copies("swarm_bodies", shell, seats, K.mat_metal("swarm_shell", "probe", 0.45))
-    _copies("swarm_bezels", band, seats, K.mat_metal("swarm_bezel", "chrome", 0.3))
+    # Satin in the wide shots (700 chrome shells sparkled between the LEDs and blurred the card stunts, C4), chrome
+    # like the hero's in S32's close-up: the roughness is keyed in animate().
+    shell_m = K.mat_metal("swarm_shell", "probe", SWARM_SATIN)
+    out["swarm_shell_mat"] = shell_m
+    _copies("swarm_bodies", shell, seats, shell_m)
+    _copies("swarm_arms", arms, seats, shell_m)
+    out["swarm_bezel_mat"] = K.mat_metal("swarm_bezel", "chrome", 0.3)
+    _copies("swarm_bezels", band, seats, out["swarm_bezel_mat"])
     out["swarm_leds"] = _copies("swarm_leds", dome, seats, _mat_led_sequence("swarm_led", f_first,
                                                                               f_last - f_first + 1), uvs)
     # Every seat is a dark cup with a brass rim on the tread, so the tiers read as seating, not a black void
@@ -933,6 +949,12 @@ def animate(S, t0, t1):
     a, b = shot["S32"]["cut"], shot["S33"]["cut"]
     A.write_keys(S["swarm_key"].data, "energy", [(0, 0.0), (A.frame(a) - 1, 0.0), (A.frame(a), SWARM_KEY),
                                                  (A.frame(b) + 1, 0.0)], interp="CONSTANT")
+    # In S32's close-up the swarm is chrome like the hero; satin either side, for the wide stunts.
+    for m, rest in ((S["swarm_shell_mat"], SWARM_SATIN), (S["swarm_bezel_mat"], 0.3)):
+        sock = m.node_tree.nodes["Principled BSDF"].inputs["Roughness"]
+        A.write_keys(m.node_tree, sock.path_from_id("default_value"),
+                     [(0, rest), (A.frame(a) - 1, rest), (A.frame(a), K.LOOK["materials"]["chrome_roughness"]),
+                      (A.frame(b) + 1, rest)], interp="CONSTANT")
 
     # Cold storage: probes ride the belt through the door; it shuts on the last kick/toms hit before 201.7 s.
     shut = max(e["t"] for e in A.pieces(kit, "kick", "toms") if e["t"] < DOOR_BEFORE)

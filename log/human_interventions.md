@@ -306,3 +306,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - **Rule:** R1.
 - **What:** "that's a smidge too close -- I want to be able to see the bottom of both visible shelves".
+
+## 2026-10-23T23:08:26-04:00 — C5 set G: the swarm doesn't read as probes
+
+- **Rule:** R1.
+- **What:** "these aren't reading as the same probes (or even probes at all) -- likely due to the difference in reflectivity between these and the protagonist probe. is this intentional".

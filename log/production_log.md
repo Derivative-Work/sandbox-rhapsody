@@ -951,3 +951,12 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 
 - **Framing** (human, R1): the camera moves back from about 1 m to 1.2 m and aims 3 cm lower. Stills at 0.2, 2.0 and 4.0 s into S32: both rows' cups and brass rails are in frame throughout, a strip of riser below the lower rail.
 - **Render:** picked up by set G's queued re-render (not started yet).
+
+## 2026-10-23T23:08:26-04:00 — C5 set G: the swarm as the hero's kind (chrome in S32, arms)
+
+- **The note** (human, R1): the swarm didn't read as the same probes as the protagonist. Partly intended: the shells were satin since C4, when 700 chrome shells sparkled between the LEDs in the wide card stunts; that was never weighed against a close-up.
+- **Chrome in S32 only:** the swarm shell and bezel materials' roughness is keyed (constant) to the hero's chrome (0.05) through S32 and back to satin (0.45, 0.3) either side. S31's wide stunt checked: unchanged.
+- **Arms:** every seat now carries the hero's two arm rods with an elbow joint, folded forward, forearms level (hands in the lap), clear of the tread; in the shell material.
+- **Templates in the hero's frame** (lens on -Y, up +Z) and turned per seat to face the stage, so the arms hang the right way.
+- **Render:** picked up by set G's queued re-render.
+- **Why:** human feedback, R1 (human interventions).
