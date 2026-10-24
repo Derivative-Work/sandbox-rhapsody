@@ -316,3 +316,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - "the "SAFE STOP" text is obscured by the flag -- re-angle this so that it's visible. the ribbon needs more details so that it reads like a ribbon. the "SUBPEONA" text sticks around longer than the planes they flew in on. the "LIABILITY" jail is not reading as containing a spreadsheet."
 - Rule R1 (review feedback). Acted on in the production log entry of the same time.
+
+## 2026-10-24T06:20:42-04:00 — R1: set H ribbon
+
+- "look closer at the ribbon shot: it's clipping through the probe"
+- Rule R1 (review feedback). Acted on in the production log entry of the same time.

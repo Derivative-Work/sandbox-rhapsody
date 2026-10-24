@@ -985,10 +985,12 @@ def animate(S, t0, t1):
     rz = d.rotation_euler.z  # the slot, local (0, -0.2, 0.5), in world space
     k = d.scale.x
     slot = Vector(d.location) + Vector((0.2 * k * math.sin(rz), -0.2 * k * math.cos(rz), 0.5 * k))
-    to = Vector((1.85 + 0.055, -1.75 - 0.01, K.PROBE_R + 0.05))  # held out at the probe's right arm
+    # Held out in front of the probe, at its reaching right arm, clear of the shell and the flag (human, C5 set H:
+    # the rosette clipped through the probe).
+    to = Vector((1.85 + 0.075, -1.75 - 0.065, K.PROBE_R + 0.075))
     z = rib["size"]
     for f, p, s in ((0, slot, 0.001), (fh - 1, slot, 0.001), (fh + 12, slot + Vector((-0.03, -0.04, 0.02)), z),
-                    (fh + 50, (slot + to) / 2 + Vector((0, -0.03, 0.12)), z), (fh + 80, to, z)):
+                    (fh + 50, (slot + to) / 2 + Vector((0, -0.12, 0.08)), z), (fh + 80, to, z)):
         rib.location, rib.scale = p, (s, s, s)
         rib.keyframe_insert("location", frame=f)
         rib.keyframe_insert("scale", frame=f)

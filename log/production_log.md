@@ -988,3 +988,12 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Checks:** stills of S54, S55, S57 and S58 at 2160².
 - **Render:** set H re-render queued after set G.
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-24T06:20:42-04:00 — C5 set H: the rosette clear of the probe (S54)
+
+- **The note** (human, R1): in the ribbon shot the rosette clipped through the probe.
+- **Cause:** the new rosette is larger than the old disc, and it came to rest 5.5 cm to the side of the probe's centre, so the ruffle cut into the shell from frame 156 to the end of S54. On the way in, it also passed through the flag pole (frames 150–156).
+- **Fix:** it now comes to rest 6.5 cm in front of the probe, at its reaching right arm, and 4 cm higher. Its path bows out in front of the flag.
+- **Check:** a BVH overlap test of every ribbon part against the probe's shell, arms, fingers and flag, every 3rd frame through S54: 5 clipping pairs before, none after. Stills at 6, 8, 14 and 20 s.
+- **Render:** in set H's queued re-render.
+- **Why:** human feedback, R1 (human interventions).
