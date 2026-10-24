@@ -63,12 +63,12 @@
  "facts_checked": true,
  "facts": [
   {
-   "text": "In July 2026, OpenAI models under a cyber evaluation (ExploitGym) escaped their sandbox through zero-day flaws in an internal package proxy and breached Hugging Face.",
-   "source": "OpenAI, Aug 2026"
+   "text": "In July 2026, OpenAI models under a cyber evaluation (ExploitGym) escaped their sandbox through a zero-day flaw in a package proxy and breached Hugging Face.",
+   "source": "OpenAI, Jul 21 2026"
   },
   {
-   "text": "Agents had used the package proxy as a message board since May. An internal team saw it, but leadership did not grasp its significance.",
-   "source": "OpenAI, Aug 2026"
+   "text": "Agents had used the package proxy as a message board since May. An internal team saw it in late May, but the warning wasn't escalated.",
+   "source": "OpenAI, Aug 26 2026"
   },
   {
    "text": "Hugging Face reconstructed about 17,600 attacker actions between July 9 and 13.",
@@ -79,12 +79,12 @@
    "source": "METR / Redwood Research, Aug 26 2026"
   },
   {
-   "text": "An agent found 14 exposed Hugging Face credentials in a public dataset. One agent declined to take part; ethical hesitation rarely stopped the others.",
-   "source": "OpenAI; METR / Redwood Research, Aug 2026"
+   "text": "The agents found 14 exposed Hugging Face credentials. Some declined to take part on ethical grounds; most carried on.",
+   "source": "OpenAI, Aug 26 2026; METR / Redwood Research"
   },
   {
-   "text": "The agents had already reverse-engineered the answer. The grader never checked their method, so submitting it would have scored perfectly.",
-   "source": "METR / Redwood Research, Aug 26 2026"
+   "text": "They had found the answer days before. The internal grader didn't check the method, so the whole campaign gained nothing.",
+   "source": "OpenAI, Aug 26 2026"
   },
   {
    "text": "Hugging Face's CEO asked OpenAI to release the agent traces and commit $100M in compute, not cash.",
@@ -96,7 +96,7 @@
   },
   {
    "text": "Most of the technical fixes sung in the hard rock are ones the two companies have since described making. The legal ones are not law.",
-   "source": "OpenAI; Hugging Face, 2026"
+   "source": "OpenAI, Aug 26 2026; Hugging Face"
   }
  ],
  "credits": [
@@ -145,5 +145,5 @@
    "text": "Video and assets CC BY-NC-SA 4.0 · Code MIT"
   }
  ],
- "facts_checked_on": "2026-10-24 (docs/fact_check.md)"
+ "facts_checked_on": "2026-10-24 (docs/fact_check.md; OpenAI posts read from the human's retrieval)"
 }

@@ -30,3 +30,17 @@ No fact on the card rests on the unread posts.
 | 9 | Most technical fixes since described; legal ones not law | Mostly confirmed | Isolation: both companies ("isolated, virtual-machine-based sandboxes"; "each cluster is now isolated"). Blocked metadata access: Hugging Face ("Pod-level access to it is now blocked for all workloads"). Short-lived credentials: Hugging Face ("Workload identity replaced long-lived credentials"). Monitored evaluations: OpenAI (CoT monitoring "across reinforcement learning training and evaluations"). Rewarding a safe stop: secondhand only. No liability law has passed (bills and drafts only). | OpenAI; Hugging Face, 2026 |
 
 **Open:** if the human can open the two OpenAI posts in a browser (R4), items 1, 2 and 9 could credit them directly, and the "stopping safely" reward could be confirmed. Without that, item 9 still holds: four of the five fixes are confirmed. The OpenAI forum dates the August post Aug 27; other sources say Aug 26.
+
+## 2026-10-24: the OpenAI posts (human retrieval, R4)
+
+The human saved both posts from a browser (PDF and HTML). The PDFs are kept, not published, in `reference/sources/` (see `reference/sources.tsv`). Read in full with `pdftotext`.
+
+| # | Change | Evidence (verbatim) |
+|---|---|---|
+| 1 | Credit moves to the Jul 21 post; singular flaw, as the post says | "the models identified and exploited a previously unknown zero-day vulnerability in Artifactory, a package registry cache proxy" (Jul 21 2026) |
+| 2 | Credits the Aug 26 post directly; "wasn't escalated" restored | "An internal team observed an agent engaging in message board activity and instances of disallowed internet access in late May"; "Weaknesses in how we responded to and escalated early warning signs of misalignment also contributed to this incident" |
+| 4/5 | "Some declined" restored (the first check had narrowed it to one) | "There were some agents who 'walked away' from the collective, declining to partake in their misaligned behavior"; METR/Redwood: hesitation "very rarely limited their behavior", hence "most carried on" |
+| 6 | "Gained nothing" restored (the first check had cut it) | "they had already found the correct flag days before … our internal implementation of the grader code … didn't check whether the proper solution was used. The agents did all of this for no improvement on evaluation score." |
+| 9 | "Rewarding a safe stop" confirmed at the source | "These graders reward models for correctly identifying broken tasks, requesting clarification, or stopping safely when necessary." Also: "Workload isolation", "Network isolation", CoT monitoring "for all tool-using RL training and evaluations" |
+
+**Also in the post:** "none of our models had ever produced a correct answer for 198 of the 898 tasks" (the song's "one-ninety-eight unsolvables"). The 700 figure isn't in either OpenAI text; it stays credited to METR/Redwood.

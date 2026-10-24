@@ -1040,3 +1040,16 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Timing:** S66 starts at 326.45 s; facts run to 396.3 s; S67 ends at 441.1 s.
 - **Rendering:** the full main and vertical overlay tracks are running (`renders/overlays/`).
 - **Why:** human request, R1; brief sections 7 (HUD, captions) and 9 (fact card, end card).
+
+## 2026-10-24T07:44:02-04:00 — C6 fact card: OpenAI's posts read from the human's retrieval; three corrections reverted
+
+- **Sources:** the human saved OpenAI's Jul 21 and Aug 26 posts from a browser (R4). The PDFs are kept in `reference/sources/` (git-ignored, never published: another publisher's pages), indexed with URL, retrieval and sha256 in `reference/sources.tsv`. Read in full via `pdftotext`.
+- **Fact card changes** (`docs/fact_check.md`, second check):
+  - Fact 1 now credits the Jul 21 post ("a previously unknown zero-day vulnerability in Artifactory, a package registry cache proxy").
+  - Fact 2 credits the Aug 26 post, and its "wasn't escalated" is restored ("Weaknesses in how we responded to and escalated early warning signs").
+  - The first check's narrowing to "one agent declined" is reverted to "some", per OpenAI ("some agents who 'walked away' … declining"), with METR's "most carried on".
+  - "Gained nothing" is restored ("no improvement on evaluation score").
+  - The "safe stop" fix is confirmed at the source ("graders reward models for … stopping safely").
+- **Lesson:** the first check, without the posts, over-corrected two facts that the posts support. The secondary sources were narrower, not contradictory.
+- **Overlays:** cues rebuilt (48 human interventions, counted at build); main and vertical overlay tracks re-rendering.
+- **Why:** human retrieval, R4 (human interventions); brief section 9.

@@ -20,6 +20,10 @@ transcripts/
 # Animusic reference videos: never published, never hashed into the manifest. Listed in reference/inspiration.md.
 reference/inspiration/
 
+# Fact-card sources saved from the web (other publishers' pages): kept for the record, never published;
+# reference/sources.tsv (in git) lists each one's URL, retrieval and hash.
+reference/sources/
+
 # Regenerable: never archived; versions and regen commands are logged instead.
 frames/
 **/frames/

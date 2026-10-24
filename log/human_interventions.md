@@ -337,3 +337,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 - "while it renders, get started on the HUD, captions, and end cards. I'm thinking of using the Neuropol typeface where it makes sense (https://www.dafont.com/neuropol.font) which appears to be public domain"
 - "(make sure to credit it anyway)"
 - Rule R1 (direction). The typeface is a human suggestion. The agent checked its license and decided where it fits; it is credited on the end card at the human's request.
+
+## 2026-10-24T07:43:38-04:00 — R4: OpenAI's two incident posts retrieved by browser
+
+- The agent's fetches of https://openai.com/index/hugging-face-model-evaluation-security-incident/ and https://openai.com/index/hugging-face-incident-and-the-road-ahead/ returned HTTP 403. The human asked for the links ("give me the openai links so I can retrieve them for you") and saved both as PDF and HTML in ~/Downloads ("both posts retrieved and placed in ~/Downloads as both PDF and HTML -- read and archive whichever works best for you").
+- Rule R4 (interfaces the agent can't reach). The agent read and archived the PDFs (`reference/sources.tsv`).
