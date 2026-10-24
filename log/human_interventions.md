@@ -326,3 +326,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - "I'm good without motion blur"
 - Rule R1 (approve/reject). Motion blur stays off.
+
+## 2026-10-24T07:02:35-04:00 — R1: render S52's frame first
+
+- "render just that one frame now so you can check it before all of H renders"
+- Rule R1 (review direction). Acted on in the production log entry of the same time.

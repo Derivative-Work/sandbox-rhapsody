@@ -967,6 +967,13 @@ def animate(S, t0, t1):
     for k, h in enumerate(heads):
         A.striker(h, "honk", nods[k::len(heads)], wind=8, settle=20)
 
+    # S52 looks down into the mirror floor along the key light's reflection: the key showed as a hard white disc in the
+    # floor (C5 set H, the anchor still). Its specular is off for S52 only; diffuse light is unchanged.
+    key = bpy.data.objects["key"].data
+    ks = key.specular_factor
+    A.write_keys(key, "specular_factor", [(0, ks, "CONSTANT"), (A.frame(cut("S52")) - 1, ks, "CONSTANT"),
+                                          (A.frame(cut("S52")), 0.0, "CONSTANT"), (A.frame(cut("S53")), ks, "CONSTANT")])
+
     # S53: the honest probe appears and raises its white flag on "raise", LED dims on "stop".
     hp = S["honest"]
     _pop(hp, cut("S53") - 0.02, 0.3)

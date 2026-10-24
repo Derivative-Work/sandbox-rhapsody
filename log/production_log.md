@@ -1009,3 +1009,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Motion blur** (human, R1: "I'm good without motion blur"): stays off for all sets; nothing to re-render.
 - **S25 string bloom** (noted at the placeholder pass): the new bloom (threshold 4.0) already took the halo off the plucked strings; the old and new anchors compared side by side. Closed.
 - **Why:** human decision, R1 (human interventions).
+
+## 2026-10-24T07:02:35-04:00 — C5 set H: S52's key-light reflection
+
+- **Found** (agent, on the human's request to render S52's anchor frame on its own before set H's re-render): a hard white disc in the bottom right of S52. Ray-cast through the pixel: through the new cube's glass front, onto the mirror floor, and the reflected ray runs back along the key light's direction (-7.7, -11.2, 11.5): the floor's reflection of the key, which only S52's downward angle catches.
+- **Fix:** the key's specular is keyed to 0 for S52 only (constant keys at the S52 and S53 cuts); diffuse light is unchanged. Stills at 0.1, 5 and 10 s: the disc is gone, and the cameras and key rack are lit as before.
+- **Render:** in set H's queued re-render (not started yet).
