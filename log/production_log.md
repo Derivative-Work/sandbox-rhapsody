@@ -1131,3 +1131,10 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - Left as is (stems straight through the post-filter, as asked); a gentle limiter before the post-filter is offered to bring the coda level with the master.
 - **Backdrop and preview:** rebuilding with the new audio and fact 8's backdrop fix.
 - **Why:** human feedback, R1 (human interventions).
+
+## 2026-10-24T08:48:17-04:00 — C6 end card: closing Animusic disclaimer
+
+- **The note** (human, R1): "we could probably use a 'not made by or affiliated with animusic' or similar at the very end" (for the next preview or the final; the running preview left alone).
+- **Card:** a last credit, "INSPIRED BY ANIMUSIC / Not made by or affiliated with Animusic", 415.57–421.52 s. It splits the final chord's release with the repo-and-licenses card, which keeps the chord's downbeat (410.18 s). There are no beats after 321.6 s, so its start isn't snapped (cards.json `credit_free_starts`, 327.0 s of song time).
+- **Descriptions:** the same line added to the main description's credits and to the shorts' shared footer (METADATA.md).
+- **Why:** human feedback, R1 (human interventions).

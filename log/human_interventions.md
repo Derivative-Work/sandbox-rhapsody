@@ -363,3 +363,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 - "hm keep the background vocals muted until "zero" as well"
 - "also bring back the main vocals at that point too"
 - Rule R1 (direction on the bounce).
+
+## 2026-10-24T08:48:17-04:00 — R1: Animusic disclaimer
+
+- "(for the next one or the final, don't stop this preview) we could probably use a "not made by or affiliated with animusic" or similar at the very end"
+- Rule R1 (direction).

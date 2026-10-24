@@ -81,6 +81,7 @@ Type: Neuropol by Ray Larabie (CC0) · Inter, JetBrains Mono and Instrument Seri
 
 Video and assets: CC BY-NC-SA 4.0 · Code: MIT
 Satire. Not affiliated with or endorsed by any company named here.
+Inspired by Animusic. Not made by or affiliated with Animusic.
 
 #AIgenerated #musicvideo #AIsafety
 ```
@@ -134,6 +135,7 @@ Full video, facts and sources: [main video link]
 Production log, with every prompt and every human intervention: https://github.com/Derivative-Work/sandbox-rhapsody
 Music: Suno · Words: Claude · Animation and edit: Claude Code
 Video and assets CC BY-NC-SA 4.0. Satire; not affiliated with any company named.
+Inspired by Animusic; not made by or affiliated with Animusic.
 
 #AIgenerated #AIsafety #Shorts
 ```

@@ -196,6 +196,14 @@
      "text": "Video and assets CC BY-NC-SA 4.0 · Code MIT"
     }
    ]
+  },
+  {
+   "lines": [
+    {
+     "label": "Inspired by Animusic",
+     "text": "Not made by or affiliated with Animusic"
+    }
+   ]
   }
  ],
  "facts_checked_on": "2026-10-24 (docs/fact_check.md; OpenAI posts read from the human's retrieval)",
@@ -240,5 +248,9 @@
   309.0,
   316.0,
   321.616
- ]
+ ],
+ "credit_free_starts": [
+  327.0
+ ],
+ "credit_free_starts_doc": "Credit starts not snapped to a downbeat, after the groups: the last chord rings with no beats after 321.6 s, so the closing disclaimer (human, C6: 'a not made by or affiliated with animusic or similar at the very end') splits its release."
 }

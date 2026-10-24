@@ -131,6 +131,7 @@ def cards():
                 back.append({"on": vt(a + j * d), "off": vt(a + (j + 1) * d), "src": round(s, 3)})
     coda = downbeats(c_on, CARDS["credits_end_s"])
     starts = [c_on - 0.25] + [min(coda, key=lambda d: abs(d - x)) for x in CARDS["credit_groups_at_downbeats"]]
+    starts += CARDS.get("credit_free_starts", [])
     ends = starts[1:] + [CARDS["credits_end_s"]]
     credits = []
     for c, a, b in zip(CARDS["credits"], starts, ends):

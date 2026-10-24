@@ -2968,7 +2968,7 @@
     },
     {
      "label": "Human interventions",
-     "text": "50, every one logged"
+     "text": "52, every one logged"
     }
    ]
   },
@@ -2988,7 +2988,7 @@
   },
   {
    "on": 410.184,
-   "off": 421.518,
+   "off": 415.518,
    "lines": [
     {
      "label": "Full production log",
@@ -2997,6 +2997,16 @@
     {
      "label": "Licenses",
      "text": "Video and assets CC BY-NC-SA 4.0 · Code MIT"
+    }
+   ]
+  },
+  {
+   "on": 415.568,
+   "off": 421.518,
+   "lines": [
+    {
+     "label": "Inspired by Animusic",
+     "text": "Not made by or affiliated with Animusic"
     }
    ]
   }
@@ -3049,6 +3059,11 @@
   },
   {
    "on": 369.962,
+   "off": 373.727,
+   "src": 174.3
+  },
+  {
+   "on": 373.727,
    "off": 377.491,
    "src": 174.3
   },

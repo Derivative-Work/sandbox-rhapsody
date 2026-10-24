@@ -382,7 +382,7 @@ Mastered by: music-deslop post-filter, M6f 10k, strength 1.0
 00:06:37,415 --> 00:06:44,593
 Animation and edit: Claude Code with Opus 5.5
 Seeds: 41 and up
-Human interventions: 50, every one logged
+Human interventions: 52, every one logged
 
 94
 00:06:44,643 --> 00:06:50,134
@@ -390,6 +390,10 @@ Rotary phone: "Rotary Phone" by lobstor, CC BY 4.0
 Type: Neuropol by Ray Larabie (CC0) · Inter, JetBrains Mono, Instrument Serif (SIL OFL)
 
 95
-00:06:50,184 --> 00:07:01,518
+00:06:50,184 --> 00:06:55,518
 Full production log: github.com/Derivative-Work/sandbox-rhapsody
 Licenses: Video and assets CC BY-NC-SA 4.0 · Code MIT
+
+96
+00:06:55,568 --> 00:07:01,518
+Inspired by Animusic: Not made by or affiliated with Animusic
