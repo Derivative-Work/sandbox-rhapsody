@@ -403,3 +403,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - After watching the final main video: "video looks fine, no need to update the count. let's just get the repo ready".
 - Rule R1 (approve). C6 is approved: the main video, the four shorts, captions and the thumbnail. The end card keeps "Human interventions: 56", the count when its overlay was rendered. Later entries (the `--jobs 3` approval, the thumbnail go-ahead and choice, and this approval) are logged here but not counted on the card.
+
+## 2026-10-24T14:55-04:00 — R1: main video for the release re-assembled under 2 GiB
+
+- The main video (2.7 GB) is over GitHub's 2 GiB release file limit. Of three options (re-assemble under 2 GiB, split into two parts, leave it out), the human chose "Re-assemble under 2 GiB (Recommended)".
+- Rule R1 (approve a plan).

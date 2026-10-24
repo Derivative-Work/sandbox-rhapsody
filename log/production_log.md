@@ -1327,3 +1327,28 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - the reference stills (`reference/stills/`);
   - the fact-card sources (`reference/sources/`);
   - caches, frame sequences, venvs and node_modules.
+
+## 2026-10-24T15:15:34-04:00 — Release copy of the main video; draft GitHub Release v1.0
+
+- **Release copy** (human, R1: re-assemble under GitHub's 2 GiB limit):
+  - Command: `scripts/assemble.py main --jobs 3 --bitrate 34M --maxrate 38M --out deliverables/sandbox_rhapsody_main_release.mp4`. `--bitrate` and `--maxrate` are new options; the defaults are unchanged.
+  - Result: 1.37 GiB, 25,294 frames, 27.6 Mb/s video, BT.709. Rendered in 33 min.
+  - Against the 2.7 GB master: PSNR mean 56.0 dB, 1st percentile 46.9, minimum 42.9 (frame 7383, S22's rewind). 18 frames are under 45 dB. Visually identical. Per-frame stats in `renders/c6_release_psnr.log`.
+  - The master stays the YouTube upload file.
+- **Transcripts:** `scripts/export_transcripts.sh` → `transcripts/claude-code/` (session e0b7d9e0, 16,941 lines, 208 MB, plus its side directory). Manifest regenerated: 1,029 files.
+- **Draft release** (`gh release create v1.0 --draft --target main` on the private repo; the tag is created on publishing):
+  - Notes: `scratchpad/release_notes.md`, with absolute links.
+  - 19 files under clean names (symlinks into the repo, except the FLACs):
+    - the main release copy and the four shorts;
+    - five SRTs and the thumbnail;
+    - the Suno WAV, MP3 and stems zip (as downloaded);
+    - the master, final audio and card audio as FLAC. These were encoded from the 24-bit WAVs; the decoded samples are identical.
+    - `transcripts_claude_code.tar.gz` (193 MB; tar sorted, fixed mtime, numeric owner; gzip -n -9);
+    - `SHA256SUMS.txt`.
+  - GitHub's sha256 digest for every file matches the local file. The main copy, Suno WAV and shorts also match `MANIFEST.sha256`.
+- **Left for the human:**
+  - publish the draft, which creates tag `v1.0` on `main`;
+  - make the repo public;
+  - then the release link goes in the README Downloads section.
+
+  This session's messages after the export aren't in the transcript archive. Re-run the export and replace that one file if they should be.

@@ -17,7 +17,7 @@ shorts = the final song audio over the short's span.
 Encoded in parallel chunks with NVENC HEVC (BT.709, tagged: YouTube reads untagged HD as BT.709; Folks Like Us),
 concatenated, muxed with AAC.
 
-Usage: .venv/bin/python -I scripts/assemble.py main|short:<id> [--range a:b] [--scale WxH] [--jobs n] [--out file]
+Usage: .venv/bin/python -I scripts/assemble.py main|short:<id> [--range a:b] [--scale WxH] [--jobs n] [--bitrate 60M --maxrate 120M] [--out file]
   --range: song seconds (previews); --scale: output size (previews)
 """
 import glob
@@ -243,6 +243,7 @@ def main():
     if opt("--scale"):
         size = tuple(int(x) for x in opt("--scale").split("x"))
     cfg["size"] = size
+    cfg["bitrate"], cfg["maxrate"] = opt("--bitrate", cfg["bitrate"]), opt("--maxrate", cfg["maxrate"])
     tmp = Path(out + ".parts")
     tmp.mkdir(parents=True, exist_ok=True)
     for p in tmp.glob("chunk*.mkv"):  # an interrupted run's chunks
