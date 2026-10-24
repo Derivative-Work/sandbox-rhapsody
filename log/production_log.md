@@ -1280,3 +1280,12 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Thumbnail:** the human chose the titled version. The thumbnail is `deliverables/thumbnail_title.jpg`. The clean one is archived as `archive/deliverables/thumbnail_rejected_clean.jpg`. `scripts/thumbnail.py` now writes only the chosen version, and regenerates it byte for byte. `METADATA.md` updated.
 - **Human interventions:** three entries added, for the `--jobs 3` approval, the go-ahead on the thumbnail, and the thumbnail choice. The log now has 59 entries.
 - **End card:** it shows 56, counted when the overlay was rendered. Re-rendering the main overlay (about 8 min) and re-assembling the main video (about 35 min) will make it match. Deferred until the human's C6 review is done, so any further interventions are counted in the same pass.
+
+## 2026-10-24T14:18:03-04:00 — C6 approved (R1); end card count kept at 56; repo preparation next
+
+- The human approved the final video and kept the end card's count of 56. That was the count when the overlay was rendered; the interventions log now has 60 entries, the later ones logged but not counted on the card. No re-render.
+- **Next:** following Ghost in the Machine's release:
+  - the licences (`LICENSE` MIT, `LICENSE-media.md` with `LICENSES/CC-BY-NC-SA-4.0.txt`), `README.md` and `docs/handoff.md`;
+  - the C6 log audit;
+  - the session transcript export;
+  - a draft GitHub Release on the private repo, for the human to publish.

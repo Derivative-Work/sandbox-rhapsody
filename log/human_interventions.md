@@ -398,3 +398,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - Of the two thumbnails (clean, and with the title in Neuropol), the human chose: "use the one with the title".
 - Rule R1 (approve a take). `deliverables/thumbnail_title.jpg` is the thumbnail; `deliverables/thumbnail.jpg` is rejected.
+
+## 2026-10-24T14:35-04:00 — R1: C6 approved; end card count kept
+
+- After watching the final main video: "video looks fine, no need to update the count. let's just get the repo ready".
+- Rule R1 (approve). C6 is approved: the main video, the four shorts, captions and the thumbnail. The end card keeps "Human interventions: 56", the count when its overlay was rendered. Later entries (the `--jobs 3` approval, the thumbnail go-ahead and choice, and this approval) are logged here but not counted on the card.
