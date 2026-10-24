@@ -4,6 +4,7 @@ vocals muted until "zero", run through the music-deslop post-filter, as the mast
 1. Bounce: every stem, with both vocal stems (`Vocals`, the lead, and `Backing Vocals`) gated shut until the
    "…zero." where the choir comes in (MUTED_UNTIL), summed as Suno exported them (their sum is the mix; step 2),
    from START_S minus a PREROLL_S of context for the model, to the stems' end (323.0 s).
+   A lookahead peak limiter (LIMIT_CEILING_DB) catches the stem sum's peaks, as Suno's limited mix had none.
 2. Post-filter: music-deslop M6f 10k, `--source suno --no-fallback --strength 1.0` (the master's chain,
    audio/master/REPORT.md), run from its own checkout and venv.
 3. Trim the pre-roll; start on START_S (a downbeat, S54's cut) with a 10 ms fade-in; replace Suno's cut-off chord
@@ -33,6 +34,14 @@ MUTED = set()  # stems muted for the whole bounce (none since the vocals return 
 # silence with a short fade: the entry is each stem's own attack.
 MUTED_UNTIL = {"Vocals": 296.75, "Backing Vocals": 296.75}
 GATE_FADE_S = 0.02
+# Lookahead peak limiter on the raw stem sum, before the post-filter (human, C6: "yes, add the limiter"). Suno's mix
+# was limited; the raw stems sum to +2.6 dBFS in the coda, and the post-filter's clip protection then turned the
+# whole bounce down 2.7 dB, leaving the coda about 2 dB under the master. Peaks only: gain = ceiling / peak where
+# over, min-filtered over +-LOOKAHEAD_S so it is down before each peak, then a one-pole release, then a Hann
+# smooth no wider than half the min window (so it never rises above the needed gain at a peak).
+LIMIT_CEILING_DB = -1.0
+LOOKAHEAD_S = 0.005
+RELEASE_S = 0.08
 START_S = 237.8818  # 3:58 (human), snapped to the downbeat there: S54's cut
 PREROLL_S = 4.0
 END_S = 333.0  # the release has decayed about 60 dB by here
@@ -55,9 +64,33 @@ def bounce():
             y[:k] = 0
             y[k:k + f] *= np.linspace(0, 1, f)[:, None]
         mix = y if mix is None else mix + y
+    mix, gr = limit(mix, sr)
     RAW.parent.mkdir(parents=True, exist_ok=True)
     sf.write(RAW, mix, sr, subtype="FLOAT")
-    return [p.name for p in names], sr
+    return [p.name for p in names], sr, gr
+
+
+def limit(x, sr):
+    from scipy.ndimage import minimum_filter1d
+    ceil = 10 ** (LIMIT_CEILING_DB / 20)
+    peak = np.abs(x).max(axis=1)
+    need = np.minimum(1.0, ceil / np.maximum(peak, 1e-12))
+    L = int(LOOKAHEAD_S * sr)
+    g = minimum_filter1d(need, size=2 * L + 1, mode="nearest")
+    k = 1 - np.exp(-1 / (RELEASE_S * sr))
+    out = np.empty_like(g)
+    cur = 1.0
+    for i, v in enumerate(g):  # release: rise back towards 1 no faster than the time constant
+        cur = v if v < cur else cur + (min(v, 1.0) - cur) * k
+        out[i] = cur
+    win = np.hanning(L + 1)
+    out = np.convolve(out, win / win.sum(), mode="same")
+    y = x * out[:, None]
+    return y, {"ceiling_db": LIMIT_CEILING_DB, "lookahead_s": LOOKAHEAD_S, "release_s": RELEASE_S,
+               "in_peak_dbfs": round(20 * np.log10(peak.max()), 2),
+               "out_peak_dbfs": round(20 * np.log10(np.abs(y).max()), 2),
+               "max_reduction_db": round(-20 * np.log10(out.min()), 2),
+               "time_reducing_s": round(float((out < 0.999).sum()) / sr, 2)}
 
 
 def deslop():
@@ -97,10 +130,10 @@ def finish(sr):
 
 
 def main():
-    stems, sr = bounce()
+    stems, sr, gr = bounce()
     cmd = deslop()
     dur, peak = finish(sr)
-    info = {"stems": stems, "muted": sorted(MUTED), "muted_until_s": MUTED_UNTIL, "gate_fade_s": GATE_FADE_S, "start_song_s": START_S, "preroll_s": PREROLL_S,
+    info = {"stems": stems, "muted": sorted(MUTED), "muted_until_s": MUTED_UNTIL, "gate_fade_s": GATE_FADE_S, "limiter": gr, "start_song_s": START_S, "preroll_s": PREROLL_S,
             "end_song_s": END_S, "duration_s": round(dur, 4), "peak_dbfs": round(peak, 2),
             "postfilter": " ".join(cmd[2:]), "postfilter_repo": str(DESLOP),
             "postfilter_commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=DESLOP, capture_output=True,

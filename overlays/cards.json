@@ -164,10 +164,6 @@
      "text": "Claude Code with Opus 5.5"
     },
     {
-     "label": "Seeds",
-     "text": "41 and up"
-    },
-    {
      "label": "Human interventions",
      "text": "{interventions}, every one logged"
     }

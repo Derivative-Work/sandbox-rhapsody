@@ -1145,3 +1145,15 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Fix** (`overlays/overlay.html` `drawCards`): a feathered dark ellipse behind each card's text (60% black at the centre to 0 at the edge, 0.84 W × 0.35 H), fading in and out with its card. It darkens only where the words sit; the rest of the footage stays at 30%. Checked on fact 7's frame: clean.
 - **Next:** the final 4K backdrop and card render wait for set H's packs (S48–S55 come from superseded plates in previews).
 - **Why:** legibility (brief; style spec captions); agent finding.
+
+## 2026-10-24T08:53:43-04:00 — C6: limiter on the card bounce; the "Seeds" credit removed
+
+- **The notes** (human, R1): "yes, add the limiter, then also remove the 'seeds' joke -- this video is far too serious for that".
+- **Limiter** (`scripts/cards_audio.py` `limit()`):
+  - What: a lookahead peak limiter on the raw stem sum, before the post-filter. Ceiling −1 dBFS, 5 ms lookahead (min-filtered gain, then Hann-smoothed so it never rises above the needed gain at a peak), 80 ms release. No make-up gain.
+  - Effect: the stem sum's peak of +2.11 dBFS is caught. The most it takes off is 8.1 dB, on a few transients; it reduces for 13.9 s of the 95.
+  - The post-filter no longer scales the bounce down.
+  - Result against the master: coda RMS −14.1 dB (master −14.1; unlimited −16.2), coda −10.1 LUFS (master −10.4). The facts bed is −22.9 dB (master −18.9: no vocals), the "zero" entry −16.2.
+  - The previous bounce is in `archive/audio/*_superseded_unlimited`.
+- **Seeds:** the "Seeds: 41 and up" line is gone from the end card (the brief's end-card list had it; the human removed it). The second credit group is now animation and edit, and human interventions. Cues and SRT rebuilt.
+- **Why:** human feedback, R1 (human interventions).

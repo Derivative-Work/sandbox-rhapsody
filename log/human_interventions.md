@@ -368,3 +368,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - "(for the next one or the final, don't stop this preview) we could probably use a "not made by or affiliated with animusic" or similar at the very end"
 - Rule R1 (direction).
+
+## 2026-10-24T08:53:43-04:00 — R1: limiter; no seeds credit
+
+- "yes, add the limiter, then also remove the "seeds" joke -- this video is far too serious for that"
+- Rule R1 (direction). The seeds line was in the brief's end-card list; the human removes it.

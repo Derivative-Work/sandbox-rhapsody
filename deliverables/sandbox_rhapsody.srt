@@ -381,8 +381,7 @@ Mastered by: music-deslop post-filter, M6f 10k, strength 1.0
 93
 00:06:37,415 --> 00:06:44,593
 Animation and edit: Claude Code with Opus 5.5
-Seeds: 41 and up
-Human interventions: 52, every one logged
+Human interventions: 53, every one logged
 
 94
 00:06:44,643 --> 00:06:50,134
