@@ -1163,3 +1163,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **The request** (human, R1): a new card preview with the limiter, to listen to.
 - **Built:** the card-section overlay rendered from S66 with the current cues (no seeds line, the Animusic card, the text pool), composited at 1080p over the existing card backdrop (fact 8 fix; S48–S55 still from set H's superseded plates), with `audio/post/cards_audio.wav` (the limited bounce) as 256 kbps AAC. 95.1 s; scratch file, not an asset.
 - **Why:** human request, R1.
+
+## 2026-10-24T09:32:38-04:00 — C6: card section approved (R1)
+
+- The human approved card-section preview v3: the stem bounce with the vocals gated until "zero" and the limiter, the music-timed fact and credit pacing, the dimmed backdrops with the text pool, and the Animusic closing card.
+- **Remaining for the section:** the 4K backdrop once set H's packs land (S48–S55), then the final assembly.
+- **Why:** human approval, R1 (human interventions).

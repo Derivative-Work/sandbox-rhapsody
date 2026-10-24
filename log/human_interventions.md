@@ -373,3 +373,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - "yes, add the limiter, then also remove the "seeds" joke -- this video is far too serious for that"
 - Rule R1 (direction). The seeds line was in the brief's end-card list; the human removes it.
+
+## 2026-10-24T09:32:38-04:00 — R1: card section approved
+
+- "end card preview is good to me" (card-section preview v3: limited bounce, fact and credit pacing, backdrops, text pool, Animusic card).
+- Rule R1 (approve).
