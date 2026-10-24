@@ -383,3 +383,18 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - Asked how shots should join given one frame of render overlap (dissolve from the cut with about a beat of extra tail rendered / hard cuts throughout / centred dissolves), the human chose "Dissolve from the cut (Recommended)".
 - Rule R1 (approve a plan).
+
+## 2026-10-24T12:58-04:00 — R1: re-run the 4K assembly at three jobs
+
+- The first 4K assembly (6 jobs) was stopped by Claude Code for low memory. The agent proposed re-running it with `--jobs 3`; the human said "go ahead with --jobs 3".
+- Rule R1 (approve a plan). The agent then found and fixed the real memory use itself (production log, "bounded memory at 4K").
+
+## 2026-10-24T14:00-04:00 — R1: thumbnail started during the final review
+
+- After the final main video and shorts were delivered: "go ahead with the thumbnail while I watch". The human is reviewing the C6 deliverables.
+- Rule R1 (approve the next step).
+
+## 2026-10-24T14:20-04:00 — R1: thumbnail chosen
+
+- Of the two thumbnails (clean, and with the title in Neuropol), the human chose: "use the one with the title".
+- Rule R1 (approve a take). `deliverables/thumbnail_title.jpg` is the thumbnail; `deliverables/thumbnail.jpg` is rejected.

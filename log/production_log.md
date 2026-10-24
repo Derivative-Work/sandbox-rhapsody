@@ -1274,3 +1274,9 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - **Found** (agent, while adding the thumbnail): `METADATA.md` still had the credit timing from before the cards were re-paced to the stem bounce. The credits chapter said 6:35 and the end-screen note said 6:35–7:20.
 - **Fixed** from `overlays/cues.json`: the credits start at 6:25 (385.49 s) and the video ends at 7:01.57. The end-screen note now names the last two centred cards, the licenses (6:50–6:55) and the Animusic disclaimer (6:55–7:01), and says to keep elements in the corners.
 - **Other chapters:** checked against the timing map. They sit on the shot cuts where each section changes on screen (for example, the opera at S30's cut, 2:35), and are unchanged.
+
+## 2026-10-24T14:15:59-04:00 — C6: thumbnail chosen (R1); human interventions brought up to date
+
+- **Thumbnail:** the human chose the titled version. The thumbnail is `deliverables/thumbnail_title.jpg`. The clean one is archived as `archive/deliverables/thumbnail_rejected_clean.jpg`. `scripts/thumbnail.py` now writes only the chosen version, and regenerates it byte for byte. `METADATA.md` updated.
+- **Human interventions:** three entries added, for the `--jobs 3` approval, the go-ahead on the thumbnail, and the thumbnail choice. The log now has 59 entries.
+- **End card:** it shows 56, counted when the overlay was rendered. Re-rendering the main overlay (about 8 min) and re-assembling the main video (about 35 min) will make it match. Deferred until the human's C6 review is done, so any further interventions are counted in the same pass.

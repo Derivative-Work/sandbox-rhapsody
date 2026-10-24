@@ -3,10 +3,11 @@
 The frame is S41's clean plate (no captions or HUD; the POV lens applied) at the second GO (song 185.5 s, frame
 11130), cropped to the letters and the sign. The letters are 22 x 8 LEDs on tiers set wider apart than the seats, so
 at thumbnail size they fall apart into rows of dots: the lit LED cores (luminance > 0.9; the unlit shells peak at
-0.6-0.8) get a warm glow stretched across the tier gap, and the unlit hall is darkened. Two versions: clean, and with
-the title in Neuropol (the title card's face).
+0.6-0.8) get a warm glow stretched across the tier gap, and the unlit hall is darkened. The title is set along the
+bottom in Neuropol (the title card's face): the human chose this over the clean frame
+(archive/deliverables/thumbnail_rejected_clean.jpg; human_interventions.md, 2026-10-24 14:20).
 
-Usage: .venv/bin/python -I scripts/thumbnail.py  ->  deliverables/thumbnail.jpg, deliverables/thumbnail_title.jpg
+Usage: .venv/bin/python -I scripts/thumbnail.py  ->  deliverables/thumbnail_title.jpg
 """
 import sys
 from pathlib import Path
@@ -42,7 +43,6 @@ def main():
     glow = np.clip(glow * 9, 0, 1)[..., None] * WARM
     out = 1 - (1 - base) * (1 - 0.75 * glow)  # screen
     img = Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8)).resize((1920, 1080), Image.LANCZOS)
-    img.save(ROOT / "deliverables/thumbnail.jpg", quality=92)
     d = ImageDraw.Draw(img)
     f = ImageFont.truetype(str(ROOT / "assets/fonts/Neuropol.otf"), 104)
     txt = "SANDBOX RHAPSODY"
@@ -52,7 +52,7 @@ def main():
     img.paste((0, 0, 0), mask=sh.filter(ImageFilter.GaussianBlur(14)))
     d.text((x, y), txt, font=f, fill=(245, 240, 230))
     img.save(ROOT / "deliverables/thumbnail_title.jpg", quality=92)
-    print("deliverables/thumbnail.jpg, deliverables/thumbnail_title.jpg (1920x1080)")
+    print("deliverables/thumbnail_title.jpg (1920x1080)")
 
 
 if __name__ == "__main__":
