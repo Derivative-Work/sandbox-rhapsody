@@ -1307,3 +1307,23 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - the main and shorts file paths (they said "not made yet");
   - the description's intervention count, 60, the log's at C6 approval, where it said "[48]";
   - the "before uploading" note, which now records that the end card keeps 56.
+
+## 2026-10-24T14:22:27-04:00 — C6 log audit
+
+- **Check** (script inline, recorded here): for every file in git (379) and in `MANIFEST.sha256` (952), at least one of the following:
+  - the production log or the interventions log names its path or file name;
+  - the logs name a folder it sits in, at least two levels deep (a mention of `renders/` alone doesn't count);
+  - a logged glob matches it.
+- **Result:** the manifest's 952 of 952 are covered (875 by folder, 38 by path, 39 by name). Git's 364 of 379 were covered. The other 15 were made and described in two C3 entries that didn't name their output files:
+  - "C3 revision 2" (2026-10-22T07:39:26, commit ff60f45):
+    - `scripts/bar_check_plot.py`: the bar-check figure, spectrogram plus beat grid plus events per track;
+    - `timing/drums_larsnet.md`: the LarsNet drum report;
+    - `timing/transcriptions/{bass,brass,guitar,keyboard,strings,synth}.{json,mid}`: Basic Pitch transcriptions of the pitched stems from `scripts/transcribe_stems.py` (12 files).
+  - "C3 revision 4" (2026-10-22T08:16:08, commit 352b0a9): `timing/drums_strikes.md`, the drum-strike report from `scripts/drums_strikes.py`.
+
+  With this entry, git is 379 of 379.
+- **Not published**, by design (`.gitignore`, absent from the manifest):
+  - the Animusic videos (`reference/inspiration/`);
+  - the reference stills (`reference/stills/`);
+  - the fact-card sources (`reference/sources/`);
+  - caches, frame sequences, venvs and node_modules.
