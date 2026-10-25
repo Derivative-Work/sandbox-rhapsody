@@ -1352,3 +1352,11 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
   - then the release link goes in the README Downloads section.
 
   This session's messages after the export aren't in the transcript archive. Re-run the export and replace that one file if they should be.
+
+## 2026-10-25T06:57:22-04:00 — Release and YouTube links added
+
+- Checked: release `v1.0` is published (not a draft), targeting `main`; the repo is public.
+- `README.md`: a new "Watch" section with the YouTube link; the Downloads section links the v1.0 release.
+- `METADATA.md`: the shorts' description link is the main video (https://www.youtube.com/watch?v=zq79yQ3164w); the before-uploading note now says so.
+- `docs/handoff.md`: what was published and where.
+- The release's transcript stays as exported (human: "email and transcript are fine as is").

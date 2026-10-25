@@ -4,7 +4,7 @@ YouTube metadata for the main video and the four vertical shorts, ready to paste
 
 **Before uploading, update:**
 - the human-intervention count in the main description (`grep -c '^## ' log/human_interventions.md`; 60 at C6 approval). The end card says 56, the count when its overlay was rendered; the human kept it (2026-10-24, C6);
-- `[main video link]` in each short's description, once the main video is up. In YouTube Studio, also set each short's **Related video** to the main video, so a tappable link shows under it.
+- each short's description now has the main video's link (https://www.youtube.com/watch?v=zq79yQ3164w, filled in 2026-10-25). In YouTube Studio, also set each short's **Related video** to the main video, so a tappable link shows under it.
 
 **The vertical cut is four shorts** (human, 2026-10-24: "Make a few shorter cuts that make sense, each under a minute. They'll all link to the main video."). The one 4:00 cut in the brief ran over YouTube's 3:00 Shorts limit. The shorts come from the square sets G–I (S30–S65), each a complete section, and each opens with the "AI-generated satire" label. Upload them in order: the opera, the cage, the bill, the benchmark.
 
@@ -130,7 +130,7 @@ Sandbox Rhapsody, AI music video, AI generated, AI satire, AI safety, sandbox es
 **Shared footer** (end of every description):
 
 ```
-Full video, facts and sources: [main video link]
+Full video, facts and sources: https://www.youtube.com/watch?v=zq79yQ3164w
 Production log, with every prompt and every human intervention: https://github.com/Derivative-Work/sandbox-rhapsody
 Music: Suno · Words: Claude · Animation and edit: Claude Code
 Video and assets CC BY-NC-SA 4.0. Satire; not affiliated with any company named.

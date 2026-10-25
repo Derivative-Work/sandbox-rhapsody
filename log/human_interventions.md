@@ -408,3 +408,13 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - The main video (2.7 GB) is over GitHub's 2 GiB release file limit. Of three options (re-assemble under 2 GiB, split into two parts, leave it out), the human chose "Re-assemble under 2 GiB (Recommended)".
 - Rule R1 (approve a plan).
+
+## 2026-10-25 — R4: release published, repo made public, main video on YouTube
+
+- The human published the draft GitHub Release (tag `v1.0` on `main`: https://github.com/Derivative-Work/sandbox-rhapsody/releases/tag/v1.0), made the repo public, and uploaded the main video to YouTube (https://www.youtube.com/watch?v=zq79yQ3164w).
+- Rule R4 (run interfaces the agent has no access to: publishing on GitHub and uploading to YouTube).
+
+## 2026-10-25 — R1: transcript and email left as is
+
+- Asked whether to redact their email from the released transcript or re-export it with the later messages: "email and transcript are fine as is".
+- Rule R1 (approve the release as it stands).

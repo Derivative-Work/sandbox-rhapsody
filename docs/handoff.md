@@ -8,6 +8,9 @@ state, and each step's entry gives its exact commands.
 
 - **All checkpoints approved (C1–C6).** The final main video, four vertical shorts, captions and thumbnail are in
   `deliverables/`; YouTube metadata is in [METADATA.md](../METADATA.md).
+- **Published 2026-10-25:** the GitHub Release
+  [v1.0](https://github.com/Derivative-Work/sandbox-rhapsody/releases/tag/v1.0), the repo made public, and the main
+  video on YouTube (https://www.youtube.com/watch?v=zq79yQ3164w).
 - **End card count:** the card says "Human interventions: 56", the count when its overlay was rendered. Entries logged
   after that (C6 approval and the decisions around it) are in the log but not on the card; the human kept it.
 - **Superseded frame packs** set aside for the human to delete (auto mode can't delete them):

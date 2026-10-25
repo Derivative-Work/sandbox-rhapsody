@@ -9,10 +9,15 @@ failures and ran tools the agent couldn't reach, and every such action is logged
 AI-generated satire about a real incident. The fact card at the end of the video lists what actually happened, with
 its sources; [docs/fact_check.md](docs/fact_check.md) checks each line against them.
 
+## Watch
+
+- **YouTube:** https://www.youtube.com/watch?v=zq79yQ3164w
+
 ## Downloads
 
-Large files stay out of git and are published as a GitHub Release (link added at publish). It holds everything
-that can't be regenerated, plus the finished videos:
+Large files stay out of git and are published as the GitHub Release
+[v1.0](https://github.com/Derivative-Work/sandbox-rhapsody/releases/tag/v1.0). It holds everything that can't be
+regenerated, plus the finished videos:
 
 - the main video (3840×2160, 7:01) and the four vertical shorts (2160×3840, each under a minute);
 - captions and the thumbnail;
