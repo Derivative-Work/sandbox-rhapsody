@@ -418,3 +418,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - Asked whether to redact their email from the released transcript or re-export it with the later messages: "email and transcript are fine as is".
 - Rule R1 (approve the release as it stands).
+
+## 2026-10-25 — R1: superseded frame packs deleted
+
+- "delete the superseded frame packs". The agent deleted them on that instruction (auto mode had earlier blocked the agent from deleting them on its own).
+- Rule R1 (approve a step). Frame sequences are never archived, by the project rules.

@@ -1360,3 +1360,10 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - `METADATA.md`: the shorts' description link is the main video (https://www.youtube.com/watch?v=zq79yQ3164w); the before-uploading note now says so.
 - `docs/handoff.md`: what was published and where.
 - The release's transcript stays as exported (human: "email and transcript are fine as is").
+
+## 2026-10-25T07:14:03-04:00 — Superseded frame packs deleted
+
+- On the human's instruction, deleted the 23 `renders/c5/set_*/frames_superseded_*` folders: lossless FFV1 packs (`.mkv`, `.start`, `.plate.json`) and PNG frame folders from renders replaced in C5. 172 GB freed (48 GB → 220 GB available).
+- None were in git or `MANIFEST.sha256`, so the manifest is unchanged. They regenerate from the commits that rendered them.
+- Kept: the 12 `anchors_superseded_*` folders of superseded test stills (about 1 GB, 82 manifest entries), since they're hashed assets, not frame packs.
+- `docs/handoff.md` updated.
