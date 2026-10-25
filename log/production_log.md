@@ -1367,3 +1367,4 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - None were in git or `MANIFEST.sha256`, so the manifest is unchanged. They regenerate from the commits that rendered them.
 - Kept: the 12 `anchors_superseded_*` folders of superseded test stills (about 1 GB, 82 manifest entries), since they're hashed assets, not frame packs.
 - `docs/handoff.md` updated.
+- Correction: the kept anchor folders have 79 manifest entries, not 82.
