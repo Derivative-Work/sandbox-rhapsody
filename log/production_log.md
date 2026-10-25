@@ -1368,3 +1368,10 @@ The human found missing eighth-note chords and snares (bars 58, 62) and inconsis
 - Kept: the 12 `anchors_superseded_*` folders of superseded test stills (about 1 GB, 82 manifest entries), since they're hashed assets, not frame packs.
 - `docs/handoff.md` updated.
 - Correction: the kept anchor folders have 79 manifest entries, not 82.
+
+## 2026-10-25T07:16:52-04:00 — Superseded anchor stills deleted
+
+- On the human's instruction, deleted the 12 `renders/c5/set_*/anchors_superseded_*` folders: 79 PNG test stills from renders replaced in C5, 950 MB. None were in git. They regenerate from the commits that rendered them.
+- `scripts/manifest.sh`: 1,029 → 950 files, the 79 stills removed.
+- One other manifest change: `renders/c6_release_psnr.log` has a new hash. The manifest of 2026-10-24T15:15 was taken while the PSNR run was still writing it; the file is now complete (all 25,294 frames) and unchanged since 15:02 that day.
+- `docs/handoff.md` updated.

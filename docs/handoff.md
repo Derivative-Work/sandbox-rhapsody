@@ -14,8 +14,8 @@ state, and each step's entry gives its exact commands.
 - **End card count:** the card says "Human interventions: 56", the count when its overlay was rendered. Entries logged
   after that (C6 approval and the decisions around it) are in the log but not on the card; the human kept it.
 - **Superseded frame packs** (`renders/c5/set_*/frames_superseded_*`, 172 GB) were deleted at the human's request
-  on 2026-10-25. They regenerate from earlier commits and were never in the manifest. The superseded anchor stills
-  (`anchors_superseded_*`) are kept and hashed in the manifest.
+  on 2026-10-25, then the superseded anchor stills (`anchors_superseded_*`, 950 MB). They regenerate from earlier
+  commits.
 
 ## 2. Setup
 

@@ -423,3 +423,8 @@ Every human action: timestamp, what, why, and which production rule allows it. R
 
 - "delete the superseded frame packs". The agent deleted them on that instruction (auto mode had earlier blocked the agent from deleting them on its own).
 - Rule R1 (approve a step). Frame sequences are never archived, by the project rules.
+
+## 2026-10-25 — R1: superseded anchor stills deleted
+
+- "delete the anchors too". The agent deleted them on that instruction.
+- Rule R1 (approve a step).
